@@ -1,0 +1,11 @@
+
+syntax: regexp
+^\.mule$
+syntax: regexp
+^\.settings$
+syntax: regexp
+^\.classpath$
+syntax: regexp
+^target$
+syntax: regexp
+^bin$

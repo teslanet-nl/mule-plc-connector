@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+#%L
+  Mule PLC Connector Test Utilities
+  %%
+  Copyright (C) 2021 (teslanet.nl) Rogier Cobben
+  
+  Contributors:
+      (teslanet.nl) Rogier Cobben - initial creation
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+-->
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:plc="http://www.teslanet.nl/schema/mule/plc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd">
+
+
+	<plc:config name="PLC_Config">
+		<plc:connection connectionUri="simulated:plc" />
+	</plc:config>
+	<flow name="basic-ping">
+		<plc:ping doc:name="Ping" config-ref="PLC_Config" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" />
+	</flow>
+	<flow name="basic-read">
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<reconnect-forever />
+			<plc:write-items>
+				<plc:write-item alias="coil1"
+					address="STATE/coil1:BOOL[1]" values="#[ [ true ] ]" />
+				<plc:write-item alias="reg1"
+					address="STATE/register1:INT[1]" values="#[[ '6789' ]]" />
+			</plc:write-items>
+		</plc:write>
+        <logger level="INFO" doc:name="Logger" message="#[payload]" />
+		<plc:read doc:name="Read" config-ref="PLC_Config">
+			<reconnect-forever />
+			<!-- <reconnect count="5" frequency="3000" /> -->
+
+			<plc:read-items>
+				<plc:read-item alias="coil1"
+					address="STATE/coil1:BOOL[1]" />
+				<plc:read-item alias="reg1"
+					address="STATE/register1:INT[1]" />
+			</plc:read-items>
+		</plc:read>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="INFO" doc:name="Logger" message="#[payload]" />
+	</flow>
+	<flow name="basic-write">
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<reconnect-forever />
+			<plc:write-items>
+				<plc:write-item alias="coil3"
+					address="STATE/coil3:BOOL[1]" values="#[ [ true ] ]" />
+				<plc:write-item alias="coil4"
+					address="STATE/coil4:BOOL[1]" values="#[ [ true ] ]" />
+				<plc:write-item alias="reg3"
+					address="STATE/register3:INT[2]" values="#[[ '22', '33' ]]" />
+			</plc:write-items>
+		</plc:write>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="INFO" doc:name="Logger" message="#[payload]" />
+	</flow>
+
+</mule>
