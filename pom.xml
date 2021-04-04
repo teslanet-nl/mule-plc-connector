@@ -69,8 +69,8 @@ L%
 
 	<scm>
 		<connection>scm:git:https://github.com/teslanet-nl/mule-plc-connector.git</connection>
-		<developerConnection>scm:git:https://github.com/teslanet-nl/mule-coap-connector.git</developerConnection>
-		<url>http://github.com/teslanet-nl/mule-coap-connector/tree/master</url>
+		<developerConnection>scm:git:https://github.com/teslanet-nl/mule-plc-connector.git</developerConnection>
+		<url>http://github.com/teslanet-nl/mule-plc-connector/tree/master</url>
 		<tag>HEAD</tag>
 	</scm>
 
