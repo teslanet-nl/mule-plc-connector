@@ -38,7 +38,7 @@ L%
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>mule-extension</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
-	<description>Mule extension that provides for communication with PLC's.</description>
+	<description>Mule extension that enables Mule-applications to communicate with PLC systems.</description>
 	<url>http://www.teslanet.nl</url>
 	<organization>
 		<name>Teslanet.nl</name>

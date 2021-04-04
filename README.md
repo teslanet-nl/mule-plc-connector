@@ -1,7 +1,7 @@
 # Mule PLC Extension
 --------------------
 
-Mule extension that adds capabilities to Mule-applications to communicate with PLC systems.
+Mule extension that enables Mule-applications to communicate with PLC systems.
 
 Different PLC protocols will be supported:
 - AB-ETH
