@@ -74,7 +74,7 @@ public class MulePlcOperations
         }
         catch ( ConnectionException | InterruptedException | ExecutionException e )
         {
-            //TODO better to throw when not supprted.
+            //TODO better to throw when not supported.
             return Boolean.FALSE;
         }
         return Boolean.TRUE;

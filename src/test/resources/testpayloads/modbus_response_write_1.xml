@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<plcWriteResponse>
+	<field alias="coil1" count="1" responseCode="OK"
+		type="IEC61131_BOOL">
+		<value>true</value>
+	</field>
+</plcWriteResponse>

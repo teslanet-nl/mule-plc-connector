@@ -67,7 +67,7 @@ public class MulePlcMockOperationsTest extends AbstractPlcTestCase
 
         String payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
         assertNotNull( payloadValue );
-        Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/read_response_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/read_response_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
@@ -75,21 +75,10 @@ public class MulePlcMockOperationsTest extends AbstractPlcTestCase
     public void executeWriteOperation() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-write" ).run().getMessage().getPayload().getValue();
-        Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/write_response_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/write_response_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
         payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
         assertNotNull( payloadValue );
     }
 
-    /**
-     * Read resource as string.
-     *
-     * @param resourcePath the resource path
-     * @return the string
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private String readResourceAsString( String resourcePath ) throws IOException
-    {
-        return IOUtils.getResourceAsString( resourcePath, this.getClass() );
-    }
 }

@@ -1,26 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-#%L
-  Mule PLC Connector Test Utilities
-  %%
-  Copyright (C) 2021 (teslanet.nl) Rogier Cobben
-  
-  Contributors:
-      (teslanet.nl) Rogier Cobben - initial creation
-  %%
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-  
-       http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-  #L%
--->
+<!-- #%L Mule PLC Connector Test Utilities %% Copyright (C) 2021 (teslanet.nl) 
+	Rogier Cobben Contributors: (teslanet.nl) Rogier Cobben - initial creation 
+	%% Licensed under the Apache License, Version 2.0 (the "License"); you may 
+	not use this file except in compliance with the License. You may obtain a 
+	copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless 
+	required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. 
+	#L% -->
 <mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
@@ -32,34 +20,65 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 
 	<plc:config name="PLC_Config">
 		<plc:connection
-			connectionUri="modbus:tcp://127.0.0.1:5502" />
+			connectionUri="modbus:tcp://192.168.66.1:502" />
 	</plc:config>
+
 	<flow name="basic-ping">
 		<plc:ping doc:name="Ping" config-ref="PLC_Config" />
 		<logger level="INFO" doc:name="Logger" />
 	</flow>
+
 	<flow name="basic-read">
 		<plc:read doc:name="Read" config-ref="PLC_Config">
-            <reconnect-forever />
-			<!-- <reconnect count="5" frequency="3000" />-->
+			<reconnect-forever />
+			<!-- <reconnect count="5" frequency="3000" /> -->
 			<plc:read-items>
-				<plc:read-item alias="coil1" address="coil:2" />
-				<plc:read-item alias="reg1" address="holding-register:1[2]" />
+				<plc:read-item alias="digital-input1" address="coil:1" />
 			</plc:read-items>
 		</plc:read>
 		<set-payload value="#[payload.^raw as String]"
 			doc:name="Set Payload" />
 		<logger level="INFO" doc:name="Logger" message="#[payload]" />
 	</flow>
-	<flow name="basic-write">
+
+	<flow name="basic-write-true">
 		<plc:write doc:name="Write" config-ref="PLC_Config">
 			<plc:write-items>
-				<plc:write-item alias="coil3" address="coil:3"
+				<plc:write-item alias="coil1" address="coil:1"
 					values="#[ [ true ] ]" />
-				<plc:write-item alias="coil4" address="coil:4"
-					values="#[ [ true ] ]" />
-				<plc:write-item alias="reg3"
-					address="holding-register:3[2]" values="#[[ '22', '33' ]]" />
+				<!-- <plc:write-item alias="coil4" address="coil:4" values="#[ [ true 
+					] ]" /> <plc:write-item alias="reg3" address="holding-register:3[2]" values="#[[ 
+					'22', '33' ]]" /> -->
+			</plc:write-items>
+		</plc:write>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="INFO" doc:name="Logger" message="#[payload]" />
+	</flow>
+	
+    <flow name="basic-write-false">
+        <plc:write doc:name="Write" config-ref="PLC_Config">
+            <plc:write-items>
+                <plc:write-item alias="coil1" address="coil:1"
+                    values="#[ [ false ] ]" />
+                <!-- <plc:write-item alias="coil4" address="coil:4" values="#[ [ true 
+                    ] ]" /> <plc:write-item alias="reg3" address="holding-register:3[2]" values="#[[ 
+                    '22', '33' ]]" /> -->
+            </plc:write-items>
+        </plc:write>
+        <set-payload value="#[payload.^raw as String]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" />
+    </flow>
+
+	<flow name="basic-write-watchdog">
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<plc:write-items>
+				<plc:write-item alias="watchdog-register"
+					address="holding-register:4384" values="#[ [ 0 ] ]" />
+				<!-- <plc:write-item alias="coil4" address="coil:4" values="#[ [ true 
+					] ]" /> <plc:write-item alias="reg3" address="holding-register:3[2]" values="#[[ 
+					'22', '33' ]]" /> -->
 			</plc:write-items>
 		</plc:write>
 		<set-payload value="#[payload.^raw as String]"
@@ -67,4 +86,28 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 		<logger level="INFO" doc:name="Logger" message="#[payload]" />
 	</flow>
 
+	<flow name="basic-write-watchdog-reset1">
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<plc:write-items>
+				<plc:write-item alias="watchdog-register-reset"
+					address="holding-register:4386" values="#[ [ -16689 ] ]" />
+			</plc:write-items>
+		</plc:write>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="INFO" doc:name="Logger" message="#[payload]" />
+	</flow>
+
+	<flow name="basic-write-watchdog-reset2">
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<plc:write-items>
+				<plc:write-item alias="watchdog-register-reset"
+					address="holding-register:4386" values="#[ [ -20482 ] ]" />
+			</plc:write-items>
+		</plc:write>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="INFO" doc:name="Logger" message="#[payload]" />
+	</flow>
 </mule>
+
