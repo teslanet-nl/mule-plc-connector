@@ -26,11 +26,8 @@ package nl.teslanet.mule.connectors.plc.test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.IOException;
-
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.junit.Test;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.builder.DiffBuilder;
