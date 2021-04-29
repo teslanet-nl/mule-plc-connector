@@ -143,6 +143,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
+    @Ignore
     @Test
     public void executeWriteWatchdogReset() throws Exception
     {

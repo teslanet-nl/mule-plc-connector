@@ -59,7 +59,6 @@ limitations under the License.
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
           </xs:sequence>
           <xs:attribute type="mule:expressionString" use="required" name="connectionUri">
             <xs:annotation>
