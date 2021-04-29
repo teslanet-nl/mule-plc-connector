@@ -55,30 +55,24 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 			doc:name="Set Payload" />
 		<logger level="INFO" doc:name="Logger" message="#[payload]" />
 	</flow>
-	
-    <flow name="basic-write-false">
-        <plc:write doc:name="Write" config-ref="PLC_Config">
-            <plc:write-items>
-                <plc:write-item alias="coil1" address="coil:1"
-                    values="#[ [ false ] ]" />
-                <!-- <plc:write-item alias="coil4" address="coil:4" values="#[ [ true 
-                    ] ]" /> <plc:write-item alias="reg3" address="holding-register:3[2]" values="#[[ 
-                    '22', '33' ]]" /> -->
-            </plc:write-items>
-        </plc:write>
-        <set-payload value="#[payload.^raw as String]"
-            doc:name="Set Payload" />
-        <logger level="INFO" doc:name="Logger" message="#[payload]" />
-    </flow>
+
+	<flow name="basic-write-false">
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<plc:write-items>
+				<plc:write-item alias="coil1" address="coil:1"
+					values="#[ [ false ] ]" />
+			</plc:write-items>
+		</plc:write>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="INFO" doc:name="Logger" message="#[payload]" />
+	</flow>
 
 	<flow name="basic-write-watchdog">
 		<plc:write doc:name="Write" config-ref="PLC_Config">
 			<plc:write-items>
 				<plc:write-item alias="watchdog-register"
 					address="holding-register:4384" values="#[ [ 0 ] ]" />
-				<!-- <plc:write-item alias="coil4" address="coil:4" values="#[ [ true 
-					] ]" /> <plc:write-item alias="reg3" address="holding-register:3[2]" values="#[[ 
-					'22', '33' ]]" /> -->
 			</plc:write-items>
 		</plc:write>
 		<set-payload value="#[payload.^raw as String]"
@@ -108,6 +102,135 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 		<set-payload value="#[payload.^raw as String]"
 			doc:name="Set Payload" />
 		<logger level="INFO" doc:name="Logger" message="#[payload]" />
+	</flow>
+
+	<flow name="parallel-write"
+		doc:id="81f91df4-32a2-490d-a9d6-2cf75bce24de">
+		<async doc:name="Async"
+			doc:id="2b725296-550b-4b2b-b07f-75a53b5d86a6">
+			<plc:write doc:name="Write" config-ref="PLC_Config">
+				<plc:write-items>
+					<plc:write-item alias="coil1" address="coil:1"
+						values="#[ [ true ] ]" />
+				</plc:write-items>
+			</plc:write>
+			<set-payload value="#[payload.^raw as String]"
+				doc:name="Set Payload" />
+			<logger level="WARN" doc:name="Logger"
+				doc:id="0e307f1d-87d0-46cb-a691-536c9576e65f" message="#[payload]" />
+		</async>
+		<async doc:name="Async"
+			doc:id="bf85d643-8d10-49af-a853-af023027f5d1">
+			<plc:write doc:name="Write" config-ref="PLC_Config">
+				<plc:write-items>
+					<plc:write-item alias="coil2" address="coil:2"
+						values="#[ [ true ] ]" />
+				</plc:write-items>
+			</plc:write>
+			<set-payload value="#[payload.^raw as String]"
+				doc:name="Set Payload" />
+			<logger level="WARN" doc:name="Logger"
+				doc:id="883c82a1-5aa4-46d1-a281-63aa33278317" message="#[payload]" />
+		</async>
+		<async doc:name="Async"
+			doc:id="eb5f652c-e5aa-4994-808b-19148978a75c">
+			<plc:write doc:name="Write" config-ref="PLC_Config">
+				<plc:write-items>
+					<plc:write-item alias="coil3" address="coil:3"
+						values="#[ [ true ] ]" />
+				</plc:write-items>
+			</plc:write>
+			<set-payload value="#[payload.^raw as String]"
+				doc:name="Set Payload" />
+			<logger level="WARN" doc:name="Logger"
+				doc:id="6cf9401c-ab91-4866-a923-95b4a20d82f9" message="#[payload]" />
+		</async>
+
+		<async doc:name="Async"
+			doc:id="2d31d861-ff6c-49c0-920f-81776ba043b9">
+			<plc:write doc:name="Write" config-ref="PLC_Config">
+				<plc:write-items>
+					<plc:write-item alias="coil4" address="coil:4"
+						values="#[ [ true ] ]" />
+				</plc:write-items>
+			</plc:write>
+			<set-payload value="#[payload.^raw as String]"
+				doc:name="Set Payload" />
+			<logger level="WARN" doc:name="Logger"
+				doc:id="0ebc4383-2028-4a4a-a088-2041f75207da" message="#[payload]" />
+		</async>
+		<async doc:name="Async"
+			doc:id="1635bb6f-5010-4fcd-93a3-3b6bdda621d2">
+			<plc:write doc:name="Write" config-ref="PLC_Config">
+				<plc:write-items>
+					<plc:write-item alias="coil5" address="coil:5"
+						values="#[ [ true ] ]" />
+				</plc:write-items>
+			</plc:write>
+			<set-payload value="#[payload.^raw as String]"
+				doc:name="Set Payload" />
+			<logger level="WARN" doc:name="Logger"
+				doc:id="9a1cb789-a1f3-4567-9d51-3eccb4425be8" message="#[payload]" />
+		</async>
+	</flow>
+	<flow name="sequential-write"
+		doc:id="999022d6-6538-4095-b89b-b35184eb65c5">
+
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<plc:write-items>
+				<plc:write-item alias="coil1" address="coil:1"
+					values="#[ [ true ] ]" />
+			</plc:write-items>
+		</plc:write>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="WARN" doc:name="Logger"
+			doc:id="ef79616f-6272-4b6a-8be5-7c5bbea30d1e" message="#[payload]" />
+
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<plc:write-items>
+				<plc:write-item alias="coil2" address="coil:2"
+					values="#[ [ true ] ]" />
+			</plc:write-items>
+		</plc:write>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="WARN" doc:name="Logger"
+			doc:id="7e6abc72-9fc6-4a5b-a02a-e68e52dd7953" message="#[payload]" />
+
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<plc:write-items>
+				<plc:write-item alias="coil3" address="coil:3"
+					values="#[ [ true ] ]" />
+			</plc:write-items>
+		</plc:write>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="WARN" doc:name="Logger"
+			doc:id="d871fe52-968b-4cff-bc85-8eacdd4b22b5" message="#[payload]" />
+
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<plc:write-items>
+				<plc:write-item alias="coil4" address="coil:4"
+					values="#[ [ true ] ]" />
+			</plc:write-items>
+		</plc:write>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="WARN" doc:name="Logger"
+			doc:id="64fe2608-5e33-454f-9902-fb0c3dfcf95a" message="#[payload]" />
+
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+			<plc:write-items>
+				<plc:write-item alias="coil5" address="coil:5"
+					values="#[ [ true ] ]" />
+			</plc:write-items>
+		</plc:write>
+		<set-payload value="#[payload.^raw as String]"
+			doc:name="Set Payload" />
+		<logger level="WARN" doc:name="Logger"
+			doc:id="baf38c40-1517-4fbb-a1fd-71103de5c760" message="#[payload]" />
+
 	</flow>
 </mule>
 

@@ -23,9 +23,13 @@
 package nl.teslanet.mule.connectors.plc.test;
 
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -62,7 +66,8 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
     {
         String payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
         LOGGER.info( payloadValue );
-        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_read_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_read_1.xml" ) ).withTest(
+            payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
@@ -133,10 +138,11 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
     {
         String payloadValue= (String) flowRunner( "basic-write" ).run().getMessage().getPayload().getValue();
         LOGGER.info( payloadValue );
-        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest(
+            payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
-    
+
     @Test
     public void executeWriteWatchdogReset() throws Exception
     {
@@ -146,8 +152,53 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         LOGGER.info( payloadValue );
         payloadValue= (String) flowRunner( "basic-write-true" ).run().getMessage().getPayload().getValue();
         LOGGER.info( payloadValue );
-        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest(
+            payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
+    }
+
+    @Ignore
+    @Test
+    public void executeParallelWriteOperation() throws Exception
+    {
+        String payloadValue= (String) flowRunner( "basic-write-watchdog-reset1" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        payloadValue= (String) flowRunner( "basic-write-watchdog-reset2" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        payloadValue= (String) flowRunner( "parallel-write" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        try
+        {
+            await().atMost( 1, TimeUnit.SECONDS ).untilTrue( new AtomicBoolean( false ) );
+        }
+        catch ( Exception e )
+        {
+        }
+
+        //Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        //assertFalse( diff.toString(), diff.hasDifferences() );
+    }
+    
+    @Ignore
+    @Test
+    public void executeSequentialWriteOperation() throws Exception
+    {
+        String payloadValue= (String) flowRunner( "basic-write-watchdog-reset1" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        payloadValue= (String) flowRunner( "basic-write-watchdog-reset2" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        payloadValue= (String) flowRunner( "sequential-write" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        try
+        {
+            //await().atMost( 10, TimeUnit.SECONDS ).untilTrue( new AtomicBoolean( false ) );
+        }
+        catch ( Exception e )
+        {
+        }
+
+        //Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        //assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
 }

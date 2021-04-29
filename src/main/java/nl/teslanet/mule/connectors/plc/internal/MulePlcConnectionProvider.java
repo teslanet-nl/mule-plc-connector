@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * caches connections or simply {@link ConnectionProvider} if you want a new connection each time something requires one.
  */
 @Alias("connection")
-public class MulePlcConnectionProvider implements PoolingConnectionProvider< MulePlcConnection >
+public class MulePlcConnectionProvider implements CachedConnectionProvider< MulePlcConnection >
 {
     /**
      * The logger of the class.
