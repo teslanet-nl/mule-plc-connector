@@ -23,8 +23,17 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import org.apache.plc4x.java.api.PlcConnection;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.apache.plc4x.java.api.messages.PlcReadResponse;
+import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.mule.runtime.api.connection.ConnectionException;
+
+import nl.teslanet.mule.connectors.plc.api.ReadItem;
+import nl.teslanet.mule.connectors.plc.api.WriteItem;
 
 
 /**
@@ -33,12 +42,6 @@ import org.mule.runtime.api.connection.ConnectionException;
  */
 public interface MulePlcConnection
 {
-    /**
-     * @return the plcConnection
-     * @throws ConnectionException 
-     */
-    public PlcConnection getPlcConnection() throws ConnectionException;
-
     /**
     * Close the connection.
     * @throws Exception 
@@ -50,4 +53,51 @@ public interface MulePlcConnection
      * @throws ConnectionException 
      */
     public void connect() throws ConnectionException;
+
+    /**
+     * @return {@code true}connection is active
+     */
+    public boolean isConnected();
+
+    /**
+     * Ping the PLC using this connection.
+     * @return {@code true} when the PLC is reachable, otherwise {@code false}
+     */
+    public Boolean ping();
+
+    /**
+     * @return {@code true} when the connection can be used to read, otherwise {@code false}.
+     */
+    public boolean canRead();
+
+    /**
+     * Read items from PLC using this connection.
+     * @param items to read.
+     * @param timeout Read response must be received within the timout.
+     * @param timeUnit Unit of the timeout parameter.
+     * @return the read response
+     * @throws TimeoutException when timeOut occurs before the response is received.
+     * @throws ExecutionException When the read could not be executed.
+     * @throws InterruptedException When the read operation is interrupted.
+     * @throws ConnectionException when connection failed.
+     */
+    public PlcReadResponse read( List< ReadItem > items, long timeout, TimeUnit timeUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException;
+
+    /**
+     * @return {@code true} when the connection can be used to write, otherwise {@code false}.
+     */
+    public boolean canWrite();
+
+    /**
+      * Read items from PLC using this connection.
+     * @param items to write.
+     * @param timeout Read response must be received within the timout.
+     * @param timeoutUnit Unit of the timeout parameter.
+     * @return the write response.
+    * @throws TimeoutException when timeOut occurs before the response is received.
+     * @throws ExecutionException When the write could not be executed.
+     * @throws InterruptedException When the write operation is interrupted.
+     * @throws ConnectionException when connection failed.
+     */
+    public PlcWriteResponse write( List< WriteItem > items, long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException;
 }

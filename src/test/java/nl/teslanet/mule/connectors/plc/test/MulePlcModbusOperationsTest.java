@@ -160,6 +160,38 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
 
     @Ignore
     @Test
+    public void executeWriteAfterWatchdog() throws Exception
+    {
+        String payloadValue= (String) flowRunner( "basic-write-watchdog-reset1" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        payloadValue= (String) flowRunner( "basic-write-watchdog-reset2" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        payloadValue= (String) flowRunner( "basic-write-true" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest(
+            payloadValue ).ignoreComments().ignoreWhitespace().build();
+        assertFalse( diff.toString(), diff.hasDifferences() );
+        try
+        {
+            await().atMost( 10, TimeUnit.SECONDS ).untilTrue( new AtomicBoolean( false ) );
+        }
+        catch ( Exception e )
+        {
+        }
+        payloadValue= (String) flowRunner( "basic-write-watchdog-reset1" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        payloadValue= (String) flowRunner( "basic-write-watchdog-reset2" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        payloadValue= (String) flowRunner( "basic-write-false" ).run().getMessage().getPayload().getValue();
+        LOGGER.info( payloadValue );
+        diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_2.xml" ) ).withTest(
+            payloadValue ).ignoreComments().ignoreWhitespace().build();
+        assertFalse( diff.toString(), diff.hasDifferences() );
+        
+    }
+    
+    @Ignore
+    @Test
     public void executeParallelWriteOperation() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-write-watchdog-reset1" ).run().getMessage().getPayload().getValue();

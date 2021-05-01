@@ -26,17 +26,13 @@ package nl.teslanet.mule.connectors.plc.internal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.concurrent.ExecutionException;
 
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.plc4x.java.api.PlcConnection;
-import org.apache.plc4x.java.api.messages.PlcReadRequest;
-import org.apache.plc4x.java.api.messages.PlcWriteRequest;
-import org.apache.plc4x.java.spi.messages.DefaultPlcReadResponse;
-import org.apache.plc4x.java.spi.messages.DefaultPlcWriteResponse;
+import org.apache.plc4x.java.api.messages.PlcReadResponse;
+import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -47,10 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import nl.teslanet.mule.connectors.plc.api.ReadItem;
 import nl.teslanet.mule.connectors.plc.api.ReadRequestBuilder;
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
-import nl.teslanet.mule.connectors.plc.api.WriteItem;
 import nl.teslanet.mule.connectors.plc.api.WriteRequestBuilder;
 import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer;
 
@@ -68,16 +62,7 @@ public class MulePlcOperations
     @MediaType(value= MediaType.ANY, strict= false)
     public Boolean ping( @Config MulePlcConfig configuration, @Connection MulePlcConnection connection )
     {
-        try
-        {
-            connection.getPlcConnection().ping().get();
-        }
-        catch ( ConnectionException | InterruptedException | ExecutionException e )
-        {
-            //TODO better to throw when not supported.
-            return Boolean.FALSE;
-        }
-        return Boolean.TRUE;
+        return connection.ping();
     }
 
     /**
@@ -88,25 +73,19 @@ public class MulePlcOperations
     public Result< InputStream, ReceivedResponseAttributes > read(
         @Config MulePlcConfig configuration,
         @Connection MulePlcConnection connection,
-        @ParameterGroup(name= "Request") ReadRequestBuilder readRequestBuilder ) throws Exception
+        @ParameterGroup(name= "Request") ReadRequestBuilder requestBuilder ) throws Exception
     {
-        PlcConnection plcConnection= connection.getPlcConnection();
         // Check if this connection support reading of data.
-        if ( !plcConnection.getMetadata().canRead() )
+        if ( !connection.canRead() )
         {
             //TODO
             LOGGER.error( "This connection doesn't support reading." );
             throw new Exception( "This connection doesn't support reading." );
         }
-        PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
-        for ( ReadItem item : readRequestBuilder.getItems() )
-        {
-            builder.addItem( item.getAlias(), item.getAddress() );
-        }
-        DefaultPlcReadResponse response= null;
+        PlcReadResponse response= null;
         try
         {
-            response= (DefaultPlcReadResponse) builder.build().execute().get( configuration.getTimeout(), configuration.getTimeoutUnits() );
+            response= connection.read( requestBuilder.getItems(), configuration.getTimeout(), configuration.getTimeoutUnits() );
         }
         catch ( Exception e )
         {
@@ -137,22 +116,16 @@ public class MulePlcOperations
         @Connection MulePlcConnection connection,
         @ParameterGroup(name= "Request") WriteRequestBuilder requestBuilder ) throws Exception
     {
-        PlcConnection plcConnection= connection.getPlcConnection();
         // Check if this connection support reading of data.
-        if ( !plcConnection.getMetadata().canWrite() )
+        if ( !connection.canWrite() )
         {
             LOGGER.error( "This connection doesn't support writing." );
             throw new Exception( "This connection doesn't support writing." );
         }
-        PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();
-        for ( WriteItem item : requestBuilder.getWriteItems() )
-        {
-            builder.addItem( item.getAlias(), item.getAddress(), item.getValues().toArray() );
-        }
-        DefaultPlcWriteResponse response= null;
+        PlcWriteResponse response= null;
         try
         {
-            response= (DefaultPlcWriteResponse) builder.build().execute().get( configuration.getTimeout(), configuration.getTimeoutUnits() );
+            response= connection.write( requestBuilder.getWriteItems(), configuration.getTimeout(), configuration.getTimeoutUnits() );
         }
         catch ( Exception e )
         {

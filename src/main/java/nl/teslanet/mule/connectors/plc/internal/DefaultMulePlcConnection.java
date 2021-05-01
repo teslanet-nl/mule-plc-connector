@@ -23,11 +23,23 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
+import org.apache.plc4x.java.api.messages.PlcReadRequest;
+import org.apache.plc4x.java.api.messages.PlcReadResponse;
+import org.apache.plc4x.java.api.messages.PlcWriteRequest;
+import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.teslanet.mule.connectors.plc.api.ReadItem;
+import nl.teslanet.mule.connectors.plc.api.WriteItem;
 
 
 /**
@@ -56,29 +68,14 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         LOGGER.info( "connection created { " + this + " }" );
     }
 
-    /**
-     * @return the plcConnection
-     * @throws ConnectionException 
-     */
     @Override
-    public PlcConnection getPlcConnection() throws ConnectionException
-    {
-        connect();
-        return plcConnection;
-    }
-
-    /**
-     * Close the connection.
-     * @throws Exception 
-     */
-    @Override
-    public void close() throws Exception
+    public synchronized void close() throws Exception
     {
         if ( plcConnection.isConnected() ) plcConnection.close();
     }
 
     @Override
-    public void connect() throws ConnectionException
+    public synchronized void connect() throws ConnectionException
     {
         if ( !plcConnection.isConnected() )
         {
@@ -96,5 +93,69 @@ public class DefaultMulePlcConnection implements MulePlcConnection
                 throw new ConnectionException( "Error on connection { " + this + " }" );
             }
         }
+    }
+
+    @Override
+    public boolean isConnected()
+    {
+        try
+        {
+            connect();
+        }
+        catch ( ConnectionException e1 )
+        {
+        } ;
+
+        return plcConnection.isConnected();
+    }
+
+    @Override
+    public synchronized Boolean ping()
+    {
+        try
+        {
+            plcConnection.ping().get();
+        }
+        catch ( InterruptedException | ExecutionException e )
+        {
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public boolean canRead()
+    {
+        return plcConnection.getMetadata().canRead();
+    }
+
+    @Override
+    public synchronized PlcReadResponse read( List< ReadItem > items, long timeout, TimeUnit timeOutUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException
+    {
+        connect();
+        PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
+        for ( ReadItem item : items )
+        {
+            builder.addItem( item.getAlias(), item.getAddress() );
+        }
+        return builder.build().execute().get( timeout, timeOutUnit );
+    }
+
+    @Override
+    public boolean canWrite()
+    {
+        return plcConnection.getMetadata().canWrite();
+    }
+
+    @Override
+    public synchronized PlcWriteResponse write( List< WriteItem > items, long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException
+    {
+        connect();
+        PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();
+        for ( WriteItem item : items )
+        {
+            builder.addItem( item.getAlias(), item.getAddress(), item.getValues().toArray() );
+        }
+        return builder.build().execute().get( timeout, timeoutUnit );
     }
 }
