@@ -79,6 +79,19 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
+    @Test
+    public void executeWriteAndReadOperation() throws Exception
+    {
+        String payloadWriteValue= (String) flowRunner( "basic-write" ).run().getMessage().getPayload().getValue();
+        Diff writeDiff= DiffBuilder.compare( payloadWriteValue ).withTest( readResourceAsString( "testpayloads/write_response_1.xml" ) ).ignoreComments().ignoreWhitespace().build();
+        assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
+
+        String payloadReadValue= (String) flowRunner( "basic-readback" ).run().getMessage().getPayload().getValue();
+        assertNotNull( payloadReadValue );
+        Diff readDiff= DiffBuilder.compare( payloadReadValue ).withTest( readResourceAsString( "testpayloads/readback_response_1.xml" ) ).ignoreComments().ignoreWhitespace().build();
+        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+    }
+
     /**
      * Read resource as string.
      *

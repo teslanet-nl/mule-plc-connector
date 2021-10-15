@@ -80,5 +80,20 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 			doc:name="Set Payload" />
 		<logger level="INFO" doc:name="Logger" message="#[payload]" />
 	</flow>
+    <flow name="basic-readback">
+        <plc:read doc:name="Read" config-ref="PLC_Config">
+            <plc:read-items>
+                <plc:read-item alias="coil3"
+                    address="STATE/coil3:BOOL[1]" />
+                <plc:read-item alias="coil4"
+                    address="STATE/coil4:BOOL[1]" />
+                <plc:read-item alias="reg3"
+                    address="STATE/register3:INT[2]" />
+            </plc:read-items>
+        </plc:read>
+        <set-payload value="#[payload.^raw as String]"
+            doc:name="Set Payload" />
+        <logger level="WARN" doc:name="Logger" message="#[payload]" />
+    </flow>
 
 </mule>
