@@ -23,11 +23,9 @@
 package nl.teslanet.mule.connectors.plc.test;
 
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 
@@ -40,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;
-import java.lang.invoke.CallSite;
 
 
 public class MulePlcOperationsTest extends AbstractPlcTestCase

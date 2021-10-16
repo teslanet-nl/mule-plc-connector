@@ -63,7 +63,7 @@ public class MockedMulePlcConnection extends DefaultMulePlcConnection
      * @throws ConnectionException 
      */
     @Override
-    public void connect() throws ConnectionException
+    public synchronized void connect() throws ConnectionException
     {
         if ( !plcConnection.isConnected() )
         {
@@ -81,7 +81,7 @@ public class MockedMulePlcConnection extends DefaultMulePlcConnection
      * @throws Exception 
      */
     @Override
-    public void close() throws Exception
+    public synchronized void close() throws Exception
     {
         if ( plcConnection.isConnected() )
         {

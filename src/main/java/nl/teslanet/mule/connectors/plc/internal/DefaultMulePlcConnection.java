@@ -68,6 +68,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         LOGGER.info( "connection created { " + this + " }" );
     }
 
+    /**
+     * Close the plc connection.
+     */
     @Override
     public synchronized void close() throws Exception
     {
