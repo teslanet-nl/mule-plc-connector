@@ -34,53 +34,60 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 	<plc:config name="PLC_Config">
 		<plc:connection connectionUri="simulated:plc" />
 	</plc:config>
+	
 	<flow name="basic-ping">
 		<plc:ping doc:name="Ping" config-ref="PLC_Config" />
         <logger level="INFO" doc:name="Logger" message="#[payload]" />
 	</flow>
+	
 	<flow name="basic-read">
-		<plc:write doc:name="Write" config-ref="PLC_Config">
-			<reconnect-forever />
-			<plc:write-items>
-				<plc:write-item alias="coil1"
-					address="STATE/coil1:BOOL[1]" values="#[ [ true ] ]" />
-				<plc:write-item alias="reg1"
-					address="STATE/register1:INT[1]" values="#[[ '6789' ]]" />
-			</plc:write-items>
-		</plc:write>
-        <logger level="INFO" doc:name="Logger" message="#[payload]" />
 		<plc:read doc:name="Read" config-ref="PLC_Config">
-			<reconnect-forever />
-			<!-- <reconnect count="5" frequency="3000" /> -->
-
+            <reconnect count="5" frequency="500" />
 			<plc:read-items>
 				<plc:read-item alias="coil1"
-					address="STATE/coil1:BOOL[1]" />
+					address="RANDOM/coil1:BOOL[1]" />
 				<plc:read-item alias="reg1"
-					address="STATE/register1:INT[1]" />
+					address="RANDOM/register1:INT[1]" />
 			</plc:read-items>
 		</plc:read>
 		<set-payload value="#[payload.^raw as String]"
 			doc:name="Set Payload" />
 		<logger level="INFO" doc:name="Logger" message="#[payload]" />
 	</flow>
-	<flow name="basic-write">
+	
+    <flow name="basic-write">
+        <plc:write doc:name="Write" config-ref="PLC_Config">
+            <reconnect count="5" frequency="500" />
+            <plc:write-items>
+                <plc:write-item alias="coil3"
+                    address="STATE/coil1:BOOL[2]" values="#[ [ true, false ] ]" />
+                <plc:write-item alias="reg1"
+                    address="STATE/register1:INT[2]" values="#[[ '11', '22' ]]" />
+            </plc:write-items>
+        </plc:write>
+        <set-payload value="#[payload.^raw as String]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" />
+    </flow>
+
+	<flow name="basic-writestate">
 		<plc:write doc:name="Write" config-ref="PLC_Config">
-			<reconnect-forever />
+            <reconnect count="5" frequency="500" />
 			<plc:write-items>
 				<plc:write-item alias="coil3"
 					address="STATE/coil3:BOOL[1]" values="#[ [ true ] ]" />
 				<plc:write-item alias="coil4"
-					address="STATE/coil4:BOOL[1]" values="#[ [ true ] ]" />
+					address="STATE/coil4:BOOL[1]" values="#[ [ false ] ]" />
 				<plc:write-item alias="reg3"
-					address="STATE/register3:INT[2]" values="#[[ '22', '33' ]]" />
+					address="STATE/register3:INT[2]" values="#[[ '33', '44' ]]" />
 			</plc:write-items>
 		</plc:write>
 		<set-payload value="#[payload.^raw as String]"
 			doc:name="Set Payload" />
 		<logger level="INFO" doc:name="Logger" message="#[payload]" />
 	</flow>
-    <flow name="basic-readback">
+	
+    <flow name="basic-readstate">
         <plc:read doc:name="Read" config-ref="PLC_Config">
             <plc:read-items>
                 <plc:read-item alias="coil3"

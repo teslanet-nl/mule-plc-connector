@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
   #%L
-  Mule PLC Connector
+  Mule CoAP Connector
   %%
   Copyright (C) 2021 (teslanet.nl) Rogier Cobben
   
@@ -21,9 +21,22 @@
   limitations under the License.
   #L%
   -->
-<plcReadResponse>
-	<field alias="digital-input1" count="1" responseCode="OK"
+
+<plcWriteResponse>
+	<field alias="coil3" count="1" responseCode="OK"
+		type="IEC61131_BOOL">
+		<value>true</value>
+	</field>
+	<field alias="coil4" count="1" responseCode="OK"
 		type="IEC61131_BOOL">
 		<value>false</value>
 	</field>
-</plcReadResponse>
+	<field alias="reg3" count="2" responseCode="OK"
+		type="IEC61131_INT">
+		<values>
+			<value>33</value>
+			<value>44</value>
+		</values>
+	</field>
+</plcWriteResponse>
+

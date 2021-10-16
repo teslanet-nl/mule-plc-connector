@@ -23,23 +23,29 @@
 package nl.teslanet.mule.connectors.plc.test;
 
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.Difference;
+import java.lang.invoke.CallSite;
 
 
 public class MulePlcOperationsTest extends AbstractPlcTestCase
 {
-    @SuppressWarnings("unused")
+    @SuppressWarnings( "unused" )
     private final Logger LOGGER= LoggerFactory.getLogger( MulePlcOperationsTest.class );
 
     /**
@@ -67,28 +73,40 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
 
         String payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
         assertNotNull( payloadValue );
-        Diff diff= DiffBuilder.compare( payloadValue ).withTest( readResourceAsString( "testpayloads/read_response_1.xml" ) ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( diff.toString(), diff.hasDifferences() );
+        Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/read_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        for ( Difference difference : diff.getDifferences() )
+        {
+            assertThat(
+                difference.toString(),
+                difference.getComparison().getControlDetails().getXPath(),
+                Matchers.either( Matchers.is( "/plcReadResponse[1]/field[1]/value[1]/text()[1]" ) ).or( Matchers.is( "/plcReadResponse[1]/field[2]/value[1]/text()[1]" ) )
+            );
+        }
+
     }
 
     @Test
     public void executeWriteOperation() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-write" ).run().getMessage().getPayload().getValue();
-        Diff diff= DiffBuilder.compare( payloadValue ).withTest( readResourceAsString( "testpayloads/write_response_1.xml" ) ).ignoreComments().ignoreWhitespace().build();
+        Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/write_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
     @Test
     public void executeWriteAndReadOperation() throws Exception
     {
-        String payloadWriteValue= (String) flowRunner( "basic-write" ).run().getMessage().getPayload().getValue();
-        Diff writeDiff= DiffBuilder.compare( payloadWriteValue ).withTest( readResourceAsString( "testpayloads/write_response_1.xml" ) ).ignoreComments().ignoreWhitespace().build();
+        String payloadWriteValue= (String) flowRunner( "basic-writestate" ).run().getMessage().getPayload().getValue();
+        Diff writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/writestate_response_1.xml" ) ).withTest(
+            payloadWriteValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
-        String payloadReadValue= (String) flowRunner( "basic-readback" ).run().getMessage().getPayload().getValue();
+        String payloadReadValue= (String) flowRunner( "basic-readstate" ).run().getMessage().getPayload().getValue();
         assertNotNull( payloadReadValue );
-        Diff readDiff= DiffBuilder.compare( payloadReadValue ).withTest( readResourceAsString( "testpayloads/readback_response_1.xml" ) ).ignoreComments().ignoreWhitespace().build();
+        Diff readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/readstate_response_1.xml" ) ).withTest(
+            payloadReadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
     }
 

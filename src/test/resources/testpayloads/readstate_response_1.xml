@@ -22,8 +22,19 @@
   #L%
   -->
 <plcReadResponse>
-	<field alias="digital-input1" count="1" responseCode="OK"
+	<field alias="coil3" count="1" responseCode="OK"
+		type="IEC61131_BOOL">
+		<value>true</value>
+	</field>
+	<field alias="coil4" count="1" responseCode="OK"
 		type="IEC61131_BOOL">
 		<value>false</value>
+	</field>
+	<field alias="reg3" count="2" responseCode="OK"
+		type="IEC61131_INT">
+		<values>
+			<value>33</value>
+			<value>44</value>
+		</values>
 	</field>
 </plcReadResponse>
