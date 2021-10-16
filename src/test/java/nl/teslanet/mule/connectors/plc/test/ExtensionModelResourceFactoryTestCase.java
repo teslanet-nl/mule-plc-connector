@@ -52,7 +52,7 @@ import nl.teslanet.mule.connectors.plc.internal.MulePlcConnector;
 public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedResourceFactoryTestCase
 {
 
-    private static final Logger LOGGER= LoggerFactory.getLogger( ExtensionModelResourceFactoryTestCase.class.getCanonicalName() );
+    private static final Logger logger= LoggerFactory.getLogger( ExtensionModelResourceFactoryTestCase.class.getCanonicalName() );
 
     private static final String RESOURCE_NAME= "plc-extension-descriptions.xml";
 
@@ -80,7 +80,7 @@ public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedReso
         assertEquals( resource.getPath(), RESOURCE_NAME );
         String expected= IOUtils.toString( currentThread().getContextClassLoader().getResource( RESOURCE_NAME ).openStream() );
         String content= new String( resource.getContent() );
-        LOGGER.info( "\n---\n" + content + "\n---" );
+        logger.info( "\n---\n" + content + "\n---" );
         Source expectedSource= Input.from( expected ).build();
         Source contentSource= Input.from( content ).build();
         Diff diff= DiffBuilder.compare( expectedSource ).withTest( contentSource ).checkForSimilar()

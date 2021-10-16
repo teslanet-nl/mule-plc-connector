@@ -57,7 +57,7 @@ import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
  */
 public class MulePlcSubscriptionOperations
 {
-    private final Logger LOGGER= LoggerFactory.getLogger( MulePlcSubscriptionOperations.class );
+    private final Logger logger= LoggerFactory.getLogger( MulePlcSubscriptionOperations.class );
 
 
     /**
@@ -74,7 +74,7 @@ public class MulePlcSubscriptionOperations
         if ( !connection.getMetadata().canRead() )
         {
             //TODO
-            LOGGER.error( "This connection doesn't support reading." );
+            logger.error( "This connection doesn't support reading." );
             throw new Exception( "This connection doesn't support reading." );
         }
         //prepare response
@@ -107,12 +107,12 @@ public class MulePlcSubscriptionOperations
         catch ( InterruptedException | ExecutionException e )
         {
             // TODO specify exception
-            LOGGER.error( "Error on read." );
+            logger.error( "Error on read." );
             throw new Exception( "Error on read." );
         }
         if ( response == null )
         {
-            LOGGER.error( "Null response on read." );
+            logger.error( "Null response on read." );
             throw new Exception( "Null response on read." );
         }
         //response element

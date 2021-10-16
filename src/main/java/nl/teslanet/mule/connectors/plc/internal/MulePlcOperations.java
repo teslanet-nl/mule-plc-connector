@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -54,7 +55,23 @@ import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer;
  */
 public class MulePlcOperations
 {
-    private final Logger LOGGER= LoggerFactory.getLogger( MulePlcOperations.class );
+    /**
+     * The logger.
+     */
+    private final Logger logger= LoggerFactory.getLogger( MulePlcOperations.class );
+
+    private final TransformerFactory transformerFactory;
+
+    /**
+     * Default constructor
+     * Creates and configures transformerfactory instance.
+     */
+    public MulePlcOperations()
+    {
+        transformerFactory = javax.xml.transform.TransformerFactory.newInstance();
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    }
 
     /**
      * Ping the PLC.
@@ -79,7 +96,7 @@ public class MulePlcOperations
         if ( !connection.canRead() )
         {
             //TODO
-            LOGGER.error( "This connection doesn't support reading." );
+            logger.error( "This connection doesn't support reading." );
             throw new Exception( "This connection doesn't support reading." );
         }
         PlcReadResponse response= null;
@@ -90,17 +107,17 @@ public class MulePlcOperations
         catch ( Exception e )
         {
             // TODO specify exception
-            LOGGER.error( "Error on read." );
+            logger.error( "Error on read." );
             throw new ConnectionException( "Error on read.", e );
         }
         if ( response == null )
         {
-            LOGGER.error( "Null response on read." );
+            logger.error( "Null response on read." );
             throw new Exception( "Null response on read." );
         }
         Document responseDom= XmlSerializer.xmlSerialize( response );
         ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
-        TransformerFactory.newInstance().newTransformer().transform( new DOMSource( responseDom ), new StreamResult( outputStream ) );
+        transformerFactory.newTransformer().transform( new DOMSource( responseDom ), new StreamResult( outputStream ) );
         byte[] bytes= outputStream.toByteArray();
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( new ByteArrayInputStream( bytes ) ).attributes(
             new ReceivedResponseAttributes( "read" ) ).build();
@@ -119,7 +136,7 @@ public class MulePlcOperations
         // Check if this connection support reading of data.
         if ( !connection.canWrite() )
         {
-            LOGGER.error( "This connection doesn't support writing." );
+            logger.error( "This connection doesn't support writing." );
             throw new Exception( "This connection doesn't support writing." );
         }
         PlcWriteResponse response= null;
@@ -130,17 +147,17 @@ public class MulePlcOperations
         catch ( Exception e )
         {
             // TODO specify exception
-            LOGGER.error( "Error on write." );
+            logger.error( "Error on write." );
             throw new ConnectionException( "Error on write.", e );
         }
         if ( response == null )
         {
-            LOGGER.error( "Null response on read." );
+            logger.error( "Null response on read." );
             throw new Exception( "Null response on write." );
         }
         Document responseDom= XmlSerializer.xmlSerialize( response );
         ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
-        TransformerFactory.newInstance().newTransformer().transform( new DOMSource( responseDom ), new StreamResult( outputStream ) );
+        transformerFactory.newTransformer().transform( new DOMSource( responseDom ), new StreamResult( outputStream ) );
         byte[] bytes= outputStream.toByteArray();
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( new ByteArrayInputStream( bytes ) ).attributes(
             new ReceivedResponseAttributes( "write" ) ).build();

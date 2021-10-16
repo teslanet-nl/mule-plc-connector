@@ -51,7 +51,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     /**
      * The logger of the class.
      */
-    private static final Logger LOGGER= LoggerFactory.getLogger( DefaultMulePlcConnection.class );
+    private static final Logger logger= LoggerFactory.getLogger( DefaultMulePlcConnection.class );
 
     /**
      * The underlying PLC plcConnection.
@@ -65,7 +65,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     public DefaultMulePlcConnection( PlcConnection plcConnection ) throws ConnectionException
     {
         this.plcConnection= plcConnection;
-        LOGGER.info( "connection created { " + this + " }" );
+        logger.info( "connection created { " + this + " }" );
     }
 
     /**
@@ -85,11 +85,11 @@ public class DefaultMulePlcConnection implements MulePlcConnection
             try
             {
                 plcConnection.connect();
-                LOGGER.info( "(re)connected connection { " + this + " }" );
+                logger.info( "(re)connected connection { " + this + " }" );
             }
             catch ( PlcConnectionException e )
             {
-                LOGGER.error( "failed reconnecting { " + this + " }" );
+                logger.error( "failed reconnecting { " + this + " }" );
             }
             if ( !plcConnection.isConnected() )
             {

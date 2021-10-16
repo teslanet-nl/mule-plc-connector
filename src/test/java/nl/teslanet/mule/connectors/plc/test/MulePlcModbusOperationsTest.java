@@ -41,7 +41,7 @@ import org.xmlunit.diff.Diff;
 
 public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
 {
-    private final Logger LOGGER= LoggerFactory.getLogger( MulePlcModbusOperationsTest.class );
+    private final Logger logger= LoggerFactory.getLogger( MulePlcModbusOperationsTest.class );
 
     /**
      * Specifies the mule config xml with the flows that are going to be executed in the tests, this file lives in the test resources.
@@ -65,7 +65,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
     public void executeReadOperation() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_read_1.xml" ) ).withTest(
             payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
@@ -86,7 +86,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
             e.printStackTrace();
         }
         Thread.sleep( 5000 );
-        LOGGER.info( "do" );
+        logger.info( "do" );
         try
         {
             payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
@@ -97,7 +97,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
             e.printStackTrace();
         }
         Thread.sleep( 5000 );
-        LOGGER.info( "do" );
+        logger.info( "do" );
         try
         {
             payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
@@ -108,7 +108,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
             e.printStackTrace();
         }
         Thread.sleep( 5000 );
-        LOGGER.info( "do" );
+        logger.info( "do" );
         try
         {
             payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
@@ -119,7 +119,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
             e.printStackTrace();
         }
         Thread.sleep( 5000 );
-        LOGGER.info( "do" );
+        logger.info( "do" );
         try
         {
             payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
@@ -137,7 +137,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
     public void executeWriteOperation() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-write" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest(
             payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
@@ -148,11 +148,11 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
     public void executeWriteWatchdogReset() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-write-watchdog-reset1" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         payloadValue= (String) flowRunner( "basic-write-watchdog-reset2" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         payloadValue= (String) flowRunner( "basic-write-true" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest(
             payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
@@ -163,11 +163,11 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
     public void executeWriteAfterWatchdog() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-write-watchdog-reset1" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         payloadValue= (String) flowRunner( "basic-write-watchdog-reset2" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         payloadValue= (String) flowRunner( "basic-write-true" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest(
             payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
@@ -179,11 +179,11 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         {
         }
         payloadValue= (String) flowRunner( "basic-write-watchdog-reset1" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         payloadValue= (String) flowRunner( "basic-write-watchdog-reset2" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         payloadValue= (String) flowRunner( "basic-write-false" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_2.xml" ) ).withTest(
             payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
@@ -195,11 +195,11 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
     public void executeParallelWriteOperation() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-write-watchdog-reset1" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         payloadValue= (String) flowRunner( "basic-write-watchdog-reset2" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         payloadValue= (String) flowRunner( "parallel-write" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         try
         {
             await().atMost( 1, TimeUnit.SECONDS ).untilTrue( new AtomicBoolean( false ) );
@@ -217,11 +217,11 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
     public void executeSequentialWriteOperation() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-write-watchdog-reset1" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         payloadValue= (String) flowRunner( "basic-write-watchdog-reset2" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         payloadValue= (String) flowRunner( "sequential-write" ).run().getMessage().getPayload().getValue();
-        LOGGER.info( payloadValue );
+        logger.info( payloadValue );
         try
         {
             //await().atMost( 10, TimeUnit.SECONDS ).untilTrue( new AtomicBoolean( false ) );

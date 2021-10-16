@@ -38,7 +38,7 @@ public class MockedMulePlcConnection extends DefaultMulePlcConnection
     /**
      * The logger of the class.
      */
-    private static final Logger LOGGER= LoggerFactory.getLogger( MockedMulePlcConnection.class );
+    private static final Logger logger= LoggerFactory.getLogger( MockedMulePlcConnection.class );
 
     /**
      * The logger of the class.
@@ -55,7 +55,7 @@ public class MockedMulePlcConnection extends DefaultMulePlcConnection
         super( mockConnection );
         this.deviceName= deviceName;
         ( (MockConnection) plcConnection ).setDevice( MulePlcConnector.getMockDevice( deviceName ) );
-        LOGGER.info( "mock added to mock connection { " + this + " }" );
+        logger.info( "mock added to mock connection { " + this + " }" );
     }
 
     /**
@@ -68,7 +68,7 @@ public class MockedMulePlcConnection extends DefaultMulePlcConnection
         if ( !plcConnection.isConnected() )
         {
             ( (MockConnection) plcConnection ).setDevice( MulePlcConnector.getMockDevice( deviceName ) );
-            LOGGER.info( "(re)connected mock connection { " + this + " }" );
+            logger.info( "(re)connected mock connection { " + this + " }" );
             if ( !plcConnection.isConnected() )
             {
                 throw new ConnectionException( "Error on mock connection { " + this + " }" );

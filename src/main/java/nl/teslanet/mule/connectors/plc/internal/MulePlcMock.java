@@ -51,7 +51,7 @@ import nl.teslanet.mule.connectors.plc.internal.mock.PlcMockDevice;
 @Configuration(name= "mock")
 public class MulePlcMock implements Startable, Stoppable
 {
-    private static final Logger LOGGER= LoggerFactory.getLogger( MulePlcMock.class );
+    private static final Logger logger= LoggerFactory.getLogger( MulePlcMock.class );
 
     @RefName
     private String configName= null;
@@ -66,6 +66,7 @@ public class MulePlcMock implements Startable, Stoppable
     @Summary("The fields of the PLC mock.")
     @DisplayName("Requestitems")
     private List< MockedField > mockedFields;
+    
     /**
      * @return The configuration name.
      */
@@ -86,7 +87,7 @@ public class MulePlcMock implements Startable, Stoppable
         {
             device.write( field.getAddress(), field.getInitialValues());
         }
-        LOGGER.warn( "started mock { " + configName + " }" );
+        logger.info( "started mock { " + configName + " }" );
     }
 
     /**
@@ -96,6 +97,6 @@ public class MulePlcMock implements Startable, Stoppable
     public void stop() throws MuleException
     {
         MulePlcConnector.removeMockDevice( configName );
-        LOGGER.warn( "stopped mock { " + configName + " }" );
+        logger.info( "stopped mock { " + configName + " }" );
     }
 }

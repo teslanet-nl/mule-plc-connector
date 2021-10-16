@@ -43,7 +43,7 @@ import org.xmlunit.diff.Difference;
 public class MulePlcOperationsTest extends AbstractPlcTestCase
 {
     @SuppressWarnings( "unused" )
-    private final Logger LOGGER= LoggerFactory.getLogger( MulePlcOperationsTest.class );
+    private final Logger logger= LoggerFactory.getLogger( MulePlcOperationsTest.class );
 
     /**
      * Specifies the mule config xml with the flows that are going to be executed in the tests, this file lives in the test resources.

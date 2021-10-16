@@ -52,7 +52,6 @@ public class PlcMockDevice implements MockDevice
         write( "register1:INT", new PlcINT( "345" ) );
     }
 
-
     public void remove( String fieldQuery )
     {
        fields.remove( fieldQuery );
