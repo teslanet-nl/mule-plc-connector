@@ -23,11 +23,11 @@
   -->
 <plcReadResponse>
 	<field alias="coil1" count="1" responseCode="OK"
-		type="IEC61131_BOOL">
+		type="BOOL">
 		<value>true</value>
 	</field>
 	<field alias="reg1" count="1" responseCode="OK"
-		type="IEC61131_INT">
+		type="INT">
 		<value>6789</value>
 	</field>
 </plcReadResponse>

@@ -23,7 +23,7 @@
   -->
 <plcReadResponse>
 	<field alias="digital-input1" count="1" responseCode="OK"
-		type="IEC61131_BOOL">
+		type="BOOL">
 		<value>false</value>
 	</field>
 </plcReadResponse>

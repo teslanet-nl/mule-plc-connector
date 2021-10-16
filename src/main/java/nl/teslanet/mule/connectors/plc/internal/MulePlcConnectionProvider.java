@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * will be pooled and reused. There are other implementations like {@link CachedConnectionProvider} which lazily creates and
  * caches connections or simply {@link ConnectionProvider} if you want a new connection each time something requires one.
  */
-@Alias("connection")
+@Alias( "connection" )
 public class MulePlcConnectionProvider implements CachedConnectionProvider< MulePlcConnection >
 {
     /**
@@ -61,7 +61,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
      * The connection uri of the plc.
      */
     @Parameter
-    @Summary("The uri of the PLC to connect to.")
+    @Summary( "The uri of the PLC to connect to." )
     private String connectionUri;
 
     private final static PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
@@ -72,15 +72,16 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     @Override
     public MulePlcConnection connect() throws ConnectionException
     {
-        LOGGER.info( "Start connect { " + connectionUri + " }");
+        LOGGER.info( "Start connect { " + connectionUri + " }" );
         MulePlcConnection connection= null;
         try ( PlcConnection plcConnnection= driverManager.getConnection( connectionUri ) )
         {
             //if ( driverManager.getDriver( connectionUri ).getProtocolCode().equals( "mock" )  )
             if ( plcConnnection instanceof MockConnection )
             {
-                int prefixLength= 1 + driverManager.getDriver( connectionUri ).getProtocolCode().length();
-                connection= new MockedMulePlcConnection( (MockConnection) plcConnnection, connectionUri.substring( prefixLength ) );
+
+                MockConnection mockConnection= (MockConnection) plcConnnection;
+                connection= new MockedMulePlcConnection( mockConnection, connectionUri.substring( 5 ) );
             }
             else
             {
@@ -90,39 +91,39 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         }
         catch ( Exception e )
         {
-            throw new ConnectionException( "Cannot connect { " + connection  + "::" + connectionUri + " }", e );
+            throw new ConnectionException( "Cannot connect { " + connection + "::" + connectionUri + " }", e );
         }
-        LOGGER.info( "Connected { " + connection  + "::" + connectionUri + " }");
+        LOGGER.info( "Connected { " + connection + "::" + connectionUri + " }" );
         return connection;
     }
 
     @Override
     public void disconnect( MulePlcConnection connection )
     {
-        LOGGER.info( "Start disconnect { " + connection  + "::" + connectionUri + " }");
+        LOGGER.info( "Start disconnect { " + connection + "::" + connectionUri + " }" );
         try
         {
             connection.close();
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error while disconnecting { " +  connection  + "::" + connectionUri + " }", e );
+            LOGGER.error( "Error while disconnecting { " + connection + "::" + connectionUri + " }", e );
         }
-        LOGGER.info( "Disconnected { " + connection  + "::" + connectionUri + " }" );
+        LOGGER.info( "Disconnected { " + connection + "::" + connectionUri + " }" );
     }
 
     @Override
     public ConnectionValidationResult validate( MulePlcConnection connection )
     {
-        LOGGER.info( "Start validation { " + connection  + "::" + connectionUri + " }" );
+        LOGGER.info( "Start validation { " + connection + "::" + connectionUri + " }" );
         if ( connection == null || !connection.isConnected() )
         {
-            LOGGER.warn( "No connection { " + connection  + "::" + connectionUri + " }" );
-            return ConnectionValidationResult.failure( "Not connected { " + connection  + "::" + connectionUri + " }", new Exception( "no connection" ) );
+            LOGGER.warn( "No connection { " + connection + "::" + connectionUri + " }" );
+            return ConnectionValidationResult.failure( "Not connected { " + connection + "::" + connectionUri + " }", new Exception( "no connection" ) );
         }
         else
         {
-            LOGGER.info( "Validation success { " + connection  + "::" + connectionUri + " }" );
+            LOGGER.info( "Validation success { " + connection + "::" + connectionUri + " }" );
             return ConnectionValidationResult.success();
         }
     }

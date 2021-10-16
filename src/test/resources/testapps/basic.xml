@@ -100,7 +100,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
         </plc:read>
         <set-payload value="#[payload.^raw as String]"
             doc:name="Set Payload" />
-        <logger level="WARN" doc:name="Logger" message="#[payload]" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" />
     </flow>
 
 </mule>

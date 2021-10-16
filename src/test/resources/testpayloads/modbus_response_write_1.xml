@@ -23,7 +23,7 @@
   -->
 <plcWriteResponse>
 	<field alias="coil1" count="1" responseCode="OK"
-		type="IEC61131_BOOL">
+		type="BOOL">
 		<value>true</value>
 	</field>
 </plcWriteResponse>

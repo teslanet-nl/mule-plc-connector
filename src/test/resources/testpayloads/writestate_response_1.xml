@@ -23,15 +23,15 @@
   -->
 <plcWriteResponse>
 	<field alias="coil3" count="1" responseCode="OK"
-		type="IEC61131_BOOL">
+		type="BOOL">
 		<value>true</value>
 	</field>
 	<field alias="coil4" count="1" responseCode="OK"
-		type="IEC61131_BOOL">
+		type="BOOL">
 		<value>false</value>
 	</field>
 	<field alias="reg3" count="2" responseCode="OK"
-		type="IEC61131_INT">
+		type="INT">
 		<values>
 			<value>33</value>
 			<value>44</value>

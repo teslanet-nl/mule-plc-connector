@@ -41,7 +41,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 	</flow>
 	<flow name="basic-read">
 		<plc:read doc:name="Read" config-ref="PLC_Config">
-			<reconnect count="5" frequency="3000" />
+			<reconnect count="5" frequency="500" />
 
 			<plc:read-items>
 				<plc:read-item alias="coil1"
@@ -56,7 +56,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 	</flow>
 	<flow name="basic-write">
 		<plc:write doc:name="Write" config-ref="PLC_Config">
-			<reconnect-forever />
+            <reconnect count="5" frequency="500" />
 			<plc:write-items>
 				<plc:write-item alias="coil1"
 					address="coil1:BOOL" values="#[[ false ]]" />

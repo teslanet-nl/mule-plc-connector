@@ -128,7 +128,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 			</plc:write>
 			<set-payload value="#[payload.^raw as String]"
 				doc:name="Set Payload" />
-			<logger level="WARN" doc:name="Logger"
+			<logger level="INFO" doc:name="Logger"
 				doc:id="0e307f1d-87d0-46cb-a691-536c9576e65f" message="#[payload]" />
 		</async>
 		<async doc:name="Async"
@@ -141,7 +141,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 			</plc:write>
 			<set-payload value="#[payload.^raw as String]"
 				doc:name="Set Payload" />
-			<logger level="WARN" doc:name="Logger"
+			<logger level="INFO" doc:name="Logger"
 				doc:id="883c82a1-5aa4-46d1-a281-63aa33278317" message="#[payload]" />
 		</async>
 		<async doc:name="Async"
@@ -154,7 +154,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 			</plc:write>
 			<set-payload value="#[payload.^raw as String]"
 				doc:name="Set Payload" />
-			<logger level="WARN" doc:name="Logger"
+			<logger level="INFO" doc:name="Logger"
 				doc:id="6cf9401c-ab91-4866-a923-95b4a20d82f9" message="#[payload]" />
 		</async>
 
@@ -168,7 +168,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 			</plc:write>
 			<set-payload value="#[payload.^raw as String]"
 				doc:name="Set Payload" />
-			<logger level="WARN" doc:name="Logger"
+			<logger level="INFO" doc:name="Logger"
 				doc:id="0ebc4383-2028-4a4a-a088-2041f75207da" message="#[payload]" />
 		</async>
 		<async doc:name="Async"
@@ -181,7 +181,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 			</plc:write>
 			<set-payload value="#[payload.^raw as String]"
 				doc:name="Set Payload" />
-			<logger level="WARN" doc:name="Logger"
+			<logger level="INFO" doc:name="Logger"
 				doc:id="9a1cb789-a1f3-4567-9d51-3eccb4425be8" message="#[payload]" />
 		</async>
 	</flow>
@@ -196,7 +196,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 		</plc:write>
 		<set-payload value="#[payload.^raw as String]"
 			doc:name="Set Payload" />
-		<logger level="WARN" doc:name="Logger"
+		<logger level="INFO" doc:name="Logger"
 			doc:id="ef79616f-6272-4b6a-8be5-7c5bbea30d1e" message="#[payload]" />
 
 		<plc:write doc:name="Write" config-ref="PLC_Config">
@@ -207,7 +207,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 		</plc:write>
 		<set-payload value="#[payload.^raw as String]"
 			doc:name="Set Payload" />
-		<logger level="WARN" doc:name="Logger"
+		<logger level="INFO" doc:name="Logger"
 			doc:id="7e6abc72-9fc6-4a5b-a02a-e68e52dd7953" message="#[payload]" />
 
 		<plc:write doc:name="Write" config-ref="PLC_Config">
@@ -218,7 +218,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 		</plc:write>
 		<set-payload value="#[payload.^raw as String]"
 			doc:name="Set Payload" />
-		<logger level="WARN" doc:name="Logger"
+		<logger level="INFO" doc:name="Logger"
 			doc:id="d871fe52-968b-4cff-bc85-8eacdd4b22b5" message="#[payload]" />
 
 		<plc:write doc:name="Write" config-ref="PLC_Config">
@@ -229,7 +229,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 		</plc:write>
 		<set-payload value="#[payload.^raw as String]"
 			doc:name="Set Payload" />
-		<logger level="WARN" doc:name="Logger"
+		<logger level="INFO" doc:name="Logger"
 			doc:id="64fe2608-5e33-454f-9902-fb0c3dfcf95a" message="#[payload]" />
 
 		<plc:write doc:name="Write" config-ref="PLC_Config">
@@ -240,7 +240,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 		</plc:write>
 		<set-payload value="#[payload.^raw as String]"
 			doc:name="Set Payload" />
-		<logger level="WARN" doc:name="Logger"
+		<logger level="INFO" doc:name="Logger"
 			doc:id="baf38c40-1517-4fbb-a1fd-71103de5c760" message="#[payload]" />
 
 	</flow>

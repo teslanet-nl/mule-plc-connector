@@ -55,7 +55,7 @@ public class MockedMulePlcConnection extends DefaultMulePlcConnection
         super( mockConnection );
         this.deviceName= deviceName;
         ( (MockConnection) plcConnection ).setDevice( MulePlcConnector.getMockDevice( deviceName ) );
-        LOGGER.info( "mock added to connection { " + this + " }" );
+        LOGGER.info( "mock added to mock connection { " + this + " }" );
     }
 
     /**
@@ -68,10 +68,10 @@ public class MockedMulePlcConnection extends DefaultMulePlcConnection
         if ( !plcConnection.isConnected() )
         {
             ( (MockConnection) plcConnection ).setDevice( MulePlcConnector.getMockDevice( deviceName ) );
-            LOGGER.info( "(re)connected connection { " + this + " }" );
+            LOGGER.info( "(re)connected mock connection { " + this + " }" );
             if ( !plcConnection.isConnected() )
             {
-                throw new ConnectionException( "Error on connection { " + this + " }" );
+                throw new ConnectionException( "Error on mock connection { " + this + " }" );
             }
         }
     }
