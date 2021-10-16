@@ -21,8 +21,7 @@
   limitations under the License.
   #L%
   -->
-
-<plcWriteResponse>
+  <plcWriteResponse>
 	<field alias="coil3" count="2" responseCode="OK"
 		type="IEC61131_BOOL">
 		<values>
