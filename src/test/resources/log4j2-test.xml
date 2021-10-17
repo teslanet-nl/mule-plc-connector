@@ -32,17 +32,9 @@
 		</Console>
 	</Appenders>
 	<Loggers>
-		<Logger name="org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader" level="warn"
-			additivity="true">
-			<AppenderRef ref="Console" />
-		</Logger>
-		<Logger name="nl.teslanet" level="warn"
-            additivity="false">
-            <AppenderRef ref="Console" />
-        </Logger>
-		<Logger name="org.apache" level="warn" additivity="false">
-			<AppenderRef ref="Console" />
-		</Logger>
+		<Logger name="org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader" level="warn"/>
+		<Logger name="nl.teslanet" level="warn"/>
+		<Logger name="org.apache.plc4x" level="warn" />
 		<Root level="warn">
 			<AppenderRef ref="Console" />
 		</Root>

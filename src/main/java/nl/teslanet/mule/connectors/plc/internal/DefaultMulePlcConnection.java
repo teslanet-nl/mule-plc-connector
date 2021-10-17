@@ -65,7 +65,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     public DefaultMulePlcConnection( PlcConnection plcConnection ) throws ConnectionException
     {
         this.plcConnection= plcConnection;
-        logger.info( "connection created { " + this + " }" );
+        logger.info( "Connection created { " + this + " }" );
     }
 
     /**
@@ -74,7 +74,12 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public synchronized void close() throws Exception
     {
-        if ( plcConnection.isConnected() ) plcConnection.close();
+        logger.info( "Closing connection { " + this + " }" );
+        if ( plcConnection.isConnected() )
+        {
+            plcConnection.close();
+            logger.info( "Closed connection { " + this + " }" );
+        }
     }
 
     @Override
@@ -85,11 +90,11 @@ public class DefaultMulePlcConnection implements MulePlcConnection
             try
             {
                 plcConnection.connect();
-                logger.info( "(re)connected connection { " + this + " }" );
+                logger.info( "(re)Connected connection { " + this + " }" );
             }
             catch ( PlcConnectionException e )
             {
-                logger.error( "failed reconnecting { " + this + " }" );
+                logger.error( "Failed reconnecting { " + this + " }" );
             }
             if ( !plcConnection.isConnected() )
             {
@@ -133,7 +138,10 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     @Override
-    public synchronized PlcReadResponse read( List< ReadItem > items, long timeout, TimeUnit timeOutUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException
+    public synchronized PlcReadResponse read( List< ReadItem > items, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        ConnectionException
     {
         connect();
         PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
@@ -151,7 +159,10 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     @Override
-    public synchronized PlcWriteResponse write( List< WriteItem > items, long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException
+    public synchronized PlcWriteResponse write( List< WriteItem > items, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        ConnectionException
     {
         connect();
         PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();

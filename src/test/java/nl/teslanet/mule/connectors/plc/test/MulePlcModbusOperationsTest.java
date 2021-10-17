@@ -28,9 +28,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -52,7 +54,16 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         return "testapps/basic-modbus.xml";
     }
 
-    //@Ignore
+    @BeforeClass
+    public static void setupClass()
+    {
+        Properties props= System.getProperties();
+        props.setProperty( "PLC4X_FORCE_AWAIT_SETUP_COMPLETE", "false" );
+        props.setProperty( "PLC4X_FORCE_AWAIT_DISCONNECT_COMPLETE", "false" );
+        props.setProperty( "PLC4X_FORCE_AWAIT_DISCOVER_COMPLETE", "false" );
+    }
+
+    @Ignore
     @Test
     public void executePingOperation() throws Exception
     {
@@ -60,19 +71,20 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         assertTrue( "ping failed", payloadValue );
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void executeReadOperation() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
         logger.info( payloadValue );
         Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_read_1.xml" ) ).withTest(
-            payloadValue ).ignoreComments().ignoreWhitespace().build();
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
-    //@Ignore
-    @Test(timeout= 60000)
+    @Ignore
+    @Test( timeout= 60000 )
     public void executeMultipleReadOperation() throws InterruptedException
     {
         String payloadValue= null;
@@ -132,18 +144,19 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         assertNotNull( payloadValue );
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void executeWriteOperation() throws Exception
     {
         String payloadValue= (String) flowRunner( "basic-write-true" ).run().getMessage().getPayload().getValue();
         logger.info( payloadValue );
         Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest(
-            payloadValue ).ignoreComments().ignoreWhitespace().build();
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void executeWriteWatchdogReset() throws Exception
     {
@@ -154,11 +167,12 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         payloadValue= (String) flowRunner( "basic-write-true" ).run().getMessage().getPayload().getValue();
         logger.info( payloadValue );
         Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest(
-            payloadValue ).ignoreComments().ignoreWhitespace().build();
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void executeWriteAfterWatchdog() throws Exception
     {
@@ -169,7 +183,8 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         payloadValue= (String) flowRunner( "basic-write-true" ).run().getMessage().getPayload().getValue();
         logger.info( payloadValue );
         Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest(
-            payloadValue ).ignoreComments().ignoreWhitespace().build();
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
         try
         {
@@ -185,12 +200,13 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         payloadValue= (String) flowRunner( "basic-write-false" ).run().getMessage().getPayload().getValue();
         logger.info( payloadValue );
         diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_2.xml" ) ).withTest(
-            payloadValue ).ignoreComments().ignoreWhitespace().build();
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
-        
+
     }
-    
-    //@Ignore
+
+    @Ignore
     @Test
     public void executeParallelWriteOperation() throws Exception
     {
@@ -211,8 +227,8 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         //Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
         //assertFalse( diff.toString(), diff.hasDifferences() );
     }
-    
-    //@Ignore
+
+    @Ignore
     @Test
     public void executeSequentialWriteOperation() throws Exception
     {
