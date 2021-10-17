@@ -1,9 +1,9 @@
-# Mule PLC Extension
+# Mule PLC Connector
 --------------------
 
-Mule extension that enables Mule-applications to communicate with PLC systems.
+Mule PLC Connector enables Mule-applications to communicate with PLC systems.
 
-Different PLC protocols will be supported:
+Different PLC protocols are be supported:
 - AB-ETH
 - ADS/AMS
 - BACnet/IP
@@ -18,24 +18,21 @@ Different PLC protocols will be supported:
 - S7 (Step7)
 - Simulated
 
-M1 release is tested with Modbus and Simulated. 
-
 ## Dependencies
 The Mule-PLC-connector uses [Apache PLC4X](https://plc4x.apache.org/users/protocols/index.html). 
 
 ## Mule supported versions
-* Mule 4.1
-* Mule 4.2
-* Mule 4.3
-
+* Mule 4.1+
 
 ## Installation
 
-To use this connector add this dependency to your application pom.xml
+To use this connector in a Mule 4 application, add following dependency to your application pom.xml:
 
 ```
-<groupId>nl.teslanet.mule.connectors.plc</groupId>
-<artifactId>mule-plc-connector</artifactId>
-<version>1.0.0-M1</version>
-<classifier>mule-plugin</classifier>
+<dependency>
+    <groupId>nl.teslanet.mule.connectors.plc</groupId>
+    <artifactId>mule-plc-connector</artifactId>
+    <version>1.0.0-M4</version>
+    <classifier>mule-plugin</classifier>
+</dependency>
 ```

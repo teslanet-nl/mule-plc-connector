@@ -52,7 +52,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         return "testapps/basic-modbus.xml";
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void executePingOperation() throws Exception
     {
@@ -60,7 +60,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         assertTrue( "ping failed", payloadValue );
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void executeReadOperation() throws Exception
     {
@@ -71,8 +71,8 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
-    @Ignore
-    @Test(timeout= 600000)
+    //@Ignore
+    @Test(timeout= 60000)
     public void executeMultipleReadOperation() throws InterruptedException
     {
         String payloadValue= null;
@@ -132,18 +132,18 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         assertNotNull( payloadValue );
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void executeWriteOperation() throws Exception
     {
-        String payloadValue= (String) flowRunner( "basic-write" ).run().getMessage().getPayload().getValue();
+        String payloadValue= (String) flowRunner( "basic-write-true" ).run().getMessage().getPayload().getValue();
         logger.info( payloadValue );
         Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/modbus_response_write_1.xml" ) ).withTest(
             payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void executeWriteWatchdogReset() throws Exception
     {
@@ -158,7 +158,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void executeWriteAfterWatchdog() throws Exception
     {
@@ -190,7 +190,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         
     }
     
-    @Ignore
+    //@Ignore
     @Test
     public void executeParallelWriteOperation() throws Exception
     {
@@ -212,7 +212,7 @@ public class MulePlcModbusOperationsTest extends AbstractPlcTestCase
         //assertFalse( diff.toString(), diff.hasDifferences() );
     }
     
-    @Ignore
+    //@Ignore
     @Test
     public void executeSequentialWriteOperation() throws Exception
     {
