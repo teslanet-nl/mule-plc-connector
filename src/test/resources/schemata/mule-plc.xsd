@@ -221,41 +221,6 @@ limitations under the License.
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="mock-config">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractExtensionType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" name="mocked-fields">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" minOccurs="0" maxOccurs="unbounded" ref="plc:abstract-mocked-field"></xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-          </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-          <xs:attribute type="mule:substitutableName" use="optional" name="mockedFields"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:complexType name="nl.teslanet.mule.connectors.plc.api.MockedField">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="xs:string" use="required" name="address"></xs:attribute>
-        <xs:attribute type="mule:substitutableName" use="optional" name="initialValues"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" type="plc:nl.teslanet.mule.connectors.plc.api.MockedField" abstract="true" name="abstract-mocked-field"></xs:element>
-  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" substitutionGroup="plc:abstract-mocked-field" name="mocked-field">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="plc:nl.teslanet.mule.connectors.plc.api.MockedField"></xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
   <xs:simpleType name="java.util.concurrent.TimeUnitEnumType">
     <xs:union>
       <xs:simpleType>

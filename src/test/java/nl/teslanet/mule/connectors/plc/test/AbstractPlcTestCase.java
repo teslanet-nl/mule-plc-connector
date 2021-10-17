@@ -27,31 +27,52 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 
-@ArtifactClassLoaderRunnerConfig(providedExclusions= { "org.mule.tests:*:*:*:*", "com.mulesoft.compatibility.tests:*:*:*:*" }, applicationRuntimeLibs= {
-        //        "org.apache.plc4x:plc4j-api",
-        //        "nl.teslanet.mule.connectors.plc:mule-plc-connector-testutils",
-        //        "org.apache.plc4x:plc4j-driver-mock",
-        //        "org.apache.plc4x:plc4j-transport-test"
-}, testRunnerExportedRuntimeLibs= { "org.mule.tests:mule-tests-functional",
-        //        "nl.teslanet.mule.connectors.plc:mule-plc-connector-testutils",
-        //        "org.apache.plc4x:plc4j-driver-mock",
-        //        "org.apache.plc4x:plc4j-transport-test"
-}, applicationSharedRuntimeLibs= {}, exportPluginClasses= {}, testExclusions= {
-    "org.mule.runtime:*:*:*:*",
-    "org.mule.modules*:*:*:*:*",
-    "org.mule.transports:*:*:*:*",
-    "org.mule.mvel:*:*:*:*",
-    "org.mule.extensions:*:*:*:*",
-    "org.mule.connectors:*:*:*:*",
-    "org.mule.tests.plugin:*:*:*:*",
-    "com.mulesoft.mule.runtime*:*:*:*:*",
-    "com.mulesoft.licm:*:*:*:*" }, testInclusions= {
-        "org.apache.plc4x:plc4j-api:jar:*:*",
-        "org.apache.plc4x:plc4j-spi:jar:*:*",
-        "org.apache.plc4x:plc4j-transport-test:*:*",
-        //"nl.teslanet.mule.connectors.plc:mule-plc-connector-testutils:jar:*:*",
+@ArtifactClassLoaderRunnerConfig
+(
+    providedExclusions=
+    { 
+        "org.mule.tests:*:*:*:*", 
+        "com.mulesoft.compatibility.tests:*:*:*:*"
+    }, 
+    applicationRuntimeLibs=
+    {
+        "org.apache.plc4x:plc4j-driver-simulated",
+        "org.apache.plc4x:plc4j-api",
+        "org.apache.plc4x:plc4j-spi",
+        "org.apache.commons:commons-lang3",
+        "com.github.jinahya:bit-io"
+    }, 
+    testRunnerExportedRuntimeLibs=
+    { 
+    }, 
+    applicationSharedRuntimeLibs=
+    {
+        "org.apache.plc4x:plc4j-driver-simulated",
+        "org.apache.plc4x:plc4j-api",
+        "org.apache.plc4x:plc4j-spi",
+    }, 
+    exportPluginClasses= {},
+    testExclusions= 
+    {
+        "org.mule.runtime:*:*:*:*",
+        "org.mule.modules*:*:*:*:*",
+        "org.mule.transports:*:*:*:*",
+        "org.mule.mvel:*:*:*:*",
+        "org.mule.extensions:*:*:*:*",
+        "org.mule.connectors:*:*:*:*",
+        "org.mule.tests.plugin:*:*:*:*",
+        "com.mulesoft.mule.runtime*:*:*:*:*",
+        "com.mulesoft.licm:*:*:*:*",
+    }, 
+    testInclusions= 
+    {
         "*:*:jar:tests:*",
-        "*:*:test-jar:*:*" }, extraPrivilegedArtifacts= {})
+        "*:*:test-jar:*:*" 
+    }, 
+    extraPrivilegedArtifacts=
+    {
+    }
+)
 public abstract class AbstractPlcTestCase extends MuleArtifactFunctionalTestCase
 {
 }

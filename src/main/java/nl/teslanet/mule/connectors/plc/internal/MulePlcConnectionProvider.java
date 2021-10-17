@@ -25,12 +25,9 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
-import org.apache.plc4x.java.mock.connection.MockConnection;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -39,15 +36,13 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This class (as it's name implies) provides connection instances and the funcionality to disconnect and validate those
+ * This class (as it's name implies) provides connection instances and the functionality to disconnect and validate those
  * connections.
  * <p>
- * All connection related parameters (values required in order to create a connection) must be
+ * All connection related parameters (values required in order to create a connection) are
  * declared in the connection providers.
  * <p>
- * This particular example is a {@link PoolingConnectionProvider} which declares that connections resolved by this provider
- * will be pooled and reused. There are other implementations like {@link CachedConnectionProvider} which lazily creates and
- * caches connections or simply {@link ConnectionProvider} if you want a new connection each time something requires one.
+ * It implements {@link CachedConnectionProvider} which lazily creates and caches connections .
  */
 @Alias( "connection" )
 public class MulePlcConnectionProvider implements CachedConnectionProvider< MulePlcConnection >
@@ -78,16 +73,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         {
             PlcConnection plcConnnection= driverManager.getConnection( connectionUri );
             //if ( driverManager.getDriver( connectionUri ).getProtocolCode().equals( "mock" )  )
-            if ( plcConnnection instanceof MockConnection )
-            {
-
-                MockConnection mockConnection= (MockConnection) plcConnnection;
-                connection= new MockedMulePlcConnection( mockConnection, connectionUri.substring( 5 ) );
-            }
-            else
-            {
-                connection= new DefaultMulePlcConnection( plcConnnection );
-            }
+            connection= new DefaultMulePlcConnection( plcConnnection );
             connection.connect();
         }
         catch ( Exception e )

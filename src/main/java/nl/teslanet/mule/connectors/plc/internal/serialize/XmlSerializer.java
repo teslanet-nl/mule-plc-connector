@@ -33,7 +33,6 @@ import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.model.PlcField;
 import org.apache.plc4x.java.api.value.PlcValue;
-import org.apache.plc4x.java.mock.field.MockPlcValue;
 import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,7 +44,7 @@ public class XmlSerializer
      * The Document Builer factory.
      */
     private final static DocumentBuilderFactoryImpl dbFactory= (DocumentBuilderFactoryImpl) DocumentBuilderFactoryImpl.newInstance();
-    
+
     /**
      * Abstraction of the method to get PlcValues.
      */
@@ -80,7 +79,7 @@ public class XmlSerializer
         Element rootElement= doc.createElement( "plcReadResponse" );
         doc.appendChild( rootElement );
         //build content
-        seralizeFileds( doc,  rootElement, response, ( alias ) -> response.getPlcValue( alias ) );
+        seralizeFileds( doc, rootElement, response, ( alias ) -> response.getPlcValue( alias ) );
         return doc;
     }
 
@@ -93,7 +92,7 @@ public class XmlSerializer
         Element rootElement= doc.createElement( "plcWriteResponse" );
         doc.appendChild( rootElement );
         //build content
-        seralizeFileds( doc,  rootElement, response, ( alias ) -> response.getRequest().getPlcValue( alias ) );
+        seralizeFileds( doc, rootElement, response, ( alias ) -> response.getRequest().getPlcValue( alias ) );
         return doc;
     }
 
@@ -156,32 +155,6 @@ public class XmlSerializer
             for ( Entry< String, ? extends PlcValue > structItem : plcValue.getStruct().entrySet() )
             {
                 valueElement.appendChild( xmlSeralize( doc, structItem.getKey(), structItem.getValue(), 1 ) );
-            }
-        }
-        else if ( plcValue instanceof MockPlcValue )
-        {
-            //MockePlcValue has little support for types.
-            if ( expectedValueCount > 1 )
-            {
-                valueElement= doc.createElement( "values" );
-                appendOptionalAttribute( valueElement, "key", key );
-                for ( int i= 0; i < expectedValueCount; i++ )
-                {
-                    Element child= doc.createElement( "value" );
-                    child.appendChild( doc.createTextNode( ( (MockPlcValue) plcValue ).getObject( i ).toString() ) );
-                    valueElement.appendChild( child );
-                }
-            }
-            else if ( expectedValueCount == 1 )
-            {
-                valueElement= doc.createElement( "value" );
-                appendOptionalAttribute( valueElement, "key", key );
-                valueElement.appendChild( doc.createTextNode( ( (MockPlcValue) plcValue ).getObject( 0 ).toString() ) );
-            }
-            else
-            {
-                valueElement= doc.createElement( "nullValue" );
-                appendOptionalAttribute( valueElement, "key", key );
             }
         }
         else

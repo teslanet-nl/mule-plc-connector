@@ -219,16 +219,13 @@ Contributors:
 			<version>${plc4j.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.plc4x</groupId>
-			<artifactId>plc4j-driver-modbus</artifactId>
-			<version>${plc4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.32</version>
 		</dependency>
+				
+		<!--  test dependencies  -->
+
 		<dependency>
 			<groupId>org.mule.runtime</groupId>
 			<artifactId>mule-module-extensions-support</artifactId>
@@ -238,20 +235,9 @@ Contributors:
 		</dependency>
 		<dependency>
 			<groupId>org.apache.plc4x</groupId>
-			<artifactId>plc4j-transport-test</artifactId>
-			<version>${plc4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.plc4x</groupId>
-			<artifactId>plc4j-driver-mock</artifactId>
-			<version>${plc4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.plc4x</groupId>
 			<artifactId>plc4j-driver-simulated</artifactId>
 			<version>${plc4j.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.xmlunit</groupId>
@@ -271,6 +257,22 @@ Contributors:
             <version>4.1.0</version>
             <scope>test</scope>
         </dependency>
+        
+        <!--  explicit transients needed for ArtifactClassLoaderRunnerConfig -->
+        
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+		    <groupId>com.github.jinahya</groupId>
+		    <artifactId>bit-io</artifactId>
+		    <version>1.4.3</version>
+            <scope>compile</scope>
+        </dependency>
+
 	</dependencies>
 
 	<repositories>

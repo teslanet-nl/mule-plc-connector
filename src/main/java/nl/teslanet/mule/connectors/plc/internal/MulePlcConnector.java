@@ -23,53 +23,18 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-
-import nl.teslanet.mule.connectors.plc.internal.mock.PlcMockDevice;
 
 
 /**
  * This is the main class of an extension, is the entry point from which configurations, connection providers, operations
  * and sources are going to be declared.
  */
-@Xml(prefix= "plc", namespace= "http://www.teslanet.nl/schema/mule/plc")
-@Extension(name= "PLC", vendor= "Teslanet.nl")
-@Configurations({ MulePlcConfig.class, MulePlcMock.class })
+@Xml( prefix= "plc", namespace= "http://www.teslanet.nl/schema/mule/plc" )
+@Extension( name= "PLC", vendor= "Teslanet.nl" )
+@Configurations( { MulePlcConfig.class } )
 public class MulePlcConnector
 {
-    /**
-     * The mockdevices that are configured.
-     */
-    private static final ConcurrentHashMap< String, PlcMockDevice > mockDevices= new ConcurrentHashMap<>();
-
-    /**
-     * @param deviceName The name of the mocked PLC.
-     * @return The PLC mock that is found, otherwise null.
-     */
-    public static PlcMockDevice getMockDevice( String deviceName )
-    {
-        return mockDevices.get( deviceName );
-    }
-
-    /**
-     * @param deviceName The name of the mocked PLC.
-     * @return The PLC mock that is added.
-     */
-    public static PlcMockDevice addMockDevice( String deviceName )
-    {
-        return mockDevices.computeIfAbsent( deviceName, newDevice -> new PlcMockDevice() );
-    }
-
-    /**
-     * Remove a PLC mock.
-     * @param deviceName  The name of the mocked PLC.
-     */
-    public static void removeMockDevice( String deviceName )
-    {
-        mockDevices.remove( deviceName );
-    }
 }

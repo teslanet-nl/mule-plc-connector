@@ -33,7 +33,7 @@
 	</Appenders>
 	<Loggers>
 		<Logger name="org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader" level="warn"/>
-		<Logger name="nl.teslanet" level="warn"/>
+		<Logger name="nl.teslanet" level="info"/>
 		<Logger name="org.apache.plc4x" level="warn" />
 		<Root level="warn">
 			<AppenderRef ref="Console" />

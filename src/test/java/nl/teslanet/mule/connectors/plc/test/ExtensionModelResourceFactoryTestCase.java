@@ -54,7 +54,9 @@ public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedReso
 
     private static final Logger logger= LoggerFactory.getLogger( ExtensionModelResourceFactoryTestCase.class.getCanonicalName() );
 
-    private static final String RESOURCE_NAME= "plc-extension-descriptions.xml";
+    private static final String modelResourcePath= "plc-extension-descriptions.xml";
+
+    private static final String expectedResourcePath= "schemata/plc-extension-descriptions.xml";
 
     private ExtensionDocumentationResourceGenerator resourceFactory= new ExtensionDocumentationResourceGenerator();
 
@@ -66,7 +68,7 @@ public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedReso
         extensionModel= loadExtension( MulePlcConnector.class );
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     @Override
     protected Class< ? extends GeneratedResourceFactory >[] getResourceFactoryTypes()
     {
@@ -77,26 +79,26 @@ public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedReso
     public void generate() throws Exception
     {
         GeneratedResource resource= resourceFactory.generateResource( extensionModel ).get();
-        assertEquals( resource.getPath(), RESOURCE_NAME );
-        String expected= IOUtils.toString( currentThread().getContextClassLoader().getResource( RESOURCE_NAME ).openStream() );
+        assertEquals( resource.getPath(), modelResourcePath );
+        String expected= IOUtils.toString( currentThread().getContextClassLoader().getResource( expectedResourcePath ).openStream() );
         String content= new String( resource.getContent() );
         logger.info( "\n---\n" + content + "\n---" );
         Source expectedSource= Input.from( expected ).build();
         Source contentSource= Input.from( content ).build();
         Diff diff= DiffBuilder.compare( expectedSource ).withTest( contentSource ).checkForSimilar()
-                //.checkForIdentical() 
-                .ignoreComments().ignoreWhitespace().normalizeWhitespace()
-                //.withComparisonController(ComparisonController) 
-                //.withComparisonFormatter(comparisonFormatter)
-                //.withComparisonListeners(comparisonListeners) 
-                //.withDifferenceEvaluator(differenceEvaluator) 
-                //.withDifferenceListeners(comparisonListeners)
-                //.withNodeMatcher(nodeMatcher) 
-                //.withAttributeFilter(attributeFilter) 
-                //.withNodeFilter(nodeFilter) 
-                //.withNamespaceContext(map)
-                //.withDocumentBuilerFactory(factory)
-                .ignoreElementContentWhitespace().build();
+                        //.checkForIdentical() 
+                        .ignoreComments().ignoreWhitespace().normalizeWhitespace()
+                        //.withComparisonController(ComparisonController) 
+                        //.withComparisonFormatter(comparisonFormatter)
+                        //.withComparisonListeners(comparisonListeners) 
+                        //.withDifferenceEvaluator(differenceEvaluator) 
+                        //.withDifferenceListeners(comparisonListeners)
+                        //.withNodeMatcher(nodeMatcher) 
+                        //.withAttributeFilter(attributeFilter) 
+                        //.withNodeFilter(nodeFilter) 
+                        //.withNamespaceContext(map)
+                        //.withDocumentBuilerFactory(factory)
+                        .ignoreElementContentWhitespace().build();
 
         assertFalse( diff.toString(), diff.hasDifferences() );
 
