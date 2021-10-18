@@ -37,11 +37,12 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 	
 	<flow name="basic-ping">
 		<plc:ping doc:name="Ping" config-ref="PLC_Config" />
-        <logger level="INFO" doc:name="Logger" message="#[payload]" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
 	</flow>
 	
 	<flow name="basic-read">
 		<plc:read doc:name="Read" config-ref="PLC_Config">
+            <non-repeatable-stream/>
             <reconnect count="5" frequency="500" />
 			<plc:read-items>
 				<plc:read-item alias="coil1"
@@ -50,9 +51,9 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 					address="RANDOM/register1:INT[1]" />
 			</plc:read-items>
 		</plc:read>
-		<set-payload value="#[payload.^raw as String]"
-			doc:name="Set Payload" />
-		<logger level="INFO" doc:name="Logger" message="#[payload]" />
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+		<logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
 	</flow>
 	
     <flow name="basic-write">
@@ -65,9 +66,9 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
                     address="STATE/register1:INT[2]" values="#[[ '11', '22' ]]" />
             </plc:write-items>
         </plc:write>
-        <set-payload value="#[payload.^raw as String]"
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
             doc:name="Set Payload" />
-        <logger level="INFO" doc:name="Logger" message="#[payload]" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
     </flow>
 
 	<flow name="basic-writestate">
@@ -82,9 +83,9 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 					address="STATE/register3:INT[2]" values="#[[ '33', '44' ]]" />
 			</plc:write-items>
 		</plc:write>
-		<set-payload value="#[payload.^raw as String]"
-			doc:name="Set Payload" />
-		<logger level="INFO" doc:name="Logger" message="#[payload]" />
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+		<logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
 	</flow>
 	
     <flow name="basic-readstate">
@@ -98,9 +99,9 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
                     address="STATE/register3:INT[2]" />
             </plc:read-items>
         </plc:read>
-        <set-payload value="#[payload.^raw as String]"
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
             doc:name="Set Payload" />
-        <logger level="INFO" doc:name="Logger" message="#[payload]" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
     </flow>
 
 </mule>

@@ -23,8 +23,14 @@
 package nl.teslanet.mule.connectors.plc.test;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.util.IOUtils;
 
 
@@ -40,7 +46,7 @@ public class TestUtils
      */
     private TestUtils()
     {
-        // TODO Auto-generated constructor stub
+        // NOOP
     }
 
     /**
@@ -54,5 +60,60 @@ public class TestUtils
     {
         return IOUtils.getResourceAsString( resourcePath, TestUtils.class );
     }
+    
+    /**
+     * Convert some payload to string.
+     *
+     * @param payload the payload to convert.
+     * @return the string represenation.
+     * @throws IOException when conversion failed
+     */
+    public static String toString( Object payload ) throws IOException
+    {
+        Object object;
 
+        if ( payload == null )
+        {
+            return new String();
+        }
+        if ( payload instanceof TypedValue )
+        {
+            object= TypedValue.unwrap( payload );
+        }
+        else
+        {
+            object= payload;
+        }
+        // transform object
+        if ( object instanceof String )
+        {
+            return (String) object;
+        }
+        if ( object instanceof CursorStreamProvider )
+        {
+            return IOUtils.toString( (CursorStreamProvider) object );
+        }
+        else if ( object instanceof InputStream )
+        {
+            return IOUtils.toString( (InputStream) object );
+        }
+        else if ( object instanceof byte[] )
+        {
+            return Arrays.toString( (byte[]) object );
+        }
+        else if ( object instanceof Byte[] )
+        {
+            return Arrays.toString( (Byte[]) object );
+        }
+        else if ( object instanceof OutputHandler )
+        {
+            ByteArrayOutputStream output= new ByteArrayOutputStream();
+            ( (OutputHandler) object ).write( null, output );
+            return output.toString();
+        }
+        else
+        {
+            return object.toString();
+        }
+    }
 }

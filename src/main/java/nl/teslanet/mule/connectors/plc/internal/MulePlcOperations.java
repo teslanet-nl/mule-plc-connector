@@ -35,9 +35,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.slf4j.Logger;
@@ -68,16 +68,18 @@ public class MulePlcOperations
      */
     public MulePlcOperations()
     {
-        transformerFactory = javax.xml.transform.TransformerFactory.newInstance();
-        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        transformerFactory= javax.xml.transform.TransformerFactory.newInstance();
+        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_DTD, "" );
+        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "" );
     }
 
     /**
      * Ping the PLC.
      */
-    @MediaType(value= MediaType.ANY, strict= false)
-    public Boolean ping( @Config MulePlcConfig configuration, @Connection MulePlcConnection connection )
+    @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.ANY, strict= false )
+    public Boolean ping( @Config
+    MulePlcConfig configuration, @Connection
+    MulePlcConnection connection )
     {
         return connection.ping();
     }
@@ -86,11 +88,11 @@ public class MulePlcOperations
      *  Read PLC items.
      * @throws Exception 
      */
-    @MediaType(value= MediaType.ANY, strict= true)
-    public Result< InputStream, ReceivedResponseAttributes > read(
-        @Config MulePlcConfig configuration,
-        @Connection MulePlcConnection connection,
-        @ParameterGroup(name= "Request") ReadRequestBuilder requestBuilder ) throws Exception
+    @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
+    public Result< InputStream, ReceivedResponseAttributes > read( @Config
+    MulePlcConfig configuration, @Connection
+    MulePlcConnection connection, @ParameterGroup( name= "Request" )
+    ReadRequestBuilder requestBuilder ) throws Exception
     {
         // Check if this connection support reading of data.
         if ( !connection.canRead() )
@@ -120,18 +122,19 @@ public class MulePlcOperations
         transformerFactory.newTransformer().transform( new DOMSource( responseDom ), new StreamResult( outputStream ) );
         byte[] bytes= outputStream.toByteArray();
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( new ByteArrayInputStream( bytes ) ).attributes(
-            new ReceivedResponseAttributes( "read" ) ).build();
+            new ReceivedResponseAttributes( "read" )
+        ).mediaType( MediaType.APPLICATION_XML ).build();
     }
 
     /**
      *  Write PLC items.
      * @throws Exception 
      */
-    @MediaType(value= MediaType.ANY, strict= true)
-    public Result< InputStream, ReceivedResponseAttributes > write(
-        @Config MulePlcConfig configuration,
-        @Connection MulePlcConnection connection,
-        @ParameterGroup(name= "Request") WriteRequestBuilder requestBuilder ) throws Exception
+    @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
+    public Result< InputStream, ReceivedResponseAttributes > write( @Config
+    MulePlcConfig configuration, @Connection
+    MulePlcConnection connection, @ParameterGroup( name= "Request" )
+    WriteRequestBuilder requestBuilder ) throws Exception
     {
         // Check if this connection support reading of data.
         if ( !connection.canWrite() )
@@ -160,6 +163,7 @@ public class MulePlcOperations
         transformerFactory.newTransformer().transform( new DOMSource( responseDom ), new StreamResult( outputStream ) );
         byte[] bytes= outputStream.toByteArray();
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( new ByteArrayInputStream( bytes ) ).attributes(
-            new ReceivedResponseAttributes( "write" ) ).build();
+            new ReceivedResponseAttributes( "write" )
+        ).mediaType( MediaType.APPLICATION_XML ).build();
     }
 }

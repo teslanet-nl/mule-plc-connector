@@ -68,7 +68,7 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
     public void executeReadOperation() throws Exception
     {
 
-        String payloadValue= (String) flowRunner( "basic-read" ).run().getMessage().getPayload().getValue();
+        String payloadValue= TestUtils.toString( flowRunner( "basic-read" ).run().getMessage().getPayload().getValue() );
         assertNotNull( payloadValue );
         Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/read_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
         for ( Difference difference : diff.getDifferences() )
@@ -85,7 +85,7 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
     @Test
     public void executeWriteOperation() throws Exception
     {
-        String payloadValue= (String) flowRunner( "basic-write" ).run().getMessage().getPayload().getValue();
+        String payloadValue= TestUtils.toString( flowRunner( "basic-write" ).run().getMessage().getPayload().getValue() );
         Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/write_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
@@ -93,7 +93,7 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
     @Test
     public void executeWriteAndReadOperation() throws Exception
     {
-        String payloadWriteValue= (String) flowRunner( "basic-writestate" ).run().getMessage().getPayload().getValue();
+        String payloadWriteValue= TestUtils.toString( flowRunner( "basic-writestate" ).run().getMessage().getPayload().getValue() );
         Diff writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/writestate_response_1.xml" ) ).withTest(
             payloadWriteValue
         ).ignoreComments().ignoreWhitespace().build();
