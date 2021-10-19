@@ -31,17 +31,17 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 
 /**
- * Definition of an PLC item to read.
+ * Definition of an PLC field to read.
  *
  */
-public class ReadItem
+public class ReadField
 {
     /**
      * The PLC address to be read.
      */
     @Parameter
     @Expression(ExpressionSupport.SUPPORTED)
-    @Summary("The alias of the item to read for refence. ")
+    @Summary("The alias of the field to read for reference. ")
     private String alias;
 
     /**
@@ -49,7 +49,7 @@ public class ReadItem
      */
     @Parameter
     @Expression(ExpressionSupport.SUPPORTED)
-    @Summary("The values to read.")
+    @Summary("The field address in protocol specific format.")
     private String address;
 
     /**

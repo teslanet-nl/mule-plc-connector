@@ -37,14 +37,14 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
  * Definition of a PLC item to write.
  *
  */
-public class WriteItem
+public class WriteField
 {
     /**
      * The PLC address to be written.
      */
     @Parameter
     @Expression( ExpressionSupport.SUPPORTED )
-    @Summary( "The alias of the field to write, for reference in the response. " )
+    @Summary( "The alias of the field to write, for reference. " )
     private String alias;
 
     /**
@@ -62,7 +62,7 @@ public class WriteItem
     @Optional
     @NullSafe
     @Expression( ExpressionSupport.SUPPORTED )
-    @Summary( "The values to write." )
+    @Summary( "Array of one or more values to write." )
     private List< Object > values;
 
     /**

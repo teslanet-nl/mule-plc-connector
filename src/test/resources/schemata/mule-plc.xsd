@@ -109,13 +109,13 @@ limitations under the License.
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="read-items">
+          <xs:element minOccurs="0" maxOccurs="1" name="read-fields">
             <xs:annotation>
-              <xs:documentation>The PLC items to read.</xs:documentation>
+              <xs:documentation>The PLC fields to read.</xs:documentation>
             </xs:annotation>
             <xs:complexType>
               <xs:sequence>
-                <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" minOccurs="0" maxOccurs="unbounded" ref="plc:abstract-read-item"></xs:element>
+                <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" minOccurs="0" maxOccurs="unbounded" ref="plc:abstract-read-field"></xs:element>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -125,9 +125,9 @@ limitations under the License.
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionList" use="optional" name="readItems">
+        <xs:attribute type="mule:expressionList" use="optional" name="readFields">
           <xs:annotation>
-            <xs:documentation>The PLC items to read.</xs:documentation>
+            <xs:documentation>The PLC fields to read.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -143,7 +143,7 @@ limitations under the License.
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="nl.teslanet.mule.connectors.plc.api.ReadItem">
+  <xs:complexType name="nl.teslanet.mule.connectors.plc.api.ReadField">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
         <xs:attribute type="mule:expressionString" use="required" name="alias"></xs:attribute>
@@ -151,11 +151,11 @@ limitations under the License.
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" type="plc:nl.teslanet.mule.connectors.plc.api.ReadItem" abstract="true" name="abstract-read-item"></xs:element>
-  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" substitutionGroup="plc:abstract-read-item" name="read-item">
+  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" type="plc:nl.teslanet.mule.connectors.plc.api.ReadField" abstract="true" name="abstract-read-field"></xs:element>
+  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" substitutionGroup="plc:abstract-read-field" name="read-field">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="plc:nl.teslanet.mule.connectors.plc.api.ReadItem"></xs:extension>
+        <xs:extension base="plc:nl.teslanet.mule.connectors.plc.api.ReadField"></xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
@@ -170,13 +170,13 @@ limitations under the License.
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="write-items">
+          <xs:element minOccurs="0" maxOccurs="1" name="write-fields">
             <xs:annotation>
               <xs:documentation>The alias and plc-name of the items to request.</xs:documentation>
             </xs:annotation>
             <xs:complexType>
               <xs:sequence>
-                <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" minOccurs="0" maxOccurs="unbounded" ref="plc:abstract-write-item"></xs:element>
+                <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" minOccurs="0" maxOccurs="unbounded" ref="plc:abstract-write-field"></xs:element>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -186,7 +186,7 @@ limitations under the License.
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionList" use="optional" name="writeItems">
+        <xs:attribute type="mule:expressionList" use="optional" name="writeFields">
           <xs:annotation>
             <xs:documentation>The alias and plc-name of the items to request.</xs:documentation>
           </xs:annotation>
@@ -204,7 +204,7 @@ limitations under the License.
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="nl.teslanet.mule.connectors.plc.api.WriteItem">
+  <xs:complexType name="nl.teslanet.mule.connectors.plc.api.WriteField">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
         <xs:attribute type="mule:expressionString" use="required" name="alias"></xs:attribute>
@@ -213,11 +213,11 @@ limitations under the License.
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" type="plc:nl.teslanet.mule.connectors.plc.api.WriteItem" abstract="true" name="abstract-write-item"></xs:element>
-  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" substitutionGroup="plc:abstract-write-item" name="write-item">
+  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" type="plc:nl.teslanet.mule.connectors.plc.api.WriteField" abstract="true" name="abstract-write-field"></xs:element>
+  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" substitutionGroup="plc:abstract-write-field" name="write-field">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="plc:nl.teslanet.mule.connectors.plc.api.WriteItem"></xs:extension>
+        <xs:extension base="plc:nl.teslanet.mule.connectors.plc.api.WriteField"></xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
@@ -240,3 +240,4 @@ limitations under the License.
     </xs:union>
   </xs:simpleType>
 </xs:schema>
+

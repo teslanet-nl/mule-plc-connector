@@ -76,8 +76,8 @@
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
                 </parameter>
-                <parameter name="readItems">
-                    <description><![CDATA[The PLC items to read.]]></description>
+                <parameter name="readFields">
+                    <description><![CDATA[The PLC fields to read.]]></description>
                 </parameter>
                 <parameter name="target">
                     <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
@@ -96,7 +96,7 @@
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
                 </parameter>
-                <parameter name="writeItems">
+                <parameter name="writeFields">
                     <description><![CDATA[The alias and plc-name of the items to request.]]></description>
                 </parameter>
                 <parameter name="target">
@@ -113,7 +113,7 @@
     </operations>
     <sources/>
     <types>
-        <type name="nl.teslanet.mule.connectors.plc.api.ReadItem">
+        <type name="nl.teslanet.mule.connectors.plc.api.ReadField">
             <description><![CDATA[]]></description>
             <parameters>
                 <parameter name="alias">
@@ -127,12 +127,12 @@
         <type name="nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes">
             <description><![CDATA[]]></description>
             <parameters>
-                <parameter name="requestCode">
+                <parameter name="success">
                     <description><![CDATA[]]></description>
                 </parameter>
             </parameters>
         </type>
-        <type name="nl.teslanet.mule.connectors.plc.api.WriteItem">
+        <type name="nl.teslanet.mule.connectors.plc.api.WriteField">
             <description><![CDATA[]]></description>
             <parameters>
                 <parameter name="alias">

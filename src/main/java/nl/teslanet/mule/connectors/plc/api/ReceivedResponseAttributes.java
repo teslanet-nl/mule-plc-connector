@@ -23,21 +23,32 @@
 package nl.teslanet.mule.connectors.plc.api;
 
 
+/**
+ * The attributes of a response.
+ */
 public class ReceivedResponseAttributes
 {
-    private String requestCode;
-
-    public ReceivedResponseAttributes( String requestCode )
+    /**
+     * Indication of successfully completion of the request.
+     * If the request concerns multiple fields, a True value indicates 
+     * that the operation succeeded on all fields. 
+     */
+    private boolean success;
+    
+    /**
+     * Constructor.
+     * @param success The success indicator.
+     */
+    public ReceivedResponseAttributes( boolean success)
     {
-        this.requestCode= requestCode;
+        this.success= success;
     }
 
     /**
-     * @return the requestCode
+     * @return the success
      */
-    public String getRequestCode()
+    public boolean isSuccess()
     {
-        return requestCode;
+        return success;
     }
-
 }

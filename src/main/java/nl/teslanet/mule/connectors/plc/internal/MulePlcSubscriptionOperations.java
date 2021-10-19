@@ -36,6 +36,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionRequest;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
+import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import nl.teslanet.mule.connectors.plc.api.ReadItem;
+import nl.teslanet.mule.connectors.plc.api.ReadField;
 import nl.teslanet.mule.connectors.plc.api.ReadRequestBuilder;
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
 
@@ -61,7 +62,7 @@ public class MulePlcSubscriptionOperations
 
 
     /**
-     *  Subscribe PLC items. NOt READY FOR USE.
+     *  Subscribe PLC items. NOT READY FOR USE.
      * @throws Exception 
      */
     @MediaType(value= MediaType.ANY, strict= true)
@@ -74,8 +75,8 @@ public class MulePlcSubscriptionOperations
         if ( !connection.getMetadata().canRead() )
         {
             //TODO
-            logger.error( "This connection doesn't support reading." );
-            throw new Exception( "This connection doesn't support reading." );
+            logger.error( "This connection doesn't support subscribing." );
+            throw new Exception( "This connection doesn't support subscribing." );
         }
         //prepare response
         DocumentBuilderFactoryImpl dbFactory= (DocumentBuilderFactoryImpl) DocumentBuilderFactoryImpl.newInstance();
@@ -90,7 +91,7 @@ public class MulePlcSubscriptionOperations
         rootElement.appendChild( requestElement );
 
         PlcSubscriptionRequest.Builder builder= connection.subscriptionRequestBuilder();
-        for ( ReadItem item : readRequestBuilder.getItems() )
+        for ( ReadField item : readRequestBuilder.getReadFields() )
         {
             builder.addChangeOfStateField( item.getAlias(), item.getAddress() );
             //requestItem element
@@ -118,13 +119,16 @@ public class MulePlcSubscriptionOperations
         //response element
         Element responseElement= responseDom.createElement( "subscribeResponse" );
         rootElement.appendChild( responseElement );
+        boolean allOk= true;
         for ( String fieldName : response.getFieldNames() )
         {
             //requestItem element
             Element responseItemElement= responseDom.createElement( "subscribeResult" );
             responseElement.appendChild( responseItemElement );
             responseItemElement.setAttribute( "alias", fieldName );
-            responseItemElement.setAttribute( "result", response.getResponseCode( fieldName ).toString() );
+            PlcResponseCode responseCode= response.getResponseCode( fieldName );
+            allOk= allOk && ( responseCode == PlcResponseCode.OK );
+            responseItemElement.setAttribute( "result", responseCode.name() );
         }
         //build content
         //Collection< PlcSubscriptionHandle > handels= response.getSubscriptionHandles();
@@ -133,6 +137,6 @@ public class MulePlcSubscriptionOperations
         TransformerFactory.newInstance().newTransformer().transform( new DOMSource( responseDom ), new StreamResult( outputStream ) );
         byte[] bytes= outputStream.toByteArray();
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( new ByteArrayInputStream (bytes) ).attributes(
-            new ReceivedResponseAttributes( "read" ) ).build();
+            new ReceivedResponseAttributes( allOk ) ).build();
     }
 }

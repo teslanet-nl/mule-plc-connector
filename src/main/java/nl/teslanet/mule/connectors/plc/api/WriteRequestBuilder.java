@@ -47,15 +47,15 @@ public class WriteRequestBuilder
     @Optional
     @NullSafe
     @Expression(ExpressionSupport.SUPPORTED)
-    @Summary("The items to write.")
+    @Summary("The fields to write to.")
     @DisplayName("Requestitems")
-    private List< WriteItem > writeItems;
+    private List< WriteField > writeFields;
 
     /**
-     * @return the request items.
+     * @return the write fields.
      */
-    public List< WriteItem > getWriteItems()
+    public List< WriteField > getWriteItems()
     {
-        return writeItems;
+        return writeFields;
     }
 }

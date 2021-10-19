@@ -36,12 +36,11 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * The builder for a read request.
- *
  */
 public class ReadRequestBuilder
 {
     /**
-     * The PLC items to read.
+     * The PLC fields to read.
      */
     @Parameter
     @Optional
@@ -49,22 +48,22 @@ public class ReadRequestBuilder
     @Expression(ExpressionSupport.SUPPORTED)
     @Summary("The PLC items to read.")
     @DisplayName("Requestitems")
-    private List< ReadItem > readItems= null;
+    private List< ReadField > readFields= null;
 
     /**
-     * @return the requested items.
+     * @return the requested fields.
      */
-    public List< ReadItem > getItems()
+    public List< ReadField > getReadFields()
     {
-        return readItems;
+        return readFields;
     }
 
     /**
-     * Set the requested items.
-     * @param readItems The itemns to read.
+     * Set the requested fields.
+     * @param readFields The fields to read.
      */
-    public void setItems( List< ReadItem > readItems )
+    public void setReadFields( List< ReadField > readFields )
     {
-        this.readItems= readItems;
+        this.readFields= readFields;
     }
 }

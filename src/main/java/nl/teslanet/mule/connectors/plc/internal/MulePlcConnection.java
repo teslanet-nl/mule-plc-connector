@@ -32,8 +32,8 @@ import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.mule.runtime.api.connection.ConnectionException;
 
-import nl.teslanet.mule.connectors.plc.api.ReadItem;
-import nl.teslanet.mule.connectors.plc.api.WriteItem;
+import nl.teslanet.mule.connectors.plc.api.ReadField;
+import nl.teslanet.mule.connectors.plc.api.WriteField;
 
 
 /**
@@ -71,8 +71,8 @@ public interface MulePlcConnection
     public boolean canRead();
 
     /**
-     * Read items from PLC using this connection.
-     * @param items to read.
+     * Read fields from PLC using this connection.
+     * @param fields to read.
      * @param timeout Read response must be received within the timout.
      * @param timeUnit Unit of the timeout parameter.
      * @return the read response
@@ -81,7 +81,7 @@ public interface MulePlcConnection
      * @throws InterruptedException When the read operation is interrupted.
      * @throws ConnectionException when connection failed.
      */
-    public PlcReadResponse read( List< ReadItem > items, long timeout, TimeUnit timeUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException;
+    public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException;
 
     /**
      * @return {@code true} when the connection can be used to write, otherwise {@code false}.
@@ -89,8 +89,8 @@ public interface MulePlcConnection
     public boolean canWrite();
 
     /**
-      * Read items from PLC using this connection.
-     * @param items to write.
+      * Read fields from PLC using this connection.
+     * @param fields to write.
      * @param timeout Read response must be received within the timout.
      * @param timeoutUnit Unit of the timeout parameter.
      * @return the write response.
@@ -99,5 +99,5 @@ public interface MulePlcConnection
      * @throws InterruptedException When the write operation is interrupted.
      * @throws ConnectionException when connection failed.
      */
-    public PlcWriteResponse write( List< WriteItem > items, long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException;
+    public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException;
 }

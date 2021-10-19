@@ -38,8 +38,8 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.teslanet.mule.connectors.plc.api.ReadItem;
-import nl.teslanet.mule.connectors.plc.api.WriteItem;
+import nl.teslanet.mule.connectors.plc.api.ReadField;
+import nl.teslanet.mule.connectors.plc.api.WriteField;
 
 
 /**
@@ -138,14 +138,14 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     @Override
-    public synchronized PlcReadResponse read( List< ReadItem > items, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+    public synchronized PlcReadResponse read( List< ReadField > items, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         ConnectionException
     {
         connect();
         PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
-        for ( ReadItem item : items )
+        for ( ReadField item : items )
         {
             builder.addItem( item.getAlias(), item.getAddress() );
         }
@@ -159,14 +159,14 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     @Override
-    public synchronized PlcWriteResponse write( List< WriteItem > items, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public synchronized PlcWriteResponse write( List< WriteField > items, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         ConnectionException
     {
         connect();
         PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();
-        for ( WriteItem item : items )
+        for ( WriteField item : items )
         {
             builder.addItem( item.getAlias(), item.getAddress(), item.getValues().toArray() );
         }

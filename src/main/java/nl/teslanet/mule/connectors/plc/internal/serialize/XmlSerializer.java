@@ -32,6 +32,7 @@ import org.apache.plc4x.java.api.messages.PlcFieldResponse;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.model.PlcField;
+import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.apache.plc4x.java.api.value.PlcValue;
 import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
 import org.w3c.dom.Document;
@@ -70,7 +71,7 @@ public class XmlSerializer
      * @return The serialized response document.
      * @throws ParserConfigurationException 
      */
-    public static Document xmlSerialize( PlcReadResponse response ) throws ParserConfigurationException
+    public static XmlSerializerResult xmlSerialize( PlcReadResponse response ) throws ParserConfigurationException
     {
         DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
         Document doc= dBuilder.newDocument();
@@ -79,11 +80,11 @@ public class XmlSerializer
         Element rootElement= doc.createElement( "plcReadResponse" );
         doc.appendChild( rootElement );
         //build content
-        seralizeFileds( doc, rootElement, response, ( alias ) -> response.getPlcValue( alias ) );
-        return doc;
+        boolean allOk= seralizeFileds( doc, rootElement, response, ( alias ) -> response.getPlcValue( alias ) );
+        return new XmlSerializerResult( allOk, doc );
     }
 
-    public static Document xmlSerialize( PlcWriteResponse response ) throws ParserConfigurationException
+    public static XmlSerializerResult xmlSerialize( PlcWriteResponse response ) throws ParserConfigurationException
     {
         DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
         Document doc= dBuilder.newDocument();
@@ -92,17 +93,21 @@ public class XmlSerializer
         Element rootElement= doc.createElement( "plcWriteResponse" );
         doc.appendChild( rootElement );
         //build content
-        seralizeFileds( doc, rootElement, response, ( alias ) -> response.getRequest().getPlcValue( alias ) );
-        return doc;
+        boolean allOk= seralizeFileds( doc, rootElement, response, ( alias ) -> response.getRequest().getPlcValue( alias ) );
+        return new XmlSerializerResult( allOk, doc );
     }
 
-    private static void seralizeFileds( Document doc, Element parent, PlcFieldResponse response, PlcValueProvider valueProvider )
+    private static boolean seralizeFileds( Document doc, Element parent, PlcFieldResponse response, PlcValueProvider valueProvider )
     {
+        boolean allOk= true;
+        
         for ( String alias : response.getFieldNames() )
         {
             Element fieldElement= doc.createElement( "field" );
             fieldElement.setAttribute( "alias", alias );
-            fieldElement.setAttribute( "responseCode", response.getResponseCode( alias ).name() );
+            PlcResponseCode responseCode= response.getResponseCode( alias );
+            allOk= allOk && ( responseCode == PlcResponseCode.OK);
+            fieldElement.setAttribute( "responseCode", responseCode.name() );
             PlcField field= response.getField( alias );
             try
             {
@@ -117,6 +122,7 @@ public class XmlSerializer
             fieldElement.appendChild( xmlSeralize( doc, valueProvider.getValue( alias ), valueCount ) );
             parent.appendChild( fieldElement );
         }
+        return allOk;
     }
 
     private static Element xmlSeralize( Document doc, PlcValue plcValue, int expectedValueCount )
@@ -170,6 +176,57 @@ public class XmlSerializer
         if ( value != null )
         {
             element.setAttribute( name, value );
+        }
+    }
+
+    /**
+     * The result of serialization.
+     */
+    public static class XmlSerializerResult
+    {
+        /**
+         * True when responseCodes for all fields is OK.
+         */
+        private boolean docIndicatesSucces;
+
+        /**
+         * The serialized response document.
+         */
+        private final Document document;
+
+        /**
+         * Constructor.
+         * @param docIndicatesSucces the succes indicator of the response.
+         * @param document The serialized response document.
+         */
+        private XmlSerializerResult( boolean docIndicatesSucces, Document document )
+        {
+            this.docIndicatesSucces= docIndicatesSucces;
+            this.document= document;
+        }
+
+        /**
+         * @return the docIndicatesSucces
+         */
+        public boolean isDocIndicatesSucces()
+        {
+            return docIndicatesSucces;
+        }
+
+        /**
+         * @param docIndicatesSucces the docIndicatesSucces to set
+         */
+        public void setDocIndicatesSucces( boolean docIndicatesSucces )
+        {
+            this.docIndicatesSucces= docIndicatesSucces;
+        }
+
+        /**
+         * @return the document
+         */
+        public Document getDocument()
+        {
+            return document;
         }
     }
 }

@@ -42,12 +42,12 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import nl.teslanet.mule.connectors.plc.api.ReadRequestBuilder;
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
 import nl.teslanet.mule.connectors.plc.api.WriteRequestBuilder;
 import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer;
+import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSerializerResult;
 
 
 /**
@@ -104,7 +104,7 @@ public class MulePlcOperations
         PlcReadResponse response= null;
         try
         {
-            response= connection.read( requestBuilder.getItems(), configuration.getTimeout(), configuration.getTimeoutUnits() );
+            response= connection.read( requestBuilder.getReadFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
         }
         catch ( Exception e )
         {
@@ -117,12 +117,12 @@ public class MulePlcOperations
             logger.error( "Null response on read." );
             throw new Exception( "Null response on read." );
         }
-        Document responseDom= XmlSerializer.xmlSerialize( response );
+        XmlSerializerResult responseResult= XmlSerializer.xmlSerialize( response );
         ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
-        transformerFactory.newTransformer().transform( new DOMSource( responseDom ), new StreamResult( outputStream ) );
+        transformerFactory.newTransformer().transform( new DOMSource( responseResult.getDocument() ), new StreamResult( outputStream ) );
         byte[] bytes= outputStream.toByteArray();
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( new ByteArrayInputStream( bytes ) ).attributes(
-            new ReceivedResponseAttributes( "read" )
+            new ReceivedResponseAttributes( responseResult.isDocIndicatesSucces() )
         ).mediaType( MediaType.APPLICATION_XML ).build();
     }
 
@@ -158,12 +158,12 @@ public class MulePlcOperations
             logger.error( "Null response on read." );
             throw new Exception( "Null response on write." );
         }
-        Document responseDom= XmlSerializer.xmlSerialize( response );
+        XmlSerializerResult responseResult= XmlSerializer.xmlSerialize( response );
         ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
-        transformerFactory.newTransformer().transform( new DOMSource( responseDom ), new StreamResult( outputStream ) );
+        transformerFactory.newTransformer().transform( new DOMSource( responseResult.getDocument() ), new StreamResult( outputStream ) );
         byte[] bytes= outputStream.toByteArray();
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( new ByteArrayInputStream( bytes ) ).attributes(
-            new ReceivedResponseAttributes( "write" )
+            new ReceivedResponseAttributes( responseResult.isDocIndicatesSucces() )
         ).mediaType( MediaType.APPLICATION_XML ).build();
     }
 }
