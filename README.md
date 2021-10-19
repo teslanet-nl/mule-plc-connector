@@ -86,13 +86,13 @@ The Config element configures how to connect to a PLC instance and is referenced
 
 This example configures a Modbus PLC:
 
-![Image](src/site/images/plc_config.png "icon")
+![Image](src/site/images/plc_config.png "config")
 
-In xml:
+Xml configuration:
 ```
     <plc:config name="PLC_Config_Modbus">
         <plc:connection
-            connectionUri="modbus:tcp://your.plc.host:502" />
+            connectionUri="modbus:tcp://127.0.0.1:502" />
     </plc:config>
 ```
 
@@ -100,7 +100,11 @@ In xml:
 
 The ping operation tests access to the PLC. When it is accessible the boolean value True is returned, otherwise False.
 
-Example: 
+Example:
+
+![Image](src/site/images/plc_ping.png "ping")
+
+Xml configuration:
 ```
     <plc:ping doc:name="Ping" config-ref="PLC_Config" />
 ```
@@ -109,7 +113,11 @@ Example:
 
 The read operation reads input from the PLC. Multiple items can be read at once. The alias is for correlation the response items to the request.
 
-Example: 
+Example:
+
+![Image](src/site/images/plc_read.png "ping")
+
+Xml configuration:
 ```
     <plc:read doc:name="Read" config-ref="PLC_Config_Modbus">
         <plc:read-fields>
@@ -146,15 +154,18 @@ The write operation writes values to the PLC. Like the read operation, multiple 
 The alias for the field to write, the address and an array of values is given. When only one value is written an array of just one value is used.
 
 Example: 
+
+![Image](src/site/images/plc_write.png "ping")
+
+Xml configuration:
 ```
     <plc:write doc:name="Write" config-ref="PLC_Config_Modbus">
         <plc:write-fields>
             <plc:write-field alias="coil1" address="coil:1"
                 values="#[ [ true ] ]" />
-            </plc:write-fields>
             <plc:write-field alias="register34array2" address="holding-register:34[2]"
                 values="#[ [ 11, 22 ] ]" />
-            </plc:write-fields>
+        </plc:write-fields>
     </plc:write>
 ```
 
@@ -164,15 +175,15 @@ The response for the request above could show:
 ```
     <plcWriteResponse>
         <field alias="coil1" count="1" responseCode="OK" type="BOOL">
-            <values>
-                <value>true</value>
-            </values>
+            <value>true</value>
         </field>
-        <field alias="register34array2" count="2" responseCode="OK" type="INT">
+        <field alias="register34array2" count="2" responseCode="OK"
+            type="INT">
             <values>
                 <value>11</value>
                 <value>22</value>
             </values>
         </field>
     </plcWriteResponse>
+
 ```
