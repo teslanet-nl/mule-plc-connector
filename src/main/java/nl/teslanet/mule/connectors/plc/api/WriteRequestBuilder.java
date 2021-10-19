@@ -30,7 +30,6 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 
@@ -48,7 +47,6 @@ public class WriteRequestBuilder
     @NullSafe
     @Expression(ExpressionSupport.SUPPORTED)
     @Summary("The fields to write to.")
-    @DisplayName("Requestitems")
     private List< WriteField > writeFields;
 
     /**

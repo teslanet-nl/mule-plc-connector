@@ -158,7 +158,7 @@ The write operation writes values to one or more fields of the PLC. The request 
 
 Example: 
 
-![Image](src/site/images/plc_write.png "ping")
+![Image](src/site/images/plc_write.png "write")
 
 Xml configuration:
 ```

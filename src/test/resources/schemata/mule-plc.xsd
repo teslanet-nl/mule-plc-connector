@@ -32,7 +32,7 @@ limitations under the License.
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
           <xs:annotation>
-            <xs:documentation>This class represents an extension configuration, values set in this class are commonly used across multiple operations since they represent something core from the extension.</xs:documentation>
+            <xs:documentation>Configuration of a PLC connection.</xs:documentation>
           </xs:annotation>
           <xs:sequence minOccurs="1" maxOccurs="1">
             <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
@@ -240,4 +240,3 @@ limitations under the License.
     </xs:union>
   </xs:simpleType>
 </xs:schema>
-
