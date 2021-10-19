@@ -1,9 +1,11 @@
 # Mule PLC Connector
 --------------------
 
+## Introduction
+
 Mule PLC Connector enables Mule 4 applications to communicate with PLC systems.
 
-PLC protocols that are supported by the [Apache PLC4X project](https://plc4x.apache.org/) can be used:
+Several PLC protocols that are supported by the [Apache PLC4X project](https://plc4x.apache.org/) can be used:
 - AB-ETH
 - ADS/AMS
 - BACnet/IP
@@ -18,15 +20,15 @@ PLC protocols that are supported by the [Apache PLC4X project](https://plc4x.apa
 - S7 (Step7)
 - Simulated
 
-## Dependencies
+### Dependencies
 The Mule-PLC-connector uses Apache PLC4X version 0.9.0
 
-## Mule supported versions
+### Mule supported versions
 * Mule 4.1+
 
 ## Installation
 
-To use the connector in a Mule 4 application, add following dependency to your application pom.xml:
+The connector is installed by adding its Maven dependency your Mule 4 application. Add following dependency to the pom:
 
 ```
 <dependency>
@@ -37,12 +39,12 @@ To use the connector in a Mule 4 application, add following dependency to your a
 </dependency>
 ```
 
-after adding the dependency to your application in AnypointStudio the connector is download from Maven Central. 
-AnypointStudios Mule Palette will show the connectors operations ready for use. 
+When this dependency is added to your application in AnypointStudio 7, the connector will be downloaded from Maven Central. 
+AnypointStudio Mule Palette will show the connectors operations, ready for use. 
 
-For every PLC protocol needed the corresponding PLC4X module has to be added to the pom as additional dependency of the Mule PLC connector. Find the corresponding Maven dependency on the [PLC4X site](https://plc4x.apache.org/users/protocols/) and add the dependency to the Mule Maven Plugin. 
+For every PLC protocol needed in your application, the corresponding PLC4X module has to be added to the pom as well, as additional dependency of the Mule PLC connector. Find the PLC4X module dependency on the [PLC4X site](https://plc4x.apache.org/users/protocols/) and add this to the configuration of the Mule Maven Plugin. 
 
-For example the Modbus and Simulated module are added to the pom like this:
+For example the Modbus and Simulated modules are added to the pom like this:
 ```
     <plugin>
          <groupId>org.mule.tools.maven</groupId>
@@ -76,15 +78,17 @@ For example the Modbus and Simulated module are added to the pom like this:
 
 ## Usage
 
-The connector's operations can be added to your Mule application by dragging from the AnypointStudios Mule Palette into the application flows, 
+The connector's operations such as _Read_ and _Write_,  can be added to your application by dragging these from the AnypointStudios Mule Palette into the application flows, 
 or by editing the application xml configuration directly.
-Which operation is supported depends on the protocol used. Also the address-format of the accessible items on the PLC are protocol specific.
+
+Which operation is supported depends on the protocol used. Also the address-format of PLC fields are protocol specific.
 See [PLC4X documentation](https://plc4x.apache.org/users/protocols/).
 
-### Config
-The Config element configures how to connect to a PLC instance and is referenced by every operation that accesses it.
+### Configuration
 
-This example configures a Modbus PLC:
+The Config element configures how to connect to a PLC instance. The configuration is referenced by every operation that accesses the PLC.
+
+For example the configuration of a Modbus PLC:
 
 ![Image](src/site/images/plc_config.png "config")
 
@@ -92,13 +96,13 @@ Xml configuration:
 ```
     <plc:config name="PLC_Config_Modbus">
         <plc:connection
-            connectionUri="modbus:tcp://127.0.0.1:502" />
+            connectionUri="modbus:tcp://plc.host.name:502" />
     </plc:config>
 ```
 
 ### Ping operation
 
-The ping operation tests access to the PLC. When it is accessible the boolean value True is returned, otherwise False.
+The ping operation tests available access to the PLC. When the PLC is accessible a boolean value True is returned, otherwise False.
 
 Example:
 
@@ -111,11 +115,11 @@ Xml configuration:
 
 ### Read operation
 
-The read operation reads input from the PLC. Multiple items can be read at once. The alias is for correlation the response items to the request.
+The read operation reads actual field values from the PLC. Multiple fields can be read in one request. Every field has an alias to correlate the values that are read and returned in the response. 
 
 Example:
 
-![Image](src/site/images/plc_read.png "ping")
+![Image](src/site/images/plc_read.png "read")
 
 Xml configuration:
 ```
@@ -128,7 +132,7 @@ Xml configuration:
     </plc:read>
 ```
 
-The result of the operation is a XML plcReadResponse message describing the values read. It contains an entry for every item indicating whether the read action was successful and if so, the value or values read.
+The result of the operation is a plcReadResponse XMLmessage describing the values are read. It contains an entry for every field. For each field the responseCode, alias and one or more values are given.
 The response for the request above could show:
 ```
     <plcReadResponse>
@@ -150,8 +154,7 @@ The response for the request above could show:
 
 ### Write operation
 
-The write operation writes values to the PLC. Like the read operation, multiple items can be written at once. 
-The alias for the field to write, the address and an array of values is given. When only one value is written an array of just one value is used.
+The write operation writes values to one or more fields of the PLC. The request contains for every field, the alias, the address and an array of one or more values.
 
 Example: 
 
@@ -169,7 +172,7 @@ Xml configuration:
     </plc:write>
 ```
 
-The result of the write operation is a XML plcWriteResponse message describing which values are successfully written. The written values are returned in the response also, for information.
+The result of the write operation is a plcWriteResponse XML message describing which values are successfully written. The written values are returned in the response for information.
 The response for the request above could show:
 
 ```
