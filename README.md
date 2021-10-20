@@ -156,7 +156,7 @@ The response on the request above could be:
 
 The write operation writes values to one or more fields of the PLC. The request contains for every field, the alias, the address and an array of one or more values to write.
 
-Wrtie example: 
+Write example: 
 
 ![Image](src/site/images/plc_write.png "write")
 
