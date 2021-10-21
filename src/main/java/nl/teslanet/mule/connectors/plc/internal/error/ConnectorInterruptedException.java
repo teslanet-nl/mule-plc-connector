@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.api.error;
+package nl.teslanet.mule.connectors.plc.internal.error;
 
 
 import org.mule.runtime.extension.api.exception.ModuleException;

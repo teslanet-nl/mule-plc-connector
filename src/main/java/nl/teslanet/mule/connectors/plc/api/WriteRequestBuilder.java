@@ -40,6 +40,17 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 public class WriteRequestBuilder
 {
     /**
+     * When {@code true} an exception is thrown if one or more fields are not successfully written.
+     */
+    @Parameter
+    @Optional( defaultValue= "true" )
+    @Expression( ExpressionSupport.NOT_SUPPORTED )
+    @Summary(
+        "When true an exception is thrown if one or more fields are not successfully written."
+    )
+    private boolean throwExceptionOnError= true;
+    
+    /**
      * The alias and plc-name of the items to request.
      */
     @Parameter
@@ -53,6 +64,22 @@ public class WriteRequestBuilder
      * @return the write fields.
      */
     public List< WriteField > getWriteItems()
+    {
+        return writeFields;
+    }
+
+    /**
+     * @return the throwExceptionOnError
+     */
+    public boolean isThrowExceptionOnError()
+    {
+        return throwExceptionOnError;
+    }
+
+    /**
+     * @return the writeFields
+     */
+    public List< WriteField > getWriteFields()
     {
         return writeFields;
     }

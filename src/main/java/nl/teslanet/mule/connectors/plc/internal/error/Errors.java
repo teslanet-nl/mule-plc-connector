@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.api.error;
+package nl.teslanet.mule.connectors.plc.internal.error;
 
 
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
@@ -32,5 +32,23 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
  */
 public enum Errors implements ErrorTypeDefinition< Errors >
 {
-    UNSUPPORTED_OPERATION, INTERRUPTED, EXECUTION_ERROR
+    /**
+     * The operation called is not supported by the prtocol used.
+     */
+    UNSUPPORTED_OPERATION,
+
+    /**
+    * One or more fields could not be read or written successfully.
+    */
+    IO_ERROR,
+
+    /**
+    * An IO operation was interrupted.
+    */
+    INTERRUPTED,
+
+    /**
+    * An internal error occurred during execution of an operation.
+    */
+    EXECUTION_ERROR
 }

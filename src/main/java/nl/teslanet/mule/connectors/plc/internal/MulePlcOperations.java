@@ -40,6 +40,7 @@ import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -48,9 +49,11 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import nl.teslanet.mule.connectors.plc.api.ReadRequestBuilder;
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
 import nl.teslanet.mule.connectors.plc.api.WriteRequestBuilder;
-import nl.teslanet.mule.connectors.plc.api.error.ConnectorExecutionException;
-import nl.teslanet.mule.connectors.plc.api.error.ConnectorInterruptedException;
-import nl.teslanet.mule.connectors.plc.api.error.UnsupportedException;
+import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionException;
+import nl.teslanet.mule.connectors.plc.internal.error.ConnectorInterruptedException;
+import nl.teslanet.mule.connectors.plc.internal.error.IoErrorException;
+import nl.teslanet.mule.connectors.plc.internal.error.OperationErrorProvider;
+import nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException;
 import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer;
 import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSerializerResult;
 
@@ -88,21 +91,23 @@ public class MulePlcOperations
     }
 
     /**
-     *  Read PLC items.
-     * @param configuration
-     * @param connection
-     * @param requestBuilder
+     * Read PLC items.
+     * @param configuration The PLC connector configuration.
+     * @param connection The connection instance
+     * @param requestBuilder The builder containing request parameters.
      * @return The readResponse as Result
-     * @throws UnsupportedException
-     * @throws ConnectorExecutionException
-     * @throws ConnectorInterruptedException
-     * @throws ConnectionException
+     * @throws UnsupportedException When write is not supported by PLC protocol.
+     * @throws ConnectorExecutionException When internal error occurs.
+     * @throws ConnectorInterruptedException When IO was interrupted.
+     * @throws IoErrorException When fields are not successfully read.
+     * @throws ConnectionException When connection is lost.
      */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
+    @Throws( OperationErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > read( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
-    ReadRequestBuilder requestBuilder ) throws UnsupportedException, ConnectorExecutionException, ConnectorInterruptedException, ConnectionException
+    ReadRequestBuilder requestBuilder ) throws UnsupportedException, ConnectorExecutionException, ConnectorInterruptedException, IoErrorException, ConnectionException
     {
         // Check if this connection support reading of data.
         if ( !connection.canRead() )
@@ -139,6 +144,7 @@ public class MulePlcOperations
         {
             throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
         }
+        if ( requestBuilder.isThrowExceptionOnError() && !responseResult.isDocIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
         ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
         try
         {
@@ -155,21 +161,23 @@ public class MulePlcOperations
     }
 
     /**
-     *  Write PLC items.
-     * @param configuration
-     * @param connection
-     * @param requestBuilder
-     * @return The wrtieResponse as Result.
-     * @throws UnsupportedException
-     * @throws ConnectorExecutionException
-     * @throws ConnectorInterruptedException
-     * @throws ConnectionException
+     * Write PLC items.
+     * @param configuration The PLC connector configuration.
+     * @param connection The connection instance
+     * @param requestBuilder The builder containing request parameters.
+     * @return The writeResponse as Result.
+     * @throws UnsupportedException When write is not supported by PLC protocol.
+     * @throws ConnectorExecutionException When internal error occurs.
+     * @throws ConnectorInterruptedException When IO was interrupted.
+     * @throws IoErrorException When fields are not successfully written.
+     * @throws ConnectionException When connection is lost.
      */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
+    @Throws( OperationErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > write( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
-    WriteRequestBuilder requestBuilder ) throws UnsupportedException, ConnectorExecutionException, ConnectorInterruptedException, ConnectionException
+    WriteRequestBuilder requestBuilder ) throws UnsupportedException, ConnectorExecutionException, ConnectorInterruptedException, IoErrorException, ConnectionException
     {
         // Check if this connection support writing of data.
         if ( !connection.canWrite() )
@@ -206,6 +214,7 @@ public class MulePlcOperations
         {
             throw new ConnectorExecutionException( "Internal error on serializing write response.", e );
         }
+        if ( requestBuilder.isThrowExceptionOnError() && !responseResult.isDocIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully written" );
         ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
         try
         {

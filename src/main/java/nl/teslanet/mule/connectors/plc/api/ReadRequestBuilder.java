@@ -39,14 +39,31 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 public class ReadRequestBuilder
 {
     /**
+     * When {@code true} an exception is thrown if one or more fields are not successfully read.
+     */
+    @Parameter
+    @Optional( defaultValue= "true" )
+    @Expression( ExpressionSupport.NOT_SUPPORTED )
+    @Summary( "When true an exception is thrown if one or more fields are not successfully read." )
+    private boolean throwExceptionOnError= true;
+
+    /**
      * The PLC fields to read.
      */
     @Parameter
     @Optional
     @NullSafe
-    @Expression(ExpressionSupport.SUPPORTED)
-    @Summary("The PLC items to read.")
+    @Expression( ExpressionSupport.SUPPORTED )
+    @Summary( "The PLC items to read." )
     private List< ReadField > readFields= null;
+
+    /**
+     * @return the throwExceptionOnError
+     */
+    public boolean isThrowExceptionOnError()
+    {
+        return throwExceptionOnError;
+    }
 
     /**
      * @return the requested fields.
@@ -56,12 +73,4 @@ public class ReadRequestBuilder
         return readFields;
     }
 
-    /**
-     * Set the requested fields.
-     * @param readFields The fields to read.
-     */
-    public void setReadFields( List< ReadField > readFields )
-    {
-        this.readFields= readFields;
-    }
 }

@@ -56,9 +56,9 @@ import org.w3c.dom.Element;
 import nl.teslanet.mule.connectors.plc.api.ReadField;
 import nl.teslanet.mule.connectors.plc.api.ReadRequestBuilder;
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
-import nl.teslanet.mule.connectors.plc.api.error.ConnectorExecutionException;
-import nl.teslanet.mule.connectors.plc.api.error.ConnectorInterruptedException;
-import nl.teslanet.mule.connectors.plc.api.error.UnsupportedException;
+import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionException;
+import nl.teslanet.mule.connectors.plc.internal.error.ConnectorInterruptedException;
+import nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException;
 
 
 /**

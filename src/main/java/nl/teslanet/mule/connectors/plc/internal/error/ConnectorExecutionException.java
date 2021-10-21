@@ -20,35 +20,48 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.api.error;
+package nl.teslanet.mule.connectors.plc.internal.error;
 
 
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 
 /**
- * InvalidHandlerNameException occurs when a given handler name is invalid.
- *
+ * Internal error occurred during execution of an operation.
  */
-public class UnsupportedException extends ModuleException
+public class ConnectorExecutionException extends ModuleException
 {
+
     /**
-     * 
+     * Serial version.
      */
     private static final long serialVersionUID= 1L;
 
-    public UnsupportedException( String message )
+    /**
+     * Constructor with message.
+     * @param message The error message.
+     */
+    public ConnectorExecutionException( String message )
     {
-        super( message, Errors.UNSUPPORTED_OPERATION );
+        super( message, Errors.EXECUTION_ERROR );
     }
 
-    public UnsupportedException( Throwable cause )
+    /**
+     * Constructor with throwable.
+     * @param cause The cause of the exception.
+     */
+    public ConnectorExecutionException( Throwable cause )
     {
-        super( Errors.UNSUPPORTED_OPERATION, cause );
+        super( Errors.EXECUTION_ERROR, cause );
     }
 
-    public UnsupportedException( String message, Throwable cause )
+    /**
+     * Constructor with message and throwable.
+     * @param message The error message.
+     * @param cause The cause of the exception.
+     */
+    public ConnectorExecutionException( String message, Throwable cause )
     {
-        super( message, Errors.UNSUPPORTED_OPERATION, cause );
+        super( message, Errors.EXECUTION_ERROR, cause );
     }
 }

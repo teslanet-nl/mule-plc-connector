@@ -20,18 +20,17 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.api.error;
+package nl.teslanet.mule.connectors.plc.internal.error;
 
 
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 
 /**
- * Internal error occurred during execution of an operation.
+ * One or more fields could not be read or written successfully.
  */
-public class ConnectorExecutionException extends ModuleException
+public class IoErrorException extends ModuleException
 {
-
     /**
      * Serial version.
      */
@@ -41,18 +40,18 @@ public class ConnectorExecutionException extends ModuleException
      * Constructor with message.
      * @param message The error message.
      */
-    public ConnectorExecutionException( String message )
+    public IoErrorException( String message )
     {
-        super( message, Errors.EXECUTION_ERROR );
+        super( message, Errors.IO_ERROR );
     }
 
     /**
      * Constructor with throwable.
      * @param cause The cause of the exception.
      */
-    public ConnectorExecutionException( Throwable cause )
+    public IoErrorException( Throwable cause )
     {
-        super( Errors.EXECUTION_ERROR, cause );
+        super( Errors.IO_ERROR, cause );
     }
 
     /**
@@ -60,8 +59,8 @@ public class ConnectorExecutionException extends ModuleException
      * @param message The error message.
      * @param cause The cause of the exception.
      */
-    public ConnectorExecutionException( String message, Throwable cause )
+    public IoErrorException( String message, Throwable cause )
     {
-        super( message, Errors.EXECUTION_ERROR, cause );
+        super( message, Errors.IO_ERROR, cause );
     }
 }

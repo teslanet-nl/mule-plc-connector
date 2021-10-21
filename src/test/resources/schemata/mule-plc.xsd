@@ -125,6 +125,11 @@ limitations under the License.
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnError">
+          <xs:annotation>
+            <xs:documentation>When true an exception is thrown if one or more fields are not successfully read.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="readFields">
           <xs:annotation>
             <xs:documentation>The PLC fields to read.</xs:documentation>
@@ -186,6 +191,11 @@ limitations under the License.
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnError">
+          <xs:annotation>
+            <xs:documentation>When true an exception is thrown if one or more fields are not successfully written.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="writeFields">
           <xs:annotation>
             <xs:documentation>The alias and plc-name of the items to request.</xs:documentation>
@@ -240,3 +250,4 @@ limitations under the License.
     </xs:union>
   </xs:simpleType>
 </xs:schema>
+

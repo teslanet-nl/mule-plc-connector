@@ -20,25 +20,30 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.internal;
+package nl.teslanet.mule.connectors.plc.internal.error;
 
 
-import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import java.util.HashSet;
+import java.util.Set;
 
-import nl.teslanet.mule.connectors.plc.internal.error.Errors;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
+import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
 
 /**
- * This is the main class of an extension, is the entry point from which configurations, connection providers, operations
- * and sources are going to be declared.
+ * Provider of errors that can be thrown by operations.
  */
-@Xml( prefix= "plc", namespace= "http://www.teslanet.nl/schema/mule/plc" )
-@Extension( name= "PLC", vendor= "Teslanet.nl" )
-@Configurations( { MulePlcConfig.class } )
-@ErrorTypes(Errors.class)
-public class MulePlcConnector
+public class OperationErrorProvider implements ErrorTypeProvider
 {
+    @SuppressWarnings( "rawtypes" )
+    @Override
+    public Set< ErrorTypeDefinition > getErrorTypes()
+    {
+        Set< ErrorTypeDefinition > errors= new HashSet<>();
+        errors.add( Errors.UNSUPPORTED_OPERATION );
+        errors.add( Errors.IO_ERROR );
+        errors.add( Errors.INTERRUPTED );
+        errors.add( Errors.EXECUTION_ERROR );
+        return errors;
+    }
 }
