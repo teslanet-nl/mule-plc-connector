@@ -20,3 +20,35 @@
  * limitations under the License.
  * #L%
  */
+package nl.teslanet.mule.connectors.plc.api.error;
+
+
+import org.mule.runtime.extension.api.exception.ModuleException;
+
+
+/**
+ * InvalidHandlerNameException occurs when a given handler name is invalid.
+ *
+ */
+public class UnsupportedException extends ModuleException
+{
+    /**
+     * 
+     */
+    private static final long serialVersionUID= 1L;
+
+    public UnsupportedException( String message )
+    {
+        super( message, Errors.UNSUPPORTED_OPERATION );
+    }
+
+    public UnsupportedException( Throwable cause )
+    {
+        super( Errors.UNSUPPORTED_OPERATION, cause );
+    }
+
+    public UnsupportedException( String message, Throwable cause )
+    {
+        super( message, Errors.UNSUPPORTED_OPERATION, cause );
+    }
+}

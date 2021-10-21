@@ -20,3 +20,17 @@
  * limitations under the License.
  * #L%
  */
+package nl.teslanet.mule.connectors.plc.api.error;
+
+
+import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+
+
+/**
+ * PLC Connector Errors.
+ *
+ */
+public enum Errors implements ErrorTypeDefinition< Errors >
+{
+    UNSUPPORTED_OPERATION, INTERRUPTED, EXECUTION_ERROR
+}

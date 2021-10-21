@@ -72,13 +72,20 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * Close the plc connection.
      */
     @Override
-    public synchronized void close() throws Exception
+    public synchronized void close()
     {
         logger.info( "Closing connection { " + this + " }" );
         if ( plcConnection.isConnected() )
         {
-            plcConnection.close();
-            logger.info( "Closed connection { " + this + " }" );
+            try
+            {
+                plcConnection.close();
+                logger.info( "Closed connection { " + this + " }" );
+            }
+            catch ( Exception e )
+            {
+                logger.error( "Exception while closing connection { " + this + " }", e );
+            }
         }
     }
 
@@ -106,12 +113,15 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public boolean isConnected()
     {
+        //in case connection lost, try to reconnect first
+        //TODO remove connect attempt
         try
         {
             connect();
         }
         catch ( ConnectionException e1 )
         {
+            //Ignore
         } ;
 
         return plcConnection.isConnected();

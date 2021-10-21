@@ -44,9 +44,8 @@ public interface MulePlcConnection
 {
     /**
     * Close the connection.
-    * @throws Exception 
     */
-    public void close() throws Exception;
+    public void close();
 
     /**
      * (re) Connect to the PLC.

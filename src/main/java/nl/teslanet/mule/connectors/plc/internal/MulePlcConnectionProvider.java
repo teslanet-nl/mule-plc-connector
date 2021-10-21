@@ -25,6 +25,7 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
+import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -62,7 +63,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     private final static PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
 
     /**
-     * Connect using the connction uri.
+     * Connect to PLC using the connction uri.
      */
     @Override
     public MulePlcConnection connect() throws ConnectionException
@@ -76,7 +77,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
             connection= new DefaultMulePlcConnection( plcConnnection );
             connection.connect();
         }
-        catch ( Exception e )
+        catch ( PlcConnectionException e )
         {
             throw new ConnectionException( "Cannot connect { " + connection + "::" + connectionUri + " }", e );
         }
@@ -84,18 +85,14 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         return connection;
     }
 
+    /**
+     * Disconnect from PLC
+     */
     @Override
     public void disconnect( MulePlcConnection connection )
     {
         logger.info( "Start disconnect { " + connection + "::" + connectionUri + " }" );
-        try
-        {
-            connection.close();
-        }
-        catch ( Exception e )
-        {
-            logger.error( "Error while disconnecting { " + connection + "::" + connectionUri + " }", e );
-        }
+        connection.close();
         logger.info( "Disconnected { " + connection + "::" + connectionUri + " }" );
     }
 
