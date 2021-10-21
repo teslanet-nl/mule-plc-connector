@@ -41,7 +41,7 @@ public abstract class IoRequestBuilder
     @Parameter
     @Optional( defaultValue= "true" )
     @Expression( ExpressionSupport.NOT_SUPPORTED )
-    @Summary( "When true an exception is thrown if one or more fields are not successfully accessed." )
+    @Summary( "When true an exception is thrown on field io errrors." )
     private boolean throwExceptionOnError= true;
 
     /**
