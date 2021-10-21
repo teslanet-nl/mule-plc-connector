@@ -23,37 +23,32 @@
 package nl.teslanet.mule.connectors.plc.api;
 
 
-import java.util.List;
-
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 
 /**
- * The builder for a read request.
+ * The builder for a io request.
  */
-public class ReadRequestBuilder extends IoRequestBuilder
+public abstract class IoRequestBuilder
 {
     /**
-     * The PLC fields to read.
+     * When {@code true} an exception is thrown if one or more fields are not successfully accessed.
      */
     @Parameter
-    @Optional
-    @NullSafe
-    @Expression( ExpressionSupport.SUPPORTED )
-    @Summary( "The PLC items to read." )
-    private List< ReadField > readFields= null;
+    @Optional( defaultValue= "true" )
+    @Expression( ExpressionSupport.NOT_SUPPORTED )
+    @Summary( "When true an exception is thrown if one or more fields are not successfully accessed." )
+    private boolean throwExceptionOnError= true;
 
     /**
-     * @return the requested fields.
+     * @return the throwExceptionOnError
      */
-    public List< ReadField > getReadFields()
+    public boolean isThrowExceptionOnError()
     {
-        return readFields;
+        return throwExceptionOnError;
     }
-
 }

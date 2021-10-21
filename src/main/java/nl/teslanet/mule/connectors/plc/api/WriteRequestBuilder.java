@@ -37,19 +37,8 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
  * The builder for a write request.
  *
  */
-public class WriteRequestBuilder
+public class WriteRequestBuilder extends IoRequestBuilder
 {
-    /**
-     * When {@code true} an exception is thrown if one or more fields are not successfully written.
-     */
-    @Parameter
-    @Optional( defaultValue= "true" )
-    @Expression( ExpressionSupport.NOT_SUPPORTED )
-    @Summary(
-        "When true an exception is thrown if one or more fields are not successfully written."
-    )
-    private boolean throwExceptionOnError= true;
-    
     /**
      * The alias and plc-name of the items to request.
      */
@@ -66,14 +55,6 @@ public class WriteRequestBuilder
     public List< WriteField > getWriteItems()
     {
         return writeFields;
-    }
-
-    /**
-     * @return the throwExceptionOnError
-     */
-    public boolean isThrowExceptionOnError()
-    {
-        return throwExceptionOnError;
     }
 
     /**
