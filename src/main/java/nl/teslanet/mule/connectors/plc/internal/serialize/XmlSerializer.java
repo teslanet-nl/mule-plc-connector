@@ -38,13 +38,15 @@ import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import nl.teslanet.mule.connectors.plc.api.ResponseCodeValueProvider;
+
 
 public class XmlSerializer
 {
     /**
      * The Document Builer factory.
      */
-    private final static DocumentBuilderFactoryImpl dbFactory= (DocumentBuilderFactoryImpl) DocumentBuilderFactoryImpl.newInstance();
+    private static final DocumentBuilderFactoryImpl dbFactory= (DocumentBuilderFactoryImpl) DocumentBuilderFactoryImpl.newInstance();
 
     /**
      * Abstraction of the method to get PlcValues.
@@ -80,7 +82,7 @@ public class XmlSerializer
         Element rootElement= doc.createElement( "plcReadResponse" );
         doc.appendChild( rootElement );
         //build content
-        boolean allOk= seralizeFileds( doc, rootElement, response, ( alias ) -> response.getPlcValue( alias ) );
+        boolean allOk= seralizeFileds( doc, rootElement, response, alias -> response.getPlcValue( alias ) );
         return new XmlSerializerResult( allOk, doc );
     }
 
@@ -93,21 +95,21 @@ public class XmlSerializer
         Element rootElement= doc.createElement( "plcWriteResponse" );
         doc.appendChild( rootElement );
         //build content
-        boolean allOk= seralizeFileds( doc, rootElement, response, ( alias ) -> response.getRequest().getPlcValue( alias ) );
+        boolean allOk= seralizeFileds( doc, rootElement, response, alias -> response.getRequest().getPlcValue( alias ) );
         return new XmlSerializerResult( allOk, doc );
     }
 
     private static boolean seralizeFileds( Document doc, Element parent, PlcFieldResponse response, PlcValueProvider valueProvider )
     {
         boolean allOk= true;
-        
+
         for ( String alias : response.getFieldNames() )
         {
             Element fieldElement= doc.createElement( "field" );
             fieldElement.setAttribute( "alias", alias );
             PlcResponseCode responseCode= response.getResponseCode( alias );
-            allOk= allOk && ( responseCode == PlcResponseCode.OK);
-            fieldElement.setAttribute( "responseCode", responseCode.name() );
+            allOk= allOk && ( responseCode == PlcResponseCode.OK );
+            fieldElement.setAttribute( "responseCode", ResponseCodeValueProvider.getKey( responseCode ));
             PlcField field= response.getField( alias );
             try
             {
@@ -117,20 +119,19 @@ public class XmlSerializer
             {
                 //Ignore
             }
-            int valueCount= field.getNumberOfElements();
-            fieldElement.setAttribute( "count", String.valueOf( valueCount ) );
-            fieldElement.appendChild( xmlSeralize( doc, valueProvider.getValue( alias ), valueCount ) );
+            fieldElement.setAttribute( "count", String.valueOf( field.getNumberOfElements() ) );
+            fieldElement.appendChild( xmlSeralize( doc, valueProvider.getValue( alias ) ) );
             parent.appendChild( fieldElement );
         }
         return allOk;
     }
 
-    private static Element xmlSeralize( Document doc, PlcValue plcValue, int expectedValueCount )
+    private static Element xmlSeralize( Document doc, PlcValue plcValue )
     {
-        return xmlSeralize( doc, null, plcValue, expectedValueCount );
+        return xmlSeralize( doc, null, plcValue );
     }
 
-    private static Element xmlSeralize( Document doc, String key, PlcValue plcValue, int expectedValueCount )
+    private static Element xmlSeralize( Document doc, String key, PlcValue plcValue )
     {
         Element valueElement;
         if ( plcValue == null || plcValue.isNull() )
@@ -150,7 +151,7 @@ public class XmlSerializer
             appendOptionalAttribute( valueElement, "key", key );
             for ( PlcValue listItem : plcValue.getList() )
             {
-                valueElement.appendChild( xmlSeralize( doc, null, listItem, 1 ) );
+                valueElement.appendChild( xmlSeralize( doc, null, listItem ) );
             }
 
         }
@@ -160,7 +161,7 @@ public class XmlSerializer
             appendOptionalAttribute( valueElement, "key", key );
             for ( Entry< String, ? extends PlcValue > structItem : plcValue.getStruct().entrySet() )
             {
-                valueElement.appendChild( xmlSeralize( doc, structItem.getKey(), structItem.getValue(), 1 ) );
+                valueElement.appendChild( xmlSeralize( doc, structItem.getKey(), structItem.getValue() ) );
             }
         }
         else

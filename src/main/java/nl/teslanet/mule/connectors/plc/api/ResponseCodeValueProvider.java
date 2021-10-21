@@ -37,11 +37,11 @@ import org.mule.runtime.extension.api.values.ValueResolvingException;
 
 public class ResponseCodeValueProvider implements ValueProvider
 {
-    static private final ConcurrentHashMap< String, PlcResponseCode > values= new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap< String, PlcResponseCode > values= new ConcurrentHashMap<>();
 
-    static private final ConcurrentHashMap< PlcResponseCode, String > seulav= new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap< PlcResponseCode, String > seulav= new ConcurrentHashMap<>();
 
-    static private void assureInitialized()
+    private static void assureInitialized()
     {
         if ( values.isEmpty() )
         {
@@ -53,19 +53,19 @@ public class ResponseCodeValueProvider implements ValueProvider
         }
     }
 
-    static public Enumeration< String > getKeys()
+    public static Enumeration< String > getKeys()
     {
         assureInitialized();
         return values.keys();
     }
 
-    static public String getKey( PlcResponseCode value )
+    public static String getKey( PlcResponseCode value )
     {
         assureInitialized();
         return seulav.get( value );
     }
 
-    static public PlcResponseCode getValue( String key )
+    public static PlcResponseCode getValue( String key )
     {
         assureInitialized();
         return values.get( key );

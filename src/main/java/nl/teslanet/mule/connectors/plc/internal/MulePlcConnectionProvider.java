@@ -73,7 +73,6 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         try
         {
             PlcConnection plcConnnection= driverManager.getConnection( connectionUri );
-            //if ( driverManager.getDriver( connectionUri ).getProtocolCode().equals( "mock" )  )
             connection= new DefaultMulePlcConnection( plcConnnection );
             connection.connect();
         }

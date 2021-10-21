@@ -43,6 +43,7 @@ public class ConnectorInterruptedException extends ModuleException
     public ConnectorInterruptedException( String message )
     {
         super( message, Errors.INTERRUPTED );
+        setInterrupt();
     }
 
     /**
@@ -52,6 +53,7 @@ public class ConnectorInterruptedException extends ModuleException
     public ConnectorInterruptedException( Throwable cause )
     {
         super( Errors.INTERRUPTED, cause );
+        setInterrupt();
     }
 
     /**
@@ -62,5 +64,11 @@ public class ConnectorInterruptedException extends ModuleException
     public ConnectorInterruptedException( String message, Throwable cause )
     {
         super( message, Errors.INTERRUPTED, cause );
+        setInterrupt();
+    }
+    
+    private void setInterrupt()
+    {
+        Thread.currentThread().interrupt();
     }
 }

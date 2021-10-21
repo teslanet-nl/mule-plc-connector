@@ -122,8 +122,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         catch ( ConnectionException e1 )
         {
             //Ignore
-        } ;
-
+        }
         return plcConnection.isConnected();
     }
 
