@@ -20,19 +20,15 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.internal.error;
-
-
-import org.mule.runtime.extension.api.exception.ModuleException;
-
+package nl.teslanet.mule.connectors.plc.internal.exception;
 
 /**
- * The operation called is not supported by the protocol used.
+ * Internal Exception thrown when a connection is unusable.
  */
-public class UnsupportedException extends ModuleException
+public class InternalConnectionException extends Exception
 {
     /**
-     * Serial version.
+     * Serial version
      */
     private static final long serialVersionUID= 1L;
 
@@ -40,18 +36,18 @@ public class UnsupportedException extends ModuleException
      * Constructor with message.
      * @param message The error message.
      */
-    public UnsupportedException( String message )
+    public InternalConnectionException( String message )
     {
-        super( message, Errors.UNSUPPORTED );
+        super( message );
     }
 
     /**
      * Constructor with throwable.
      * @param cause The cause of the exception.
      */
-    public UnsupportedException( Throwable cause )
+    public InternalConnectionException( Throwable cause )
     {
-        super( Errors.UNSUPPORTED, cause );
+        super( cause );
     }
 
     /**
@@ -59,8 +55,8 @@ public class UnsupportedException extends ModuleException
      * @param message The error message.
      * @param cause The cause of the exception.
      */
-    public UnsupportedException( String message, Throwable cause )
+    public InternalConnectionException( String message, Throwable cause )
     {
-        super( message, Errors.UNSUPPORTED, cause );
+        super( message, cause );
     }
 }

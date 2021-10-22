@@ -30,6 +30,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
+import org.apache.plc4x.java.api.exceptions.PlcUnsupportedOperationException;
 import org.apache.plc4x.java.api.messages.PlcReadRequest;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteRequest;
@@ -40,6 +41,8 @@ import org.slf4j.LoggerFactory;
 
 import nl.teslanet.mule.connectors.plc.api.ReadField;
 import nl.teslanet.mule.connectors.plc.api.WriteField;
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
 
 
 /**
@@ -90,7 +93,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     @Override
-    public synchronized void connect() throws ConnectionException
+    public synchronized void connect() throws InternalConnectionException
     {
         if ( !plcConnection.isConnected() )
         {
@@ -105,7 +108,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
             }
             if ( !plcConnection.isConnected() )
             {
-                throw new ConnectionException( "Error on connection { " + this + " }" );
+                throw new InternalConnectionException( "Error on connection { " + this + " }" );
             }
         }
     }
@@ -119,7 +122,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         {
             connect();
         }
-        catch ( ConnectionException e1 )
+        catch ( InternalConnectionException e1 )
         {
             //Ignore
         }
@@ -127,14 +130,18 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     @Override
-    public synchronized Boolean ping()
+    public synchronized Boolean ping() throws InterruptedException, InternalUnsupportedException
     {
         try
         {
             plcConnection.ping().get();
         }
-        catch ( InterruptedException | ExecutionException e )
+        catch ( ExecutionException e )
         {
+            if ( e.getCause() instanceof PlcUnsupportedOperationException )
+            {
+                throw new InternalUnsupportedException();
+            }
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
@@ -150,7 +157,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     public synchronized PlcReadResponse read( List< ReadField > items, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        ConnectionException
+        InternalConnectionException
     {
         connect();
         PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
@@ -171,7 +178,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     public synchronized PlcWriteResponse write( List< WriteField > items, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        ConnectionException
+        InternalConnectionException
     {
         connect();
         PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();

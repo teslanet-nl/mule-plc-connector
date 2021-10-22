@@ -33,9 +33,9 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 public enum Errors implements ErrorTypeDefinition< Errors >
 {
     /**
-     * The operation called is not supported by the prtocol used.
+     * The operation called is not supported by the protocol used.
      */
-    UNSUPPORTED_OPERATION,
+    UNSUPPORTED,
 
     /**
     * One or more fields could not be read or written successfully.

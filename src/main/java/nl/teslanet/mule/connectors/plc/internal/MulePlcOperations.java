@@ -53,7 +53,10 @@ import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionExceptio
 import nl.teslanet.mule.connectors.plc.internal.error.ConnectorInterruptedException;
 import nl.teslanet.mule.connectors.plc.internal.error.IoErrorException;
 import nl.teslanet.mule.connectors.plc.internal.error.OperationErrorProvider;
+import nl.teslanet.mule.connectors.plc.internal.error.PingErrorProvider;
 import nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException;
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
 import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer;
 import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSerializerResult;
 
@@ -83,11 +86,23 @@ public class MulePlcOperations
      * Ping the PLC.
      */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.ANY, strict= false )
+    @Throws( PingErrorProvider.class )
     public Boolean ping( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection )
     {
-        return connection.ping();
+        try
+        {
+            return connection.ping();
+        }
+        catch ( InterruptedException e )
+        {
+            throw new ConnectorInterruptedException( "Ping was interrupted.", e );
+        }
+        catch ( InternalUnsupportedException e )
+        {
+            throw new UnsupportedException( "Protocol does not support ping." );
+        }
     }
 
     /**
@@ -96,18 +111,14 @@ public class MulePlcOperations
      * @param connection The connection instance
      * @param requestBuilder The builder containing request parameters.
      * @return The readResponse as Result
-     * @throws UnsupportedException When write is not supported by PLC protocol.
-     * @throws ConnectorExecutionException When internal error occurs.
-     * @throws ConnectorInterruptedException When IO was interrupted.
-     * @throws IoErrorException When fields are not successfully read.
-     * @throws ConnectionException When connection is lost.
+     * @throws ConnectionException 
      */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > read( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
-    ReadRequestBuilder requestBuilder ) throws UnsupportedException, ConnectorExecutionException, ConnectorInterruptedException, IoErrorException, ConnectionException
+    ReadRequestBuilder requestBuilder ) throws ConnectionException
     {
         // Check if this connection support reading of data.
         if ( !connection.canRead() )
@@ -127,9 +138,9 @@ public class MulePlcOperations
         {
             throw new ConnectorInterruptedException( "Interruption on read.", e );
         }
-        catch ( ConnectionException | TimeoutException e )
+        catch ( InternalConnectionException | TimeoutException e )
         {
-            throw new ConnectionException( "IO Error on read.", e );
+            throw new ConnectionException( "Connection Error on read.", e );
         }
         if ( response == null )
         {
@@ -177,7 +188,7 @@ public class MulePlcOperations
     public Result< InputStream, ReceivedResponseAttributes > write( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
-    WriteRequestBuilder requestBuilder ) throws UnsupportedException, ConnectorExecutionException, ConnectorInterruptedException, IoErrorException, ConnectionException
+    WriteRequestBuilder requestBuilder ) throws ConnectionException
     {
         // Check if this connection support writing of data.
         if ( !connection.canWrite() )
@@ -187,7 +198,7 @@ public class MulePlcOperations
         PlcWriteResponse response= null;
         try
         {
-            response= connection.write( requestBuilder.getWriteItems(), configuration.getTimeout(), configuration.getTimeoutUnits() );
+            response= connection.write( requestBuilder.getWriteFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
         }
         catch ( ExecutionException e )
         {
@@ -197,9 +208,9 @@ public class MulePlcOperations
         {
             throw new ConnectorInterruptedException( "Interruption on write.", e );
         }
-        catch ( ConnectionException | TimeoutException e )
+        catch ( InternalConnectionException | TimeoutException e )
         {
-            throw new ConnectionException( "IO Error on write.", e );
+            throw new ConnectionException( "Connection Error on write.", e );
         }
         if ( response == null )
         {

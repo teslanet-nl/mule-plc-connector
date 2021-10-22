@@ -50,14 +50,6 @@ public class WriteRequestBuilder extends IoRequestBuilder
     private List< WriteField > writeFields;
 
     /**
-     * @return the write fields.
-     */
-    public List< WriteField > getWriteItems()
-    {
-        return writeFields;
-    }
-
-    /**
      * @return the writeFields
      */
     public List< WriteField > getWriteFields()

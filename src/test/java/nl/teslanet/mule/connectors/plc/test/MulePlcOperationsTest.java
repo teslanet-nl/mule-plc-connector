@@ -24,8 +24,11 @@ package nl.teslanet.mule.connectors.plc.test;
 
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -38,6 +41,8 @@ import org.slf4j.LoggerFactory;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;
+
+import nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException;
 
 
 public class MulePlcOperationsTest extends AbstractPlcTestCase
@@ -58,11 +63,12 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
     @Test
     public void executePingOperation() throws Exception
     {
-        Boolean payloadValue= (Boolean) flowRunner( "basic-ping" ).run().getMessage().getPayload().getValue();
-        assertNotNull( "ping returned no response", payloadValue );
-        //simulated does not support ping
-        assertFalse( "ping should not be supported", payloadValue );
-    }
+        Exception e= assertThrows( Exception.class, () -> {
+            flowRunner( "basic-ping" ).run().getMessage().getPayload().getValue();
+        } );
+        assertTrue( "wrong exception message", e.getMessage().contains( "Protocol does not support ping." ) );
+        assertEquals( "wrong exception cause", UnsupportedException.class, e.getCause().getClass() );
+   }
 
     @Test
     public void executeReadOperation() throws Exception

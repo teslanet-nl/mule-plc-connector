@@ -31,9 +31,9 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
 
 /**
- * Provider of errors that can be thrown by operations.
+ * Provider of errors that can be thrown by ping.
  */
-public class OperationErrorProvider implements ErrorTypeProvider
+public class PingErrorProvider implements ErrorTypeProvider
 {
     @SuppressWarnings( "rawtypes" )
     @Override
@@ -41,9 +41,7 @@ public class OperationErrorProvider implements ErrorTypeProvider
     {
         Set< ErrorTypeDefinition > errors= new HashSet<>();
         errors.add( Errors.UNSUPPORTED );
-        errors.add( Errors.IO_ERROR );
         errors.add( Errors.INTERRUPTED );
-        errors.add( Errors.EXECUTION_ERROR );
         return errors;
     }
 }

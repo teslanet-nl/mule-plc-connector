@@ -30,10 +30,11 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
-import org.mule.runtime.api.connection.ConnectionException;
 
 import nl.teslanet.mule.connectors.plc.api.ReadField;
 import nl.teslanet.mule.connectors.plc.api.WriteField;
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
 
 
 /**
@@ -49,9 +50,9 @@ public interface MulePlcConnection
 
     /**
      * (re) Connect to the PLC.
-     * @throws ConnectionException 
+     * @throws InternalConnectionException When connection could not be established.
      */
-    public void connect() throws ConnectionException;
+    public void connect() throws InternalConnectionException;
 
     /**
      * @return {@code true}connection is active
@@ -61,8 +62,10 @@ public interface MulePlcConnection
     /**
      * Ping the PLC using this connection.
      * @return {@code true} when the PLC is reachable, otherwise {@code false}
+     * @throws InterruptedException When the operation was interrupted.
+     * @throws InternalUnsupportedException When the operation is not supported by protocol used.
      */
-    public Boolean ping();
+    public Boolean ping() throws InterruptedException, InternalUnsupportedException;
 
     /**
      * @return {@code true} when the connection can be used to read, otherwise {@code false}.
@@ -78,9 +81,9 @@ public interface MulePlcConnection
      * @throws TimeoutException when timeOut occurs before the response is received.
      * @throws ExecutionException When the read could not be executed.
      * @throws InterruptedException When the read operation is interrupted.
-     * @throws ConnectionException when connection failed.
+     * @throws InternalConnectionException when connection failed.
      */
-    public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException;
+    public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeUnit ) throws InterruptedException, ExecutionException, TimeoutException, InternalConnectionException;
 
     /**
      * @return {@code true} when the connection can be used to write, otherwise {@code false}.
@@ -96,7 +99,7 @@ public interface MulePlcConnection
     * @throws TimeoutException when timeOut occurs before the response is received.
      * @throws ExecutionException When the write could not be executed.
      * @throws InterruptedException When the write operation is interrupted.
-     * @throws ConnectionException when connection failed.
+     * @throws InternalConnectionException when connection failed.
      */
-    public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, TimeoutException, ConnectionException;
+    public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, TimeoutException, InternalConnectionException;
 }

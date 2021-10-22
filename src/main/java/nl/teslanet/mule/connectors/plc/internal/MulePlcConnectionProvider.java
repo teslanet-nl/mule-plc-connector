@@ -35,6 +35,8 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
+
 
 /**
  * This class (as it's name implies) provides connection instances and the functionality to disconnect and validate those
@@ -76,7 +78,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
             connection= new DefaultMulePlcConnection( plcConnnection );
             connection.connect();
         }
-        catch ( PlcConnectionException e )
+        catch ( InternalConnectionException | PlcConnectionException e )
         {
             throw new ConnectionException( "Cannot connect { " + connection + "::" + connectionUri + " }", e );
         }

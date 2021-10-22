@@ -51,7 +51,9 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
         "org.apache.plc4x:plc4j-api",
         "org.apache.plc4x:plc4j-spi",
     }, 
-    exportPluginClasses= {},
+    exportPluginClasses= {
+        nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException.class
+    },
     testExclusions= 
     {
         "org.mule.runtime:*:*:*:*",
