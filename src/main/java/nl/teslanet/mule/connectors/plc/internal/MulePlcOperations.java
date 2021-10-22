@@ -144,7 +144,7 @@ public class MulePlcOperations
         {
             throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
         }
-        if ( requestBuilder.isThrowExceptionOnError() && !responseResult.isDocIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
+        if ( requestBuilder.isThrowExceptionOnIoError() && !responseResult.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
         ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
         try
         {
@@ -156,7 +156,7 @@ public class MulePlcOperations
         }
         byte[] bytes= outputStream.toByteArray();
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( new ByteArrayInputStream( bytes ) ).attributes(
-            new ReceivedResponseAttributes( responseResult.isDocIndicatesSucces() )
+            new ReceivedResponseAttributes( responseResult.isIndicatesSucces() )
         ).mediaType( MediaType.APPLICATION_XML ).build();
     }
 
@@ -214,7 +214,7 @@ public class MulePlcOperations
         {
             throw new ConnectorExecutionException( "Internal error on serializing write response.", e );
         }
-        if ( requestBuilder.isThrowExceptionOnError() && !responseResult.isDocIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully written" );
+        if ( requestBuilder.isThrowExceptionOnIoError() && !responseResult.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully written" );
         ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
         try
         {
@@ -226,7 +226,7 @@ public class MulePlcOperations
         }
         byte[] bytes= outputStream.toByteArray();
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( new ByteArrayInputStream( bytes ) ).attributes(
-            new ReceivedResponseAttributes( responseResult.isDocIndicatesSucces() )
+            new ReceivedResponseAttributes( responseResult.isIndicatesSucces() )
         ).mediaType( MediaType.APPLICATION_XML ).build();
     }
 }

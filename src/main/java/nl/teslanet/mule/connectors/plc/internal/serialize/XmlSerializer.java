@@ -188,7 +188,7 @@ public class XmlSerializer
         /**
          * True when responseCodes for all fields is OK.
          */
-        private boolean docIndicatesSucces;
+        private boolean indicatesSucces;
 
         /**
          * The serialized response document.
@@ -202,24 +202,24 @@ public class XmlSerializer
          */
         private XmlSerializerResult( boolean docIndicatesSucces, Document document )
         {
-            this.docIndicatesSucces= docIndicatesSucces;
+            this.indicatesSucces= docIndicatesSucces;
             this.document= document;
         }
 
         /**
-         * @return the docIndicatesSucces
+         * @return the success flag
          */
-        public boolean isDocIndicatesSucces()
+        public boolean isIndicatesSucces()
         {
-            return docIndicatesSucces;
+            return indicatesSucces;
         }
 
         /**
-         * @param docIndicatesSucces the docIndicatesSucces to set
+         * @param indicatesSucces the success flag to set
          */
-        public void setDocIndicatesSucces( boolean docIndicatesSucces )
+        public void setIndicatesSucces( boolean indicatesSucces )
         {
-            this.docIndicatesSucces= docIndicatesSucces;
+            this.indicatesSucces= indicatesSucces;
         }
 
         /**

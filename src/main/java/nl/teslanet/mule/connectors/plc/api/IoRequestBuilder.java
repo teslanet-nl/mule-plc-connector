@@ -36,19 +36,19 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 public abstract class IoRequestBuilder
 {
     /**
-     * When {@code true} an exception is thrown if one or more fields are not successfully accessed.
+     * When {@code true} an exception is thrown on field io errrors.
      */
     @Parameter
     @Optional( defaultValue= "true" )
     @Expression( ExpressionSupport.NOT_SUPPORTED )
     @Summary( "When true an exception is thrown on field io errrors." )
-    private boolean throwExceptionOnError= true;
+    private boolean throwExceptionOnIoError= true;
 
     /**
      * @return the throwExceptionOnError
      */
-    public boolean isThrowExceptionOnError()
+    public boolean isThrowExceptionOnIoError()
     {
-        return throwExceptionOnError;
+        return throwExceptionOnIoError;
     }
 }

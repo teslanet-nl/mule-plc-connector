@@ -76,8 +76,8 @@
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
                 </parameter>
-                <parameter name="throwExceptionOnError">
-                    <description><![CDATA[When true an exception is thrown if one or more fields are not successfully accessed.]]></description>
+                <parameter name="throwExceptionOnIoError">
+                    <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
                 </parameter>
                 <parameter name="readFields">
                     <description><![CDATA[The PLC fields to read.]]></description>
@@ -99,8 +99,8 @@
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
                 </parameter>
-                <parameter name="throwExceptionOnError">
-                    <description><![CDATA[When true an exception is thrown if one or more fields are not successfully accessed.]]></description>
+                <parameter name="throwExceptionOnIoError">
+                    <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
                 </parameter>
                 <parameter name="writeFields">
                     <description><![CDATA[The alias and plc-name of the items to request.]]></description>
@@ -154,3 +154,4 @@
         </type>
     </types>
 </extension-documentation>
+

@@ -125,9 +125,9 @@ limitations under the License.
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnError">
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnIoError">
           <xs:annotation>
-            <xs:documentation>When true an exception is thrown if one or more fields are not successfully accessed.</xs:documentation>
+            <xs:documentation>When true an exception is thrown on field io errrors.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="readFields">
@@ -191,9 +191,9 @@ limitations under the License.
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnError">
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnIoError">
           <xs:annotation>
-            <xs:documentation>When true an exception is thrown if one or more fields are not successfully accessed.</xs:documentation>
+            <xs:documentation>When true an exception is thrown on field io errrors.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="writeFields">
@@ -250,3 +250,4 @@ limitations under the License.
     </xs:union>
   </xs:simpleType>
 </xs:schema>
+
