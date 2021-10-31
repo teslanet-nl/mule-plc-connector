@@ -24,8 +24,9 @@ package nl.teslanet.mule.connectors.plc.internal.serialize;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
@@ -209,19 +210,22 @@ public class XmlSerializer
      */
     public static Result< InputStream, ReceivedResponseAttributes > createMuleResult( XmlSerializerResult responsePayload )
     {
-        ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
+        StringWriter writer= new StringWriter();
+        writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+
         try
         {
             Transformer transformer= transformerFactory.newTransformer();
             transformer.setOutputProperty( OutputKeys.ENCODING, "UTF-8" );
-            transformer.transform( new DOMSource( responsePayload.getDocument() ), new StreamResult( outputStream ) );
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.transform( new DOMSource( responsePayload.getDocument() ), new StreamResult( writer ) );
         }
         catch ( TransformerException e )
         {
             throw new ConnectorExecutionException( "Internal error on transforming read response.", e );
         }
         //small messages expected -> store payload in byte array
-        ByteArrayInputStream inputStream= new ByteArrayInputStream( outputStream.toByteArray() );
+        ByteArrayInputStream inputStream= new ByteArrayInputStream( writer.toString().getBytes( Charset.forName("UTF-8") ) );
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( inputStream ).attributes(
             new ReceivedResponseAttributes( responsePayload.isIndicatesSucces() )
         ).mediaType( MediaType.APPLICATION_XML ).build();
