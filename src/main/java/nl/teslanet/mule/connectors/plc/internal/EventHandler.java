@@ -23,30 +23,21 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.apache.plc4x.java.api.messages.PlcSubscriptionEvent;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
 import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.slf4j.Logger;
@@ -99,20 +90,12 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
     private ConcurrentHashMap< String, PlcSubscriptionResponse > subscriptions= new ConcurrentHashMap<>();
 
     /**
-    * Xml transformer factory for processing responses.
-    */
-    //TODO move to config level
-    private final TransformerFactory transformerFactory;
-
-    /**
     * Default constructor
     * Creates and configures transformerfactory instance.
     */
     public EventHandler()
     {
-        transformerFactory= javax.xml.transform.TransformerFactory.newInstance();
-        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_DTD, "" );
-        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "" );
+        //NOOP
     }
 
     /**
@@ -233,23 +216,7 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
             logger.error( "Handler { " + handlerName + " } cannot process event.", e );
             return;
         }
-        ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
-        try
-        {
-            transformerFactory.newTransformer().transform( new DOMSource( serializedContent.getDocument() ), new StreamResult( outputStream ) );
-        }
-        catch ( TransformerException e )
-        {
-            logger.error( "Handler { " + handlerName + " } cannot process event.", e );
-            return;
-        }
-        byte[] bytes= outputStream.toByteArray();
         //hand over to Mule
-        sourceCallback.handle(
-            Result.< InputStream, ReceivedResponseAttributes > builder().output( new ByteArrayInputStream( bytes ) ).attributes(
-                new ReceivedResponseAttributes( serializedContent.isIndicatesSucces() )
-            ).mediaType( MediaType.APPLICATION_XML ).build()
-        );
+        sourceCallback.handle( XmlSerializer.createMuleResult( serializedContent ) );
     }
-
 }

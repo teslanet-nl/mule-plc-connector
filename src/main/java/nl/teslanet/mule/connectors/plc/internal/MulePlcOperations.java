@@ -23,19 +23,12 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
@@ -43,7 +36,6 @@ import org.apache.plc4x.java.api.messages.PlcUnsubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -77,19 +69,11 @@ import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSeria
 public class MulePlcOperations
 {
     /**
-    * Xml transformer factory for processing responses.
-    */
-    private final TransformerFactory transformerFactory;
-
-    /**
     * Default constructor
-    * Creates and configures transformerfactory instance.
     */
     public MulePlcOperations()
     {
-        transformerFactory= javax.xml.transform.TransformerFactory.newInstance();
-        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_DTD, "" );
-        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "" );
+        //NOOP
     }
 
     /**
@@ -166,7 +150,7 @@ public class MulePlcOperations
             throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
         }
         if ( requestBuilder.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
-        return createResult( responsePayload );
+        return XmlSerializer.createMuleResult( responsePayload );
     }
 
     /**
@@ -220,7 +204,7 @@ public class MulePlcOperations
             throw new ConnectorExecutionException( "Internal error on serializing write response.", e );
         }
         if ( requestBuilder.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully written" );
-        return createResult( responsePayload );
+        return XmlSerializer.createMuleResult( responsePayload );
     }
 
     /**
@@ -287,7 +271,7 @@ public class MulePlcOperations
         {
             throw new InvalidSubscriptionException( "Subscription is invalid { " + subscription.getHandlerName() + "::" + subscription.getSubscriptionName() + " }", e );
         }
-        return createResult( responsePayload );
+        return XmlSerializer.createMuleResult( responsePayload );
     }
 
     /**
@@ -353,30 +337,6 @@ public class MulePlcOperations
             throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
         }
         if ( unsubscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
-        return createResult( responsePayload );
+        return XmlSerializer.createMuleResult( responsePayload );
     }
-
-    /**
-     * Create Result that can be returned to Mule
-     * @param responsePayload The payload contents of the message to return. 
-     * @return The Result object created.
-     */
-    private Result< InputStream, ReceivedResponseAttributes > createResult( XmlSerializerResult responsePayload )
-    {
-        ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
-        try
-        {
-            transformerFactory.newTransformer().transform( new DOMSource( responsePayload.getDocument() ), new StreamResult( outputStream ) );
-        }
-        catch ( TransformerException e )
-        {
-            throw new ConnectorExecutionException( "Internal error on transforming read response.", e );
-        }
-        //small messages expected -> store payload in byte array
-        ByteArrayInputStream inputStream= new ByteArrayInputStream( outputStream.toByteArray() );
-        return Result.< InputStream, ReceivedResponseAttributes > builder().output( inputStream ).attributes(
-            new ReceivedResponseAttributes( responsePayload.isIndicatesSucces() )
-        ).mediaType( MediaType.APPLICATION_XML ).build();
-    }
-
 }
