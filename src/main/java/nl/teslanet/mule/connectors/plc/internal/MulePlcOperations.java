@@ -274,7 +274,6 @@ public class MulePlcOperations
             throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
         }
         if ( subscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
-        //TODO create relation
         //TODO check already active
         //find handler
         EventHandler handler= configuration.getHandler( subscription.getHandlerName() );
@@ -286,7 +285,7 @@ public class MulePlcOperations
         }
         catch ( InternalInvalidSubscriptionException e )
         {
-            throw new InvalidSubscriptionException( "Subscription is invalid { " + subscription.getHandlerName() + " }", e );
+            throw new InvalidSubscriptionException( "Subscription is invalid { " + subscription.getHandlerName() + "::" + subscription.getSubscriptionName() + " }", e );
         }
         return createResult( responsePayload );
     }
@@ -300,7 +299,6 @@ public class MulePlcOperations
     * @throws ConnectionException 
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
-    //TODO Unsubscribe errors
     @Throws( SubscribeErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > unsubscribe( @Config
     MulePlcConfig configuration, @Connection
@@ -324,7 +322,10 @@ public class MulePlcOperations
         }
         catch ( InternalInvalidSubscriptionException e )
         {
-            throw new InvalidSubscriptionException( "Unsubscription failed, invalid subscription { " + unsubscription.getHandlerName() + " }", e );
+            throw new InvalidSubscriptionException(
+                "Unsubscription failed, invalid subscription { " + unsubscription.getHandlerName() + "::" + unsubscription.getSubscriptionName() + " }",
+                e
+            );
         }
         catch ( ExecutionException e )
         {
@@ -372,7 +373,7 @@ public class MulePlcOperations
             throw new ConnectorExecutionException( "Internal error on transforming read response.", e );
         }
         //small messages expected -> store payload in byte array
-        ByteArrayInputStream inputStream = new ByteArrayInputStream( outputStream.toByteArray());
+        ByteArrayInputStream inputStream= new ByteArrayInputStream( outputStream.toByteArray() );
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( inputStream ).attributes(
             new ReceivedResponseAttributes( responsePayload.isIndicatesSucces() )
         ).mediaType( MediaType.APPLICATION_XML ).build();

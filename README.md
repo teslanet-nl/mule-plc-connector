@@ -199,3 +199,98 @@ The response on the request above could be:
 
 ```
 
+### Subscribe operation
+
+The subscribe operation subscribes to one or more fields of the PLC. The request contains for every field to subscribe, the alias and the address.
+After executing the operation every change on subscribed field values triggers an event that is delivered to the given event handler. 
+
+Subscribe example using the Simulated protocol: 
+
+![Image](src/site/images/plc_subscribe.png "subscribe")
+
+Xml configuration:
+
+```
+    <flow name="simulated-subscribe">
+        <plc:subscribe config-ref="PLC_Config_Simulated" subscriptionName="subscription1" handlerName="handler1">
+            <plc:subscribe-fields >
+                <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
+                <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
+            </plc:subscribe-fields>
+        </plc:subscribe>
+    </flow>
+```
+
+The result of the subscribe operation is a **plcSubscribeResponse** message describing which fields are successfully subscribed to.
+
+The response on the request above could be:
+
+```
+    <plcSubscribeResponse handler= "handler1" subscription="subscription1">
+        <field alias="coil1" responseCode="OK"/>
+        <field alias="reg1" responseCode="OK"/>
+    </plcSubscribeResponse>
+
+```
+
+### Unsubscribe operation
+
+The unsubscribe operation cancels a subscription. The request contains the subscription name and the name of the handler owning the subscription.
+After execution of this operation no events for concerning subscription are delivered to the event handler any more. 
+
+Unsubscribe example using the Simulated protocol: 
+
+![Image](src/site/images/plc_unsubscribe.png "unsubscribe")
+
+Xml configuration:
+
+```
+    <flow name="simulated-unsubscribe">
+        <plc:unsubscribe config-ref="PLC_Config_Simulated" handlerName="handler1" subscriptionName="subscription1"/>
+    </flow>
+```
+
+The result of the unsubscribe operation is a **plcUnsubscribeResponse** message describing which subscription has been cancelled.
+
+The response on the request above could be:
+
+```
+    <plcUnsubscribeResponse handler= "handler1" subscription="subscription1"/>
+
+```
+
+### Event handler
+
+The event handler listens to events that occur when values change of fields that are subscribed to. The event handler delivers an event message containing the new value(s) to the flow for processing.
+
+Event handler example: 
+
+![Image](src/site/images/plc_eventhandler.png "event handler")
+
+Xml configuration:
+
+```
+    <flow name="simulated-eventhandler">
+        <plc:event-handler config-ref="PLC_Config_Simulated" handlerName="handler1"/>
+        <logger level="INFO" doc:name="Logger" message="#[payload]"/>
+    </flow>
+```
+
+The events are delivered using a **plcSubscribeResponse** message containing the new value(s) of the field. The field alias in the event messages matches the alias given in the subscription.
+
+An event message from the subscription above could be:
+
+```
+<plcEvent>
+  <field alias="coil1" responseCode="OK">
+    <values>
+      <value>true</value>
+      <value>false</value>
+    </values>
+  </field>
+</plcEvent>
+
+```
+
+    
+    
