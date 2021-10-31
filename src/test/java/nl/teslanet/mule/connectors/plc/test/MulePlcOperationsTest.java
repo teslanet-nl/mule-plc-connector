@@ -66,6 +66,10 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
         return "testapps/basic.xml";
     }
 
+    /**
+     * Test the ping operation.
+     * @throws Exception When an error occurs.
+     */
     @Test
     public void executePingOperation() throws Exception
     {
@@ -76,6 +80,10 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
         assertEquals( "wrong exception cause", UnsupportedException.class, e.getCause().getClass() );
     }
 
+    /**
+     * Test the read operation.
+     * @throws Exception When an error occurs.
+     */
     @Test
     public void executeReadOperation() throws Exception
     {
@@ -94,6 +102,10 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
 
     }
 
+    /**
+     * Test the write operation.
+     * @throws Exception When an error occurs.
+     */
     @Test
     public void executeWriteOperation() throws Exception
     {
@@ -102,6 +114,10 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
+    /**
+     * Test the write operation and reading of the written values.
+     * @throws Exception When an error occurs.
+     */
     @Test
     public void executeWriteAndReadOperation() throws Exception
     {
@@ -119,6 +135,10 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
     }
 
+    /**
+     * Test the subscribe operation and the production of events.
+     * @throws Exception When an error occurs.
+     */
     @Test
     public void subscribeOperation() throws Exception
     {
@@ -136,8 +156,9 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
             return spy.getEvents().size() == 0;
         } );
 
+        //subscribe
         response= TestUtils.toString( flowRunner( "basic-subscribe" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscribe_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //second write
@@ -187,6 +208,10 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
     }
 
+    /**
+     * Test the unsubscribe operation and the ending of production of events.
+     * @throws Exception When an error occurs.
+     */
     @Test
     public void unsubscribeOperation() throws Exception
     {
@@ -204,8 +229,9 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
             return spy.getEvents().size() == 0;
         } );
 
+        //subscribe
         response= TestUtils.toString( flowRunner( "basic-subscribe" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscribe_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //second write
