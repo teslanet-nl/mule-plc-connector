@@ -60,7 +60,6 @@ import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSeria
 @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
 public class EventHandler extends Source< InputStream, ReceivedResponseAttributes > implements Consumer< PlcSubscriptionEvent >
 {
-
     /**
      * The logger of this class.
      */
@@ -116,13 +115,16 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
         logger.info( this + " started." );
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.runtime.extension.api.runtime.source.Source#onStop()
+    /**
+     * Stop the handler.
      */
     @Override
     public void onStop()
     {
+        //TODO unregister
+        subscriptions.clear();
         config.removeHandler( handlerName );
+        
         sourceCallback= null;
         logger.info( this + " stopped." );
 
@@ -158,6 +160,11 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
         if ( sourceCallback != null ) register( subscription.getSubscriptionName() );
     }
     
+    /**
+     * Remove the subscription.
+     * @param unSubscription The unsubscribe request.
+     * @throws InternalInvalidSubscriptionException
+     */
     public void removeSubscription( UnSubscription unSubscription ) throws InternalInvalidSubscriptionException
     {
         if ( unSubscription == null || unSubscription.getSubscriptionName().isEmpty() )
@@ -194,6 +201,10 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
         return response.getSubscriptionHandles();
     }
 
+    /**
+     * Register this as handler for the subscription.
+     * @param subscriptionName the name of the subscription.
+     */
     private synchronized void register( String subscriptionName )
     {
         PlcSubscriptionResponse subscriptionResponse= subscriptions.get( subscriptionName );
@@ -203,6 +214,9 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
         }
     }
 
+    /**
+     * Accept PLC event, serialize to XML and hand over to the Mule flow.
+     */
     @Override
     public void accept( PlcSubscriptionEvent event )
     {
