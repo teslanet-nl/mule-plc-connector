@@ -23,6 +23,7 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -33,13 +34,19 @@ import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.api.exceptions.PlcUnsupportedOperationException;
 import org.apache.plc4x.java.api.messages.PlcReadRequest;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
+import org.apache.plc4x.java.api.messages.PlcSubscriptionRequest;
+import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
+import org.apache.plc4x.java.api.messages.PlcUnsubscriptionRequest;
+import org.apache.plc4x.java.api.messages.PlcUnsubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteRequest;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
+import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.teslanet.mule.connectors.plc.api.ReadField;
+import nl.teslanet.mule.connectors.plc.api.SubscribeField;
 import nl.teslanet.mule.connectors.plc.api.WriteField;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
@@ -154,16 +161,16 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     @Override
-    public synchronized PlcReadResponse read( List< ReadField > items, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+    public synchronized PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException
     {
         connect();
         PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
-        for ( ReadField item : items )
+        for ( ReadField field : fields )
         {
-            builder.addItem( item.getAlias(), item.getAddress() );
+            builder.addItem( field.getAlias(), field.getAddress() );
         }
         return builder.build().execute().get( timeout, timeOutUnit );
     }
@@ -175,17 +182,50 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     @Override
-    public synchronized PlcWriteResponse write( List< WriteField > items, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public synchronized PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException
     {
         connect();
         PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();
-        for ( WriteField item : items )
+        for ( WriteField field : fields )
         {
-            builder.addItem( item.getAlias(), item.getAddress(), item.getValues().toArray() );
+            builder.addItem( field.getAlias(), field.getAddress(), field.getValues().toArray() );
         }
         return builder.build().execute().get( timeout, timeoutUnit );
     }
+    
+    @Override
+    public boolean canSubscribe()
+    {
+        return plcConnection.getMetadata().canSubscribe();
+    }
+
+    @Override
+    public synchronized PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException
+    {
+        connect();
+        PlcSubscriptionRequest.Builder builder= plcConnection.subscriptionRequestBuilder();
+        for ( SubscribeField field : fields )
+        {
+            //TODO make configurable what type of subscription is wanted
+            builder.addChangeOfStateField( field.getAlias(), field.getAddress() );
+        }
+        return builder.build().execute().get( timeout, timeOutUnit );
+    }
+
+    @Override
+    public PlcUnsubscriptionResponse unSubscribe( Collection<PlcSubscriptionHandle> handles, long timeout, TimeUnit timeOutUnit ) throws InterruptedException, ExecutionException, TimeoutException, InternalConnectionException
+    {
+        connect();
+        PlcUnsubscriptionRequest.Builder builder= plcConnection.unsubscriptionRequestBuilder();
+        builder.addHandles( handles );
+        return builder.build().execute().get( timeout, timeOutUnit );
+    }
+
+
 }

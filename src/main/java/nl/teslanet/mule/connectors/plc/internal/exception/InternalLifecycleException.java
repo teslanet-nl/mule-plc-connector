@@ -20,45 +20,31 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.internal.error;
-
-
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+package nl.teslanet.mule.connectors.plc.internal.exception;
 
 
 /**
- * PLC Connector Errors.
- *
+ * internal InternalLifecycleException occurs when a component cannot execute because it is not started.
  */
-public enum Errors implements ErrorTypeDefinition< Errors >
+public class InternalLifecycleException extends Exception
 {
     /**
-     * The operation called is not supported by the protocol used.
+     * serial version
      */
-    UNSUPPORTED,
+    private static final long serialVersionUID= 1L;
 
-    /**
-    * One or more fields could not be read or written successfully.
-    */
-    IO_ERROR,
+    public InternalLifecycleException( String message )
+    {
+        super( message );
+    }
 
-    /**
-    * An IO operation was interrupted.
-    */
-    INTERRUPTED,
+    public InternalLifecycleException( Throwable cause )
+    {
+        super( cause );
+    }
 
-    /**
-    * An internal error occurred during execution of an operation.
-    */
-    EXECUTION_ERROR, 
-    
-    /**
-     * A handlername is used that is invalid.
-     */
-    INVALID_HANDLER_NAME, 
-    
-    /**
-     *  One or more Subscription parameters are invalid.
-     */
-    INVALID_SUBSCRIPTION
+    public InternalLifecycleException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 }

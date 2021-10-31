@@ -2,12 +2,12 @@
 <!-- 
 #%L
   Mule PLC Connector Test Utilities
-  %%
+%%
   Copyright (C) 2021 (teslanet.nl) Rogier Cobben
   
   Contributors:
       (teslanet.nl) Rogier Cobben - initial creation
-  %%
+%%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
@@ -19,7 +19,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-  #L%
+#L%
 -->
 <extension-documentation>
     <configs>
@@ -71,7 +71,7 @@
             </parameters>
         </operation>
         <operation name="read">
-            <description><![CDATA[Read PLC items.]]></description>
+            <description><![CDATA[Read PLC flields.]]></description>
             <parameters>
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
@@ -93,8 +93,63 @@
                 </parameter>
             </parameters>
         </operation>
+        <operation name="subscribe">
+            <description><![CDATA[Subscribe PLC fields.]]></description>
+            <parameters>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="throwExceptionOnIoError">
+                    <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
+                </parameter>
+                <parameter name="handlerName">
+                    <description><![CDATA[The handlerName that will process the events produced by the PLC on this subscription.]]></description>
+                </parameter>
+                <parameter name="subscriptionName">
+                    <description><![CDATA[The name of the subscription.]]></description>
+                </parameter>
+                <parameter name="subscribeFields">
+                    <description><![CDATA[The PLC fields to subscribe to.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="unsubscribe">
+            <description><![CDATA[Unsubscribe PLC fields.]]></description>
+            <parameters>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="throwExceptionOnIoError">
+                    <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
+                </parameter>
+                <parameter name="handlerName">
+                    <description><![CDATA[The handlerName that will process the events produced by the PLC on this subscription.]]></description>
+                </parameter>
+                <parameter name="subscriptionName">
+                    <description><![CDATA[The name of the subscription.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
         <operation name="write">
-            <description><![CDATA[Write PLC items.]]></description>
+            <description><![CDATA[Write PLC fields.]]></description>
             <parameters>
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
@@ -117,7 +172,25 @@
             </parameters>
         </operation>
     </operations>
-    <sources/>
+    <sources>
+        <source name="EventHandler">
+            <description><![CDATA[The EventHandler message source receives PLC events. The received PLC messages are delivered to the handlers mule-flow.]]></description>
+            <parameters>
+                <parameter name="handlerName">
+                    <description><![CDATA[The name of the handler by which it is referenced by observers and async requestst.]]></description>
+                </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+            </parameters>
+        </source>
+    </sources>
     <types>
         <type name="nl.teslanet.mule.connectors.plc.api.ReadField">
             <description><![CDATA[]]></description>
@@ -138,6 +211,17 @@
                 </parameter>
             </parameters>
         </type>
+        <type name="nl.teslanet.mule.connectors.plc.api.SubscribeField">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="alias">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="address">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
         <type name="nl.teslanet.mule.connectors.plc.api.WriteField">
             <description><![CDATA[]]></description>
             <parameters>
@@ -154,4 +238,3 @@
         </type>
     </types>
 </extension-documentation>
-

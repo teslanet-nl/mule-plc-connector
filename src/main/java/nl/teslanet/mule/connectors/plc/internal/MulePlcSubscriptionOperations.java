@@ -1,6 +1,6 @@
 /*-
  * #%L
- * Mule CoAP Connector
+ * Mule PLC Connector
  * %%
  * Copyright (C) 2021 (teslanet.nl) Rogier Cobben
  * 
@@ -43,6 +43,7 @@ import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -58,6 +59,7 @@ import nl.teslanet.mule.connectors.plc.api.ReadRequestBuilder;
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
 import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionException;
 import nl.teslanet.mule.connectors.plc.internal.error.ConnectorInterruptedException;
+import nl.teslanet.mule.connectors.plc.internal.error.OperationErrorProvider;
 import nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException;
 
 
@@ -74,10 +76,11 @@ public class MulePlcSubscriptionOperations
      * @throws ConnectionException 
      */
     @MediaType(value= MediaType.ANY, strict= true)
+    @Throws( OperationErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > subscribe(
         @Config MulePlcConfig configuration,
         @Connection PlcConnection connection,
-        @ParameterGroup(name= "Request") ReadRequestBuilder readRequestBuilder ) throws UnsupportedException, ConnectorExecutionException, ConnectorInterruptedException, ConnectionException
+        @ParameterGroup(name= "Request") ReadRequestBuilder readRequestBuilder ) throws ConnectionException 
     {
         // Check if this connection support reading of data.
         if ( !connection.getMetadata().canRead() )
@@ -130,7 +133,7 @@ public class MulePlcSubscriptionOperations
         }
         catch ( TimeoutException e )
         {
-            throw new ConnectionException( "IO Error on read.", e );
+            throw new ConnectionException( "Connection Error on subscription.", e );
         }
         //response element
         Element responseElement= responseDom.createElement( "subscribeResponse" );
