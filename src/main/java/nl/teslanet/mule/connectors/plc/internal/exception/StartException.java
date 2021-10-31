@@ -20,45 +20,32 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.internal.error;
+package nl.teslanet.mule.connectors.plc.internal.exception;
 
 
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+import org.mule.runtime.api.exception.DefaultMuleException;
 
 
 /**
- * PLC Connector Errors.
+ * Exception thrown when a processor or source cannot start
  *
  */
-public enum Errors implements ErrorTypeDefinition< Errors >
+public class StartException extends DefaultMuleException
 {
-    /**
-     * The operation called is not supported by the protocol used.
-     */
-    UNSUPPORTED,
 
     /**
-    * One or more fields could not be read or written successfully.
-    */
-    IO_ERROR,
-
-    /**
-    * An IO operation was interrupted.
-    */
-    INTERRUPTED,
-
-    /**
-    * An internal error occurred during execution of an operation.
-    */
-    EXECUTION_ERROR, 
-    
-    /**
-     * A handlername is used that is invalid.
+     * serial version ID
      */
-    INVALID_HANDLER_NAME, 
-    
-    /**
-     *  One or more Subscription parameters are invalid.
-     */
-    INVALID_SUBSCRIPTION
+    private static final long serialVersionUID= 1L;
+
+    public StartException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
+
+    public StartException( String message )
+    {
+        super( message );
+    }
+
 }

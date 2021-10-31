@@ -23,15 +23,20 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
+import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
+import org.apache.plc4x.java.api.messages.PlcUnsubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
+import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 
 import nl.teslanet.mule.connectors.plc.api.ReadField;
+import nl.teslanet.mule.connectors.plc.api.SubscribeField;
 import nl.teslanet.mule.connectors.plc.api.WriteField;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
@@ -73,17 +78,20 @@ public interface MulePlcConnection
     public boolean canRead();
 
     /**
-     * Read fields from PLC using this connection.
-     * @param fields to read.
-     * @param timeout Read response must be received within the timout.
-     * @param timeUnit Unit of the timeout parameter.
-     * @return the read response
-     * @throws TimeoutException when timeOut occurs before the response is received.
-     * @throws ExecutionException When the read could not be executed.
-     * @throws InterruptedException When the read operation is interrupted.
-     * @throws InternalConnectionException when connection failed.
+    * Read fields from PLC using this connection.
+    * @param fields to read.
+    * @param timeout Read response must be received within the timout.
+    * @param timeUnit Unit of the timeout parameter.
+    * @return The read response
+    * @throws TimeoutException when timeOut occurs before the response is received.
+    * @throws ExecutionException When the read could not be executed.
+    * @throws InterruptedException When the read operation is interrupted.
+    * @throws InternalConnectionException when connection failed.
      */
-    public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeUnit ) throws InterruptedException, ExecutionException, TimeoutException, InternalConnectionException;
+    public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException;
 
     /**
      * @return {@code true} when the connection can be used to write, otherwise {@code false}.
@@ -91,15 +99,52 @@ public interface MulePlcConnection
     public boolean canWrite();
 
     /**
-      * Read fields from PLC using this connection.
-     * @param fields to write.
-     * @param timeout Read response must be received within the timout.
-     * @param timeoutUnit Unit of the timeout parameter.
-     * @return the write response.
+    * Write fields from PLC using this connection.
+    * @param fields to write.
+    * @param timeout Write response must be received within the timeout.
+    * @param timeoutUnit Unit of the timeout parameter.
+    * @return The write response.
     * @throws TimeoutException when timeOut occurs before the response is received.
-     * @throws ExecutionException When the write could not be executed.
-     * @throws InterruptedException When the write operation is interrupted.
-     * @throws InternalConnectionException when connection failed.
+    * @throws ExecutionException When the write could not be executed.
+    * @throws InterruptedException When the write operation is interrupted.
+    * @throws InternalConnectionException when connection failed.
+    */
+    public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException;
+
+    /**
+     * @return {@code true} when the connection can be used to subscribe, otherwise {@code false}.
      */
-    public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, TimeoutException, InternalConnectionException;
+    boolean canSubscribe();
+
+    /**
+    * Subscribe to fields from PLC using this connection.
+    * @param fields to subscribe to.
+    * @param timeout Subscribe response must be received within the timeout.
+    * @param timeoutUnit Unit of the timeout parameter.
+    * @return The subscription response.
+    * @throws TimeoutException when timeOut occurs before the response is received.
+    * @throws ExecutionException When the subscribe request could not be executed.
+    * @throws InterruptedException When the subscribe request is interrupted.
+    * @throws InternalConnectionException when connection failed.
+    */
+    PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException;
+
+    /**
+    * Unsubscribe to fields from PLC using this connection.
+    * @param handles of the fields to unsubscribe to.
+    * @param timeout Subscribe response must be received within the timeout.
+    * @param timeoutUnit Unit of the timeout parameter.
+    * @return The unSubscribe response containing the results of the operation.
+    * @throws TimeoutException when timeOut occurs before the response is received.
+    * @throws ExecutionException When the subscribe request could not be executed.
+    * @throws InterruptedException When the subscribe request is interrupted.
+    * @throws InternalConnectionException when connection failed.
+    */
+    PlcUnsubscriptionResponse unSubscribe( Collection< PlcSubscriptionHandle > handles, long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, TimeoutException, InternalConnectionException;
 }

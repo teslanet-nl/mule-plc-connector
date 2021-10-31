@@ -23,42 +23,28 @@
 package nl.teslanet.mule.connectors.plc.internal.error;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
 
 /**
- * PLC Connector Errors.
- *
+ * Provider of errors that can be thrown by operations.
  */
-public enum Errors implements ErrorTypeDefinition< Errors >
+public class SubscribeErrorProvider implements ErrorTypeProvider
 {
-    /**
-     * The operation called is not supported by the protocol used.
-     */
-    UNSUPPORTED,
-
-    /**
-    * One or more fields could not be read or written successfully.
-    */
-    IO_ERROR,
-
-    /**
-    * An IO operation was interrupted.
-    */
-    INTERRUPTED,
-
-    /**
-    * An internal error occurred during execution of an operation.
-    */
-    EXECUTION_ERROR, 
-    
-    /**
-     * A handlername is used that is invalid.
-     */
-    INVALID_HANDLER_NAME, 
-    
-    /**
-     *  One or more Subscription parameters are invalid.
-     */
-    INVALID_SUBSCRIPTION
+    @SuppressWarnings( "rawtypes" )
+    @Override
+    public Set< ErrorTypeDefinition > getErrorTypes()
+    {
+        Set< ErrorTypeDefinition > errors= new HashSet<>();
+        errors.add( Errors.UNSUPPORTED );
+        errors.add( Errors.IO_ERROR );
+        errors.add( Errors.INTERRUPTED );
+        errors.add( Errors.EXECUTION_ERROR );
+        errors.add( Errors.INVALID_HANDLER_NAME );
+        return errors;
+    }
 }

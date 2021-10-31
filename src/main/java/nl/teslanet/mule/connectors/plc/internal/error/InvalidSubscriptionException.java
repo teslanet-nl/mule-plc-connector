@@ -23,42 +23,32 @@
 package nl.teslanet.mule.connectors.plc.internal.error;
 
 
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+import org.mule.runtime.extension.api.exception.ModuleException;
 
 
 /**
- * PLC Connector Errors.
+ * InvalidSubscriptionException occurs when a given subscription parameters are invalid.
  *
  */
-public enum Errors implements ErrorTypeDefinition< Errors >
+public class InvalidSubscriptionException extends ModuleException
 {
     /**
-     * The operation called is not supported by the protocol used.
+     * 
      */
-    UNSUPPORTED,
+    private static final long serialVersionUID= 1L;
 
-    /**
-    * One or more fields could not be read or written successfully.
-    */
-    IO_ERROR,
+    public InvalidSubscriptionException( String message )
+    {
+        super( message, Errors.INVALID_SUBSCRIPTION );
+    }
 
-    /**
-    * An IO operation was interrupted.
-    */
-    INTERRUPTED,
+    public InvalidSubscriptionException( Throwable cause )
+    {
+        super( Errors.INVALID_SUBSCRIPTION, cause );
+    }
 
-    /**
-    * An internal error occurred during execution of an operation.
-    */
-    EXECUTION_ERROR, 
-    
-    /**
-     * A handlername is used that is invalid.
-     */
-    INVALID_HANDLER_NAME, 
-    
-    /**
-     *  One or more Subscription parameters are invalid.
-     */
-    INVALID_SUBSCRIPTION
+    public InvalidSubscriptionException( String message, Throwable cause )
+    {
+        super( message, Errors.INVALID_SUBSCRIPTION, cause );
+    }
 }

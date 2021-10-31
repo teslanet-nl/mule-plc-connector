@@ -20,45 +20,32 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.internal.error;
-
-
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+package nl.teslanet.mule.connectors.plc.internal.exception;
 
 
 /**
- * PLC Connector Errors.
+ * internal InvalidHandlerNameException occurs when a given handler name is invalid.
  *
  */
-public enum Errors implements ErrorTypeDefinition< Errors >
+public class InternalInvalidHandlerNameException extends Exception
 {
     /**
-     * The operation called is not supported by the protocol used.
+     * serial version
      */
-    UNSUPPORTED,
+    private static final long serialVersionUID= 1L;
 
-    /**
-    * One or more fields could not be read or written successfully.
-    */
-    IO_ERROR,
+    public InternalInvalidHandlerNameException( String message )
+    {
+        super( message );
+    }
 
-    /**
-    * An IO operation was interrupted.
-    */
-    INTERRUPTED,
+    public InternalInvalidHandlerNameException( Throwable cause )
+    {
+        super( cause );
+    }
 
-    /**
-    * An internal error occurred during execution of an operation.
-    */
-    EXECUTION_ERROR, 
-    
-    /**
-     * A handlername is used that is invalid.
-     */
-    INVALID_HANDLER_NAME, 
-    
-    /**
-     *  One or more Subscription parameters are invalid.
-     */
-    INVALID_SUBSCRIPTION
+    public InternalInvalidHandlerNameException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 }

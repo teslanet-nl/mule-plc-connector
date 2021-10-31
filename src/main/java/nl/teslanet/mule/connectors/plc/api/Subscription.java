@@ -20,45 +20,34 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.internal.error;
+package nl.teslanet.mule.connectors.plc.api;
 
 
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+import java.util.List;
+
+import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 
 /**
- * PLC Connector Errors.
- *
+ * The Configuration of a subscription.
  */
-public enum Errors implements ErrorTypeDefinition< Errors >
+public class Subscription extends AbstractSubscriptionParams
 {
     /**
-     * The operation called is not supported by the protocol used.
-     */
-    UNSUPPORTED,
+    * The PLC fields to subscribe to.
+    */
+    @Parameter
+    @Expression( ExpressionSupport.SUPPORTED )
+    private List< SubscribeField > subscribeFields= null;
 
     /**
-    * One or more fields could not be read or written successfully.
-    */
-    IO_ERROR,
-
-    /**
-    * An IO operation was interrupted.
-    */
-    INTERRUPTED,
-
-    /**
-    * An internal error occurred during execution of an operation.
-    */
-    EXECUTION_ERROR, 
-    
-    /**
-     * A handlername is used that is invalid.
+     * @return the requested fields.
      */
-    INVALID_HANDLER_NAME, 
-    
-    /**
-     *  One or more Subscription parameters are invalid.
-     */
-    INVALID_SUBSCRIPTION
+    public List< SubscribeField > getSubscribeFieldsConfigs()
+    {
+        return subscribeFields;
+    }
+
 }

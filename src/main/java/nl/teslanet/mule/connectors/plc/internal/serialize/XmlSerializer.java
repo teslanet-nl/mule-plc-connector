@@ -30,6 +30,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.plc4x.java.api.messages.PlcFieldResponse;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
+import org.apache.plc4x.java.api.messages.PlcSubscriptionEvent;
+import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
+import org.apache.plc4x.java.api.messages.PlcUnsubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.model.PlcField;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
@@ -82,10 +85,16 @@ public class XmlSerializer
         Element rootElement= doc.createElement( "plcReadResponse" );
         doc.appendChild( rootElement );
         //build content
-        boolean allOk= seralizeFileds( doc, rootElement, response, alias -> response.getPlcValue( alias ) );
+        boolean allOk= seralizeFields( doc, rootElement, response, alias -> response.getPlcValue( alias ) );
         return new XmlSerializerResult( allOk, doc );
     }
 
+    /**
+     * Serialize a write response.
+     * @param response The write response to serialize.
+     * @return The serialized result.
+     * @throws ParserConfigurationException On failing XML configuration.
+     */
     public static XmlSerializerResult xmlSerialize( PlcWriteResponse response ) throws ParserConfigurationException
     {
         DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
@@ -95,11 +104,83 @@ public class XmlSerializer
         Element rootElement= doc.createElement( "plcWriteResponse" );
         doc.appendChild( rootElement );
         //build content
-        boolean allOk= seralizeFileds( doc, rootElement, response, alias -> response.getRequest().getPlcValue( alias ) );
+        boolean allOk= seralizeFields( doc, rootElement, response, alias -> response.getRequest().getPlcValue( alias ) );
         return new XmlSerializerResult( allOk, doc );
     }
 
-    private static boolean seralizeFileds( Document doc, Element parent, PlcFieldResponse response, PlcValueProvider valueProvider )
+    /**
+     * Serialize a subscription response.
+     * @param handlerName The name of the handler owning the subscription.
+     * @param subscriptionName The name of the subscription.
+     * @param response The subscription response to serialize.
+     * @return The serialized result.
+     * @throws ParserConfigurationException On failing XML configuration.
+     */
+    public static XmlSerializerResult xmlSerialize( String handlerName, String subscriptionName, PlcSubscriptionResponse response ) throws ParserConfigurationException
+    {
+        DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
+        Document doc= dBuilder.newDocument();
+
+        // root element
+        Element rootElement= doc.createElement( "plcSubscribeResponse" );
+        rootElement.setAttribute( "handler", handlerName );
+        rootElement.setAttribute( "subscription", subscriptionName );
+        doc.appendChild( rootElement );
+        //build content
+        boolean allOk= seralizeFields( doc, rootElement, response );
+        return new XmlSerializerResult( allOk, doc );
+    }
+
+    /**
+     * Serialize a unsubscription response.
+     * @param handlerName The name of the handler owning the subscription.
+     * @param subscriptionName The name of the subscription.
+     * @param response The unsubscription response to serialize.
+     * @return The serialized result.
+     * @throws ParserConfigurationException On failing XML configuration.
+     */
+    public static XmlSerializerResult xmlSerialize( String handlerName, String subscriptionName, PlcUnsubscriptionResponse response ) throws ParserConfigurationException
+    {
+        DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
+        Document doc= dBuilder.newDocument();
+
+        // root element
+        Element rootElement= doc.createElement( "plcUnsubscribeResponse" );
+        rootElement.setAttribute( "handler", handlerName );
+        rootElement.setAttribute( "subscription", subscriptionName );
+        doc.appendChild( rootElement );
+        //build content
+        boolean allOk= seralizeFields( doc, rootElement, response );
+        return new XmlSerializerResult( allOk, doc );
+    }
+
+    /**
+     * Serialize an event.
+     * @param event The event to serialize.
+     * @return The serialized result.
+     * @throws ParserConfigurationException On failing XML configuration.
+     */
+    public static XmlSerializerResult xmlSerialize( PlcSubscriptionEvent event ) throws ParserConfigurationException
+    {
+        DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
+        Document doc= dBuilder.newDocument();
+
+        // root element
+        Element rootElement= doc.createElement( "plcEvent" );
+        doc.appendChild( rootElement );
+        //build content
+        boolean allOk= seralizeFields( doc, rootElement, event, alias -> event.getPlcValue( alias ) );
+        return new XmlSerializerResult( allOk, doc );
+    }
+
+    /**
+     * @param doc
+     * @param parent
+     * @param response
+     * @param valueProvider
+     * @return
+     */
+    private static boolean seralizeFields( Document doc, Element parent, PlcFieldResponse response, PlcValueProvider valueProvider )
     {
         boolean allOk= true;
 
@@ -110,22 +191,45 @@ public class XmlSerializer
             PlcResponseCode responseCode= response.getResponseCode( alias );
             allOk= allOk && ( responseCode == PlcResponseCode.OK );
             fieldElement.setAttribute( "responseCode", ResponseCodeValueProvider.getKey( responseCode ));
-            PlcField field= response.getField( alias );
             try
             {
+                PlcField field= response.getField( alias );
                 fieldElement.setAttribute( "type", field.getPlcDataType() );
+                fieldElement.setAttribute( "count", String.valueOf( field.getNumberOfElements() ) );
             }
             catch ( Exception e )
             {
                 //Ignore
             }
-            fieldElement.setAttribute( "count", String.valueOf( field.getNumberOfElements() ) );
             fieldElement.appendChild( xmlSeralize( doc, valueProvider.getValue( alias ) ) );
             parent.appendChild( fieldElement );
         }
         return allOk;
     }
 
+    private static boolean seralizeFields( Document doc, Element parent, PlcSubscriptionResponse response )
+    {
+        boolean allOk= true;
+
+        for ( String alias : response.getFieldNames() )
+        {
+            Element fieldElement= doc.createElement( "field" );
+            fieldElement.setAttribute( "alias", alias );
+            PlcResponseCode responseCode= response.getResponseCode( alias );
+            allOk= allOk && ( responseCode == PlcResponseCode.OK );
+            fieldElement.setAttribute( "responseCode", ResponseCodeValueProvider.getKey( responseCode ));
+            parent.appendChild( fieldElement );
+        }
+        return allOk;
+    }
+    
+    private static boolean seralizeFields( Document doc, Element parent, PlcUnsubscriptionResponse response )
+    {
+        boolean allOk= true;
+        //No field info available
+        return allOk;
+    }
+    
     private static Element xmlSeralize( Document doc, PlcValue plcValue )
     {
         return xmlSeralize( doc, null, plcValue );
