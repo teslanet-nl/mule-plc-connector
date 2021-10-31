@@ -23,10 +23,20 @@
 package nl.teslanet.mule.connectors.plc.internal.serialize;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.Map.Entry;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.plc4x.java.api.messages.PlcFieldResponse;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
@@ -38,14 +48,33 @@ import org.apache.plc4x.java.api.model.PlcField;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.apache.plc4x.java.api.value.PlcValue;
 import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
 import nl.teslanet.mule.connectors.plc.api.ResponseCodeValueProvider;
+import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionException;
 
 
 public class XmlSerializer
 {
+    /**
+    * Xml transformer factory for processing responses.
+    */
+    private static final TransformerFactory transformerFactory;
+
+    /**
+    * Create and configures transformerfactory instance.
+    */
+    static
+    {
+        transformerFactory= javax.xml.transform.TransformerFactory.newInstance();
+        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_DTD, "" );
+        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "" );
+    }
+    
     /**
      * The Document Builer factory.
      */
@@ -171,6 +200,31 @@ public class XmlSerializer
         //build content
         boolean allOk= seralizeFields( doc, rootElement, event, alias -> event.getPlcValue( alias ) );
         return new XmlSerializerResult( allOk, doc );
+    }
+    
+    /**
+     * Create Mule Result that can be passed to Mule flow
+     * @param responsePayload The payload contents of the message to return. 
+     * @return The Result object created.
+     */
+    public static Result< InputStream, ReceivedResponseAttributes > createMuleResult( XmlSerializerResult responsePayload )
+    {
+        ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
+        try
+        {
+            Transformer transformer= transformerFactory.newTransformer();
+            transformer.setOutputProperty( OutputKeys.ENCODING, "UTF-8" );
+            transformer.transform( new DOMSource( responsePayload.getDocument() ), new StreamResult( outputStream ) );
+        }
+        catch ( TransformerException e )
+        {
+            throw new ConnectorExecutionException( "Internal error on transforming read response.", e );
+        }
+        //small messages expected -> store payload in byte array
+        ByteArrayInputStream inputStream= new ByteArrayInputStream( outputStream.toByteArray() );
+        return Result.< InputStream, ReceivedResponseAttributes > builder().output( inputStream ).attributes(
+            new ReceivedResponseAttributes( responsePayload.isIndicatesSucces() )
+        ).mediaType( MediaType.APPLICATION_XML ).build();
     }
 
     /**
