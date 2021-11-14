@@ -26,7 +26,7 @@ package nl.teslanet.mule.connectors.plc.test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -95,15 +95,11 @@ public class TestUtils
         }
         else if ( object instanceof InputStream )
         {
-            return IOUtils.toString( (InputStream) object );
+            return IOUtils.toString( (InputStream) object, StandardCharsets.UTF_8  );
         }
         else if ( object instanceof byte[] )
         {
-            return Arrays.toString( (byte[]) object );
-        }
-        else if ( object instanceof Byte[] )
-        {
-            return Arrays.toString( (Byte[]) object );
+            return new String( (byte[]) object, StandardCharsets.UTF_8 );
         }
         else if ( object instanceof OutputHandler )
         {
