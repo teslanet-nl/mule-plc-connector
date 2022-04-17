@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -139,6 +140,7 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
      * Test the subscribe operation and the production of events.
      * @throws Exception When an error occurs.
      */
+    @Ignore
     @Test
     public void subscribeOperation() throws Exception
     {
@@ -212,6 +214,7 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
      * Test the unsubscribe operation and the ending of production of events.
      * @throws Exception When an error occurs.
      */
+    @Ignore
     @Test
     public void unsubscribeOperation() throws Exception
     {

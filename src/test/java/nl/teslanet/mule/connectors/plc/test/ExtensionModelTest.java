@@ -49,10 +49,10 @@ import nl.teslanet.mule.connectors.plc.internal.MulePlcConnector;
 
 
 @SmallTest
-public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedResourceFactoryTestCase
+public class ExtensionModelTest extends AbstractGeneratedResourceFactoryTestCase
 {
 
-    private static final Logger logger= LoggerFactory.getLogger( ExtensionModelResourceFactoryTestCase.class.getCanonicalName() );
+    private static final Logger logger= LoggerFactory.getLogger( ExtensionModelTest.class.getCanonicalName() );
 
     private static final String modelResourcePath= "plc-extension-descriptions.xml";
 
