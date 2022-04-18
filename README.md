@@ -35,7 +35,7 @@ The connector is installed by adding its Maven dependency to your Mule 4 applica
 <dependency>
     <groupId>nl.teslanet.mule.connectors.plc</groupId>
     <artifactId>mule-plc-connector</artifactId>
-    <version>1.0.0-M5</version>
+    <version>1.0.0-M6</version>
     <classifier>mule-plugin</classifier>
 </dependency>
 ```
