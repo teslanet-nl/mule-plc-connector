@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+#%L
+  Mule PLC Connector Test Utilities
+  %%
+  Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+  
+  Contributors:
+      (teslanet.nl) Rogier Cobben - initial creation
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+-->
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:plc="http://www.teslanet.nl/schema/mule/plc"
+    xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+
+	<plc:config name="PLC_Config">
+		<plc:connection connectionUri="simulated:plc" />
+	</plc:config>
+	
+
+    <flow name="subscribe-subscribe" doc:id="27a936b4-f6ad-45ed-9ea9-cc7e389683e2" >
+        <plc:subscribe doc:name="Subscribe" config-ref="PLC_Config" subscriptionName="subscription1" handlerName="handler1">
+            <plc:subscribe-fields >
+                <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
+                <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
+            </plc:subscribe-fields>
+        </plc:subscribe>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+    </flow>
+    
+    <flow name="subscribe-unsubscribe" doc:id="9c275e40-b46e-428a-b725-c26c4d76b3e1" >
+        <plc:unsubscribe doc:name="Unsubscribe" config-ref="PLC_Config" handlerName="handler1" subscriptionName="subscription1"/>
+         <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+    </flow>
+    
+    <flow name="subscribe-eventhandler" doc:id="9a650d61-0921-4b29-9390-2bdc0c6fb2ed" >
+        <plc:event-handler doc:name="Event handler" config-ref="PLC_Config" handlerName="handler1"/>
+        <logger level="INFO" doc:name="Logger" message="#['EVENT']" category="nl.teslanet.mule.connectors.plc.test"/>
+        <logger level="INFO" doc:name="Logger" message="#[message]" category="nl.teslanet.mule.connectors.plc.test"/>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+        <java:new doc:name="New spy"
+            class="nl.teslanet.mule.connectors.plc.test.utils.MuleEventSpy"
+            constructor="MuleEventSpy(String)" target="spy">
+            <java:args><![CDATA[#[{ arg0: "handler1" }]]]></java:args>
+        </java:new>
+        <java:invoke doc:name="Invoke" instance="#[vars.spy]"
+            class="nl.teslanet.mule.connectors.plc.test.utils.MuleEventSpy"
+            method="event(Object)">
+            <java:args><![CDATA[#[{ arg0: message }]]]></java:args>
+        </java:invoke>
+    </flow>
+    
+    <flow name="subscribe-write-1">
+        <plc:write doc:name="Write" config-ref="PLC_Config">
+            <reconnect count="5" frequency="500" />
+            <plc:write-fields>
+                <plc:write-field alias="coil1"
+                    address="STATE/coil1:BOOL[2]" values="#[ [ true, false ] ]" />
+            </plc:write-fields>
+        </plc:write>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+    </flow>
+
+    <flow name="subscribe-write-2">
+        <plc:write doc:name="Write" config-ref="PLC_Config">
+            <reconnect count="5" frequency="500" />
+            <plc:write-fields>
+                <plc:write-field alias="reg1"
+                    address="STATE/register1:INT[2]" values="#[[ '111', '222' ]]" />
+            </plc:write-fields>
+        </plc:write>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+    </flow>
+
+    <flow name="subscribe-write-3">
+        <plc:write doc:name="Write" config-ref="PLC_Config">
+            <reconnect count="5" frequency="500" />
+            <plc:write-fields>
+                <plc:write-field alias="coil1"
+                    address="STATE/coil1:BOOL[2]" values="#[ [ false, true ] ]" />
+            </plc:write-fields>
+        </plc:write>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+    </flow>
+
+
+</mule>
