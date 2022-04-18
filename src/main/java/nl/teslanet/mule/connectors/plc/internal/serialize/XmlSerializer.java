@@ -75,7 +75,7 @@ public class XmlSerializer
         transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_DTD, "" );
         transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "" );
     }
-    
+
     /**
      * The Document Builer factory.
      */
@@ -202,7 +202,7 @@ public class XmlSerializer
         boolean allOk= seralizeFields( doc, rootElement, event, alias -> event.getPlcValue( alias ) );
         return new XmlSerializerResult( allOk, doc );
     }
-    
+
     /**
      * Create Mule Result that can be passed to Mule flow
      * @param responsePayload The payload contents of the message to return. 
@@ -214,9 +214,9 @@ public class XmlSerializer
         try
         {
             Transformer transformer= transformerFactory.newTransformer();
-            transformer.setOutputProperty( OutputKeys.ENCODING, "UTF-8" );
+            transformer.setOutputProperty( OutputKeys.ENCODING, "ISO-8859-1" );
             transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "no" );
             transformer.transform( new DOMSource( responsePayload.getDocument() ), new StreamResult( writer ) );
         }
         catch ( TransformerException e )
@@ -224,10 +224,10 @@ public class XmlSerializer
             throw new ConnectorExecutionException( "Internal error on transforming read response.", e );
         }
         //small messages expected -> store payload in byte array
-        ByteArrayInputStream inputStream= new ByteArrayInputStream( writer.toString().getBytes( StandardCharsets.UTF_8 ) );
+        ByteArrayInputStream inputStream= new ByteArrayInputStream( writer.toString().getBytes( StandardCharsets.ISO_8859_1 ) );
         return Result.< InputStream, ReceivedResponseAttributes > builder().output( inputStream ).attributes(
             new ReceivedResponseAttributes( responsePayload.isIndicatesSucces() )
-        ).mediaType( MediaType.APPLICATION_XML ).build();
+        ).mediaType( MediaType.APPLICATION_XML.withCharset( StandardCharsets.ISO_8859_1 ) ).build();
     }
 
     /**
@@ -247,7 +247,7 @@ public class XmlSerializer
             fieldElement.setAttribute( "alias", alias );
             PlcResponseCode responseCode= response.getResponseCode( alias );
             allOk= allOk && ( responseCode == PlcResponseCode.OK );
-            fieldElement.setAttribute( "responseCode", ResponseCodeValueProvider.getKey( responseCode ));
+            fieldElement.setAttribute( "responseCode", ResponseCodeValueProvider.getKey( responseCode ) );
             try
             {
                 PlcField field= response.getField( alias );
@@ -274,19 +274,19 @@ public class XmlSerializer
             fieldElement.setAttribute( "alias", alias );
             PlcResponseCode responseCode= response.getResponseCode( alias );
             allOk= allOk && ( responseCode == PlcResponseCode.OK );
-            fieldElement.setAttribute( "responseCode", ResponseCodeValueProvider.getKey( responseCode ));
+            fieldElement.setAttribute( "responseCode", ResponseCodeValueProvider.getKey( responseCode ) );
             parent.appendChild( fieldElement );
         }
         return allOk;
     }
-    
+
     private static boolean seralizeFields( Document doc, Element parent, PlcUnsubscriptionResponse response )
     {
         boolean allOk= true;
         //No field info available
         return allOk;
     }
-    
+
     private static Element xmlSeralize( Document doc, PlcValue plcValue )
     {
         return xmlSeralize( doc, null, plcValue );
