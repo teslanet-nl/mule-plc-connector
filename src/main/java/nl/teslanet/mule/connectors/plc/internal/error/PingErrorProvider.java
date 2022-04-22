@@ -41,7 +41,6 @@ public class PingErrorProvider implements ErrorTypeProvider
     {
         Set< ErrorTypeDefinition > errors= new HashSet<>();
         errors.add( Errors.UNSUPPORTED );
-        errors.add( Errors.INTERRUPTED );
         return errors;
     }
 }

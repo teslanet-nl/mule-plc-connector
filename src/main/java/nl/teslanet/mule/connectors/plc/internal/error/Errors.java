@@ -43,11 +43,6 @@ public enum Errors implements ErrorTypeDefinition< Errors >
     IO_ERROR,
 
     /**
-    * An IO operation was interrupted.
-    */
-    INTERRUPTED,
-
-    /**
     * An internal error occurred during execution of an operation.
     */
     EXECUTION_ERROR, 
