@@ -34,11 +34,11 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 public abstract class AbstractSubscriptionParams extends IoRequestBuilder
 {
     /**
-     * The handlerName that will process the events produced by the PLC on this subscription.
+     * The handler that will process the events produced by the PLC on this subscription.
      */
     @Parameter
     @Expression( ExpressionSupport.SUPPORTED )
-    private String handlerName;
+    private String eventHandler;
 
     /**
      * The name of the subscription.
@@ -58,8 +58,8 @@ public abstract class AbstractSubscriptionParams extends IoRequestBuilder
     /**
      * @return the handlerName
      */
-    public String getHandlerName()
+    public String getEventHandler()
     {
-        return handlerName;
+        return eventHandler;
     }
 }

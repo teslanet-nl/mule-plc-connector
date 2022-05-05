@@ -67,12 +67,12 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns="http://www.teslanet.nl/schema/mule/plc" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EventHandlerType" substitutionGroup="mule:abstract-message-source" name="event-handler">
+  <xs:element xmlns="http://www.teslanet.nl/schema/mule/plc" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EventListenerType" substitutionGroup="mule:abstract-message-source" name="event-listener">
     <xs:annotation>
-      <xs:documentation>The EventHandler message source receives PLC events. The received PLC messages are delivered to the handlers mule-flow.</xs:documentation>
+      <xs:documentation>The EventListener message source receives PLC events. The received PLC messages are delivered to the listeners mule-flow.</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:complexType name="EventHandlerType">
+  <xs:complexType name="EventListenerType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
         <xs:sequence minOccurs="0" maxOccurs="1">
@@ -84,9 +84,9 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="handlerName">
+        <xs:attribute type="xs:string" use="required" name="eventHandler">
           <xs:annotation>
-            <xs:documentation>The name of the handler by which it is referenced by observers and async requestst.</xs:documentation>
+            <xs:documentation>The handler of which events are listened to.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
@@ -224,9 +224,9 @@
             <xs:documentation>When true an exception is thrown on field io errrors.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="handlerName">
+        <xs:attribute type="mule:expressionString" use="required" name="eventHandler">
           <xs:annotation>
-            <xs:documentation>The handlerName that will process the events produced by the PLC on this subscription.</xs:documentation>
+            <xs:documentation>The handler that will process the events produced by the PLC on this subscription.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionString" use="required" name="subscriptionName">
@@ -290,9 +290,9 @@
             <xs:documentation>When true an exception is thrown on field io errrors.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="handlerName">
+        <xs:attribute type="mule:expressionString" use="required" name="eventHandler">
           <xs:annotation>
-            <xs:documentation>The handlerName that will process the events produced by the PLC on this subscription.</xs:documentation>
+            <xs:documentation>The handler that will process the events produced by the PLC on this subscription.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionString" use="required" name="subscriptionName">
@@ -399,5 +399,3 @@
     </xs:union>
   </xs:simpleType>
 </xs:schema>
-
-
