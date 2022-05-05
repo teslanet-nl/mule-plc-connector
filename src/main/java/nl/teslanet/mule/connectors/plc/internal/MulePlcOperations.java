@@ -238,7 +238,7 @@ public class MulePlcOperations
         XmlSerializerResult responsePayload;
         try
         {
-            responsePayload= XmlSerializer.xmlSerialize( subscription.getHandlerName(), subscription.getSubscriptionName(), response );
+            responsePayload= XmlSerializer.xmlSerialize( subscription.getEventHandler(), subscription.getSubscriptionName(), response );
         }
         catch ( ParserConfigurationException e )
         {
@@ -247,8 +247,8 @@ public class MulePlcOperations
         if ( subscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
         //TODO check already active
         //find handler
-        EventHandler handler= configuration.getHandler( subscription.getHandlerName() );
-        if ( handler == null ) throw new InvalidHandlerNameException( "No handler found with given name { " + subscription.getHandlerName() + " }" );
+        EventListener handler= configuration.getHandler( subscription.getEventHandler() );
+        if ( handler == null ) throw new InvalidHandlerNameException( "No handler found with given name { " + subscription.getEventHandler() + " }" );
         //activate subscription
         try
         {
@@ -256,7 +256,7 @@ public class MulePlcOperations
         }
         catch ( InternalInvalidSubscriptionException e )
         {
-            throw new InvalidSubscriptionException( "Subscription is invalid { " + subscription.getHandlerName() + "::" + subscription.getSubscriptionName() + " }", e );
+            throw new InvalidSubscriptionException( "Subscription is invalid { " + subscription.getEventHandler() + "::" + subscription.getSubscriptionName() + " }", e );
         }
         return XmlSerializer.createMuleResult( responsePayload );
     }
@@ -283,8 +283,8 @@ public class MulePlcOperations
             throw new UnsupportedException( "Protocol does not support subscribing." );
         }
         PlcUnsubscriptionResponse response= null;
-        EventHandler handler= configuration.getHandler( unsubscription.getHandlerName() );
-        if ( handler == null ) throw new InvalidHandlerNameException( "No handler found with given name { " + unsubscription.getHandlerName() + " }" );
+        EventListener handler= configuration.getHandler( unsubscription.getEventHandler() );
+        if ( handler == null ) throw new InvalidHandlerNameException( "No handler found with given name { " + unsubscription.getEventHandler() + " }" );
         try
         {
             Collection< PlcSubscriptionHandle > handles= handler.getHandles( unsubscription.getSubscriptionName() );
@@ -295,7 +295,7 @@ public class MulePlcOperations
         catch ( InternalInvalidSubscriptionException e )
         {
             throw new InvalidSubscriptionException(
-                "Unsubscription failed, invalid subscription { " + unsubscription.getHandlerName() + "::" + unsubscription.getSubscriptionName() + " }",
+                "Unsubscription failed, invalid subscription { " + unsubscription.getEventHandler() + "::" + unsubscription.getSubscriptionName() + " }",
                 e
             );
         }
@@ -314,7 +314,7 @@ public class MulePlcOperations
         XmlSerializerResult responsePayload;
         try
         {
-            responsePayload= XmlSerializer.xmlSerialize( unsubscription.getHandlerName(), unsubscription.getSubscriptionName(), response );
+            responsePayload= XmlSerializer.xmlSerialize( unsubscription.getEventHandler(), unsubscription.getSubscriptionName(), response );
         }
         catch ( ParserConfigurationException e )
         {

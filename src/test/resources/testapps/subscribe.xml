@@ -38,7 +38,7 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 	
 
     <flow name="subscribe-subscribe" doc:id="27a936b4-f6ad-45ed-9ea9-cc7e389683e2" >
-        <plc:subscribe doc:name="Subscribe" config-ref="PLC_Config" subscriptionName="subscription1" handlerName="handler1">
+        <plc:subscribe doc:name="Subscribe" config-ref="PLC_Config" subscriptionName="subscription1" eventHandler="handler1">
             <plc:subscribe-fields >
                 <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
                 <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
@@ -50,14 +50,14 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
     </flow>
     
     <flow name="subscribe-unsubscribe" doc:id="9c275e40-b46e-428a-b725-c26c4d76b3e1" >
-        <plc:unsubscribe doc:name="Unsubscribe" config-ref="PLC_Config" handlerName="handler1" subscriptionName="subscription1"/>
+        <plc:unsubscribe doc:name="Unsubscribe" config-ref="PLC_Config" subscriptionName="subscription1" eventHandler="handler1"/>
          <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
             doc:name="Set Payload" />
         <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
     </flow>
     
     <flow name="subscribe-eventhandler" doc:id="9a650d61-0921-4b29-9390-2bdc0c6fb2ed" >
-        <plc:event-handler doc:name="Event handler" config-ref="PLC_Config" handlerName="handler1"/>
+        <plc:event-listener doc:name="Event listener" config-ref="PLC_Config" eventHandler="handler1"/>
         <logger level="INFO" doc:name="Logger" message="#['EVENT']" category="nl.teslanet.mule.connectors.plc.test"/>
         <logger level="INFO" doc:name="Logger" message="#[message]" category="nl.teslanet.mule.connectors.plc.test"/>
         <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"

@@ -43,7 +43,7 @@ import nl.teslanet.mule.connectors.plc.internal.exception.InternalInvalidHandler
  */
 @Configuration( name= "config" )
 @Operations( MulePlcOperations.class )
-@Sources( EventHandler.class )
+@Sources( EventListener.class )
 @ConnectionProviders( MulePlcConnectionProvider.class )
 public class MulePlcConfig
 {
@@ -69,7 +69,7 @@ public class MulePlcConfig
     /**
      * The list of response handlers
      */
-    private ConcurrentHashMap< String, EventHandler > handlers= new ConcurrentHashMap<>();
+    private ConcurrentHashMap< String, EventListener > handlers= new ConcurrentHashMap<>();
 
     /**
      * @return The configuration name.
@@ -101,7 +101,7 @@ public class MulePlcConfig
      * @param callback the source callback that will process the responses
      * @throws InternalInvalidHandlerNameException 
      */
-    synchronized void addHandler( String handlerName, EventHandler handler ) throws InternalInvalidHandlerNameException
+    synchronized void addHandler( String handlerName, EventListener handler ) throws InternalInvalidHandlerNameException
     {
         if ( handlerName == null || handlerName.isEmpty() ) throw new InternalInvalidHandlerNameException( "empty response handler name not allowed" );
         if ( handlers.get( handlerName ) != null ) throw new InternalInvalidHandlerNameException( "responsehandler name { " + handlerName + " } not unique" );
@@ -113,7 +113,7 @@ public class MulePlcConfig
      * @param handlerName The name of the handler.
      * @return The handler or null if no handler with given name exists.
      */
-    public EventHandler getHandler( String handlerName )
+    public EventListener getHandler( String handlerName )
     {
         return handlers.get( handlerName );
     }

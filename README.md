@@ -1,5 +1,5 @@
 # Mule PLC Connector
---------------------
+![Mule-PLC logo](icon/icon.svg)
 
 ## Introduction
 

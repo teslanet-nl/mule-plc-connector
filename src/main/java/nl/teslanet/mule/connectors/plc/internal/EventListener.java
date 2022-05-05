@@ -54,29 +54,29 @@ import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSeria
 
 
 /**
- * The EventHandler message source receives PLC events.
- * The received PLC messages are delivered to the handlers mule-flow.
+ * The EventListener message source receives PLC events.
+ * The received PLC messages are delivered to the listeners mule-flow.
  */
 @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
-public class EventHandler extends Source< InputStream, ReceivedResponseAttributes > implements Consumer< PlcSubscriptionEvent >
+public class EventListener extends Source< InputStream, ReceivedResponseAttributes > implements Consumer< PlcSubscriptionEvent >
 {
     /**
      * The logger of this class.
      */
-    private static final Logger logger= LoggerFactory.getLogger( EventHandler.class.getCanonicalName() );
+    private static final Logger logger= LoggerFactory.getLogger( EventListener.class.getCanonicalName() );
 
     /**
-     * The config that owns the handler.
+     * The PLC configuration.
      */
     @Config
     private MulePlcConfig config;
 
     /**
-     * The name of the handler by which it is referenced by observers and async requestst.
+     * The handler of which events are listened to.
      */
     @Parameter
     @Expression( ExpressionSupport.NOT_SUPPORTED )
-    private String handlerName;
+    private String eventHandler;
 
     /**
      * Source callback to deliver messages to Mule.
@@ -92,7 +92,7 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
     * Default constructor
     * Creates and configures transformerfactory instance.
     */
-    public EventHandler()
+    public EventListener()
     {
         //NOOP
     }
@@ -105,7 +105,7 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
     {
         try
         {
-            config.addHandler( handlerName, this );
+            config.addHandler( eventHandler, this );
         }
         catch ( InternalInvalidHandlerNameException e )
         {
@@ -123,7 +123,7 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
     {
         //TODO unregister
         subscriptions.clear();
-        config.removeHandler( handlerName );
+        config.removeHandler( eventHandler );
         
         sourceCallback= null;
         logger.info( this + " stopped." );
@@ -136,7 +136,7 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
     @Override
     public String toString()
     {
-        return "PLC ResponseHandler { " + config.getConfigName() + "::" + handlerName + " }";
+        return "PLC ResponseHandler { " + config.getConfigName() + "::" + eventHandler + " }";
     }
 
     /**
@@ -227,7 +227,7 @@ public class EventHandler extends Source< InputStream, ReceivedResponseAttribute
         }
         catch ( ParserConfigurationException e )
         {
-            logger.error( "Handler { " + handlerName + " } cannot process event.", e );
+            logger.error( "Handler { " + eventHandler + " } cannot process event.", e );
             return;
         }
         //hand over to Mule
