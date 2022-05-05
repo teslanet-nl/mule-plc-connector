@@ -48,7 +48,6 @@ import nl.teslanet.mule.connectors.plc.api.Subscription;
 import nl.teslanet.mule.connectors.plc.api.UnSubscription;
 import nl.teslanet.mule.connectors.plc.api.WriteRequestBuilder;
 import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionException;
-import nl.teslanet.mule.connectors.plc.internal.error.ConnectorInterruptedException;
 import nl.teslanet.mule.connectors.plc.internal.error.InvalidHandlerNameException;
 import nl.teslanet.mule.connectors.plc.internal.error.InvalidSubscriptionException;
 import nl.teslanet.mule.connectors.plc.internal.error.IoErrorException;
@@ -78,20 +77,17 @@ public class MulePlcOperations
 
     /**
      * Ping the PLC.
+    * @throws InterruptedException When the operation was interrupted.
      */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.ANY, strict= false )
     @Throws( PingErrorProvider.class )
     public Boolean ping( @Config
     MulePlcConfig configuration, @Connection
-    MulePlcConnection connection )
+    MulePlcConnection connection ) throws InterruptedException
     {
         try
         {
             return connection.ping();
-        }
-        catch ( InterruptedException e )
-        {
-            throw new ConnectorInterruptedException( "Ping was interrupted.", e );
         }
         catch ( InternalUnsupportedException e )
         {
@@ -106,13 +102,14 @@ public class MulePlcOperations
     * @param requestBuilder The builder containing request parameters.
     * @return The readResponse as Result
     * @throws ConnectionException 
+    * @throws InterruptedException When the operation was interrupted.
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > read( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
-    ReadRequestBuilder requestBuilder ) throws ConnectionException
+    ReadRequestBuilder requestBuilder ) throws ConnectionException, InterruptedException
     {
         // Check if this connection support reading of data.
         if ( !connection.canRead() )
@@ -127,10 +124,6 @@ public class MulePlcOperations
         catch ( ExecutionException e )
         {
             throw new ConnectorExecutionException( "Execution Error on read.", e );
-        }
-        catch ( InterruptedException e )
-        {
-            throw new ConnectorInterruptedException( "Interruption on read.", e );
         }
         catch ( InternalConnectionException | TimeoutException e )
         {
@@ -160,13 +153,14 @@ public class MulePlcOperations
     * @param requestBuilder The builder containing request parameters.
     * @return The writeResponse as Result.
     * @throws ConnectionException When connection is lost.
+    * @throws InterruptedException When the operation was interrupted.
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > write( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
-    WriteRequestBuilder requestBuilder ) throws ConnectionException
+    WriteRequestBuilder requestBuilder ) throws ConnectionException, InterruptedException
     {
         // Check if this connection support writing of data.
         if ( !connection.canWrite() )
@@ -181,10 +175,6 @@ public class MulePlcOperations
         catch ( ExecutionException e )
         {
             throw new ConnectorExecutionException( "Execution Error on write.", e );
-        }
-        catch ( InterruptedException e )
-        {
-            throw new ConnectorInterruptedException( "Interruption on write.", e );
         }
         catch ( InternalConnectionException | TimeoutException e )
         {
@@ -214,13 +204,14 @@ public class MulePlcOperations
     * @param subscription The subscription parameters.
     * @return The readResponse as Result
     * @throws ConnectionException 
+    * @throws InterruptedException When the operation was interrupted.
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( SubscribeErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > subscribe( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Subscription" )
-    Subscription subscription ) throws ConnectionException
+    Subscription subscription ) throws ConnectionException, InterruptedException
     {
         // Check if this connection supports subscribing.
         if ( !connection.canSubscribe() )
@@ -235,10 +226,6 @@ public class MulePlcOperations
         catch ( ExecutionException e )
         {
             throw new ConnectorExecutionException( "Execution Error on subscription.", e );
-        }
-        catch ( InterruptedException e )
-        {
-            throw new ConnectorInterruptedException( "Interruption on subscription.", e );
         }
         catch ( InternalConnectionException | TimeoutException e )
         {
@@ -281,13 +268,14 @@ public class MulePlcOperations
     * @param unsubscription The subscription parameters.
     * @return The readResponse as Result
     * @throws ConnectionException 
+    * @throws InterruptedException When the operation was interrupted.
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( SubscribeErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > unsubscribe( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Subscription" )
-    UnSubscription unsubscription ) throws ConnectionException
+    UnSubscription unsubscription ) throws ConnectionException, InterruptedException
     {
         // Check if this connection supports subscribing.
         if ( !connection.canSubscribe() )
@@ -314,10 +302,6 @@ public class MulePlcOperations
         catch ( ExecutionException e )
         {
             throw new ConnectorExecutionException( "Execution Error on unsubscription.", e );
-        }
-        catch ( InterruptedException e )
-        {
-            throw new ConnectorInterruptedException( "Interruption on unsubscription.", e );
         }
         catch ( InternalConnectionException | TimeoutException e )
         {

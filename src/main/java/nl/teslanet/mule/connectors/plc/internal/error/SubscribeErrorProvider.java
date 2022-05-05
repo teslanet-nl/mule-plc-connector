@@ -43,7 +43,6 @@ public class SubscribeErrorProvider implements ErrorTypeProvider
         errors.add( Errors.UNSUPPORTED );
         errors.add( Errors.INVALID_SUBSCRIPTION );
         errors.add( Errors.IO_ERROR );
-        errors.add( Errors.INTERRUPTED );
         errors.add( Errors.EXECUTION_ERROR );
         errors.add( Errors.INVALID_HANDLER_NAME );
         return errors;

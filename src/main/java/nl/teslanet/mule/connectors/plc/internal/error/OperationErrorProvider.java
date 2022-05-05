@@ -42,7 +42,6 @@ public class OperationErrorProvider implements ErrorTypeProvider
         Set< ErrorTypeDefinition > errors= new HashSet<>();
         errors.add( Errors.UNSUPPORTED );
         errors.add( Errors.IO_ERROR );
-        errors.add( Errors.INTERRUPTED );
         errors.add( Errors.EXECUTION_ERROR );
         return errors;
     }
