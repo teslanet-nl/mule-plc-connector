@@ -20,35 +20,30 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.internal.error;
+package nl.teslanet.mule.connectors.plc.api;
 
 
-import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 
 
 /**
- * InvalidSubscriptionException occurs when a given subscription parameters are invalid.
- *
+ * Configuration of a PLC eventHandler.
  */
-public class InvalidSubscriptionException extends ModuleException
+@TypeDsl( allowInlineDefinition= false, allowTopLevelDefinition= true )
+public class EventHandler
 {
     /**
-     * 
+     * Name of the handler.
      */
-    private static final long serialVersionUID= 1L;
-
-    public InvalidSubscriptionException( String message )
+    @RefName
+    private String handlerName= null;
+    
+    /**
+     * @return The handler name.
+     */
+    public String getHandlerName()
     {
-        super( message, Errors.INVALID_SUBSCRIPTION );
-    }
-
-    public InvalidSubscriptionException( Throwable cause )
-    {
-        super( Errors.INVALID_SUBSCRIPTION, cause );
-    }
-
-    public InvalidSubscriptionException( String message, Throwable cause )
-    {
-        super( message, Errors.INVALID_SUBSCRIPTION, cause );
+        return handlerName;
     }
 }

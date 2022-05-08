@@ -23,43 +23,30 @@
 package nl.teslanet.mule.connectors.plc.api;
 
 
+import java.util.List;
+
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 
 /**
- * Generic subscription parameters.
+ * The Configuration of an unsubscription.
  */
-public abstract class AbstractSubscriptionParams extends IoRequestBuilder
+public class Unsubscription extends IoRequestBuilder
 {
     /**
-     * The handler that will process the events produced by the PLC on this subscription.
-     */
+    * The PLC fields to unsubscribe to.
+    */
     @Parameter
     @Expression( ExpressionSupport.SUPPORTED )
-    private String eventHandler;
+    private List< UnsubscribeField > unsubscribeFields= null;
 
     /**
-     * The name of the subscription.
+     * @return the requested fields.
      */
-    @Parameter
-    @Expression( ExpressionSupport.SUPPORTED )
-    private String subscriptionName;
-
-    /**
-     * @return the subscriptionName
-     */
-    public String getSubscriptionName()
+    public List< UnsubscribeField > getUnsubscribeFields()
     {
-        return subscriptionName;
-    }
-
-    /**
-     * @return the handlerName
-     */
-    public String getEventHandler()
-    {
-        return eventHandler;
+        return unsubscribeFields;
     }
 }

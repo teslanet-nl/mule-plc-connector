@@ -23,8 +23,9 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.teslanet.mule.connectors.plc.api.ReadField;
 import nl.teslanet.mule.connectors.plc.api.SubscribeField;
+import nl.teslanet.mule.connectors.plc.api.UnsubscribeField;
 import nl.teslanet.mule.connectors.plc.api.WriteField;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
@@ -64,18 +66,40 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     private static final Logger logger= LoggerFactory.getLogger( DefaultMulePlcConnection.class );
 
     /**
+     * Handles of subscribed fields.
+     */
+    private ConcurrentHashMap< String, PlcSubscriptionHandle > handles= new ConcurrentHashMap<>();
+
+    /**
+     * The connection uri of the plc.
+     */
+    private String uri;
+
+    /**
      * The underlying PLC plcConnection.
      */
     protected final PlcConnection plcConnection;
 
     /**
-     * @param plcConnection The PLC Connection. 
-     * @throws ConnectionException 
+     * Constructor.
+     * @param uri The uri of the PLC connection.
+     * @param plcConnection The PLC Connectionbe established. 
+     * @throws ConnectionException When the conncetion couls not 
      */
-    public DefaultMulePlcConnection( PlcConnection plcConnection ) throws ConnectionException
+    public DefaultMulePlcConnection( String uri, PlcConnection plcConnection ) throws ConnectionException
     {
+        this.uri= uri;
         this.plcConnection= plcConnection;
         logger.info( "Connection created { " + this + " }" );
+    }
+
+    /**
+     * @return the uri
+     */
+    @Override
+    public String getUri()
+    {
+        return uri;
     }
 
     /**
@@ -195,7 +219,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         }
         return builder.build().execute().get( timeout, timeoutUnit );
     }
-    
+
     @Override
     public boolean canSubscribe()
     {
@@ -215,17 +239,32 @@ public class DefaultMulePlcConnection implements MulePlcConnection
             //TODO make configurable what type of subscription is wanted
             builder.addChangeOfStateField( field.getAlias(), field.getAddress() );
         }
-        return builder.build().execute().get( timeout, timeOutUnit );
+        PlcSubscriptionResponse subscribeResponse= builder.build().execute().get( timeout, timeOutUnit );
+        for ( String fieldName : subscribeResponse.getFieldNames() )
+        {
+            handles.put( fieldName, subscribeResponse.getSubscriptionHandle( fieldName ) );
+        }
+        return subscribeResponse;
     }
 
     @Override
-    public PlcUnsubscriptionResponse unSubscribe( Collection<PlcSubscriptionHandle> handles, long timeout, TimeUnit timeOutUnit ) throws InterruptedException, ExecutionException, TimeoutException, InternalConnectionException
+    public PlcUnsubscriptionResponse unSubscribe( List< UnsubscribeField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException
     {
         connect();
+        List< PlcSubscriptionHandle > toUnsubscribe= new ArrayList<>();
+        for ( UnsubscribeField field : fields )
+        {
+            PlcSubscriptionHandle handle= handles.get( field.getAlias() );
+            if ( handle != null )
+            {
+                toUnsubscribe.add( handle );
+            }
+        }
         PlcUnsubscriptionRequest.Builder builder= plcConnection.unsubscriptionRequestBuilder();
-        builder.addHandles( handles );
+        builder.addHandles( toUnsubscribe );
         return builder.build().execute().get( timeout, timeOutUnit );
     }
-
-
 }

@@ -103,10 +103,7 @@
                     <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
                 </parameter>
                 <parameter name="eventHandler">
-                    <description><![CDATA[The handler that will process the events produced by the PLC on this subscription.]]></description>
-                </parameter>
-                <parameter name="subscriptionName">
-                    <description><![CDATA[The name of the subscription.]]></description>
+                    <description><![CDATA[The event handler that will collect the PLC events produced by the subscription.]]></description>
                 </parameter>
                 <parameter name="subscribeFields">
                     <description><![CDATA[The PLC fields to subscribe to.]]></description>
@@ -131,11 +128,8 @@
                 <parameter name="throwExceptionOnIoError">
                     <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
                 </parameter>
-                <parameter name="eventHandler">
-                    <description><![CDATA[The handler that will process the events produced by the PLC on this subscription.]]></description>
-                </parameter>
-                <parameter name="subscriptionName">
-                    <description><![CDATA[The name of the subscription.]]></description>
+                <parameter name="unsubscribeFields">
+                    <description><![CDATA[The PLC fields to unsubscribe to.]]></description>
                 </parameter>
                 <parameter name="target">
                     <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
@@ -177,7 +171,7 @@
             <description><![CDATA[The EventListener message source receives PLC events. The received PLC messages are delivered to the listeners mule-flow.]]></description>
             <parameters>
                 <parameter name="eventHandler">
-                    <description><![CDATA[The handler of which events are listened to.]]></description>
+                    <description><![CDATA[The handler that will deliver the events produced by the PLC on this subscription.]]></description>
                 </parameter>
                 <parameter name="primaryNodeOnly">
                     <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
@@ -192,6 +186,14 @@
         </source>
     </sources>
     <types>
+        <type name="nl.teslanet.mule.connectors.plc.api.EventHandler">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="handlerName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
         <type name="nl.teslanet.mule.connectors.plc.api.ReadField">
             <description><![CDATA[]]></description>
             <parameters>
@@ -218,6 +220,14 @@
                     <description><![CDATA[]]></description>
                 </parameter>
                 <parameter name="address">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="nl.teslanet.mule.connectors.plc.api.UnsubscribeField">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="alias">
                     <description><![CDATA[]]></description>
                 </parameter>
             </parameters>

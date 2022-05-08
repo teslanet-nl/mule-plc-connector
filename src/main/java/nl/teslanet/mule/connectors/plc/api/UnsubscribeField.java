@@ -20,32 +20,35 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.internal.exception;
+
+package nl.teslanet.mule.connectors.plc.api;
+
+
+import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 
 /**
- * internal InternalInvalidSubscriptionException occurs when a given subscription name is invalid.
+ * Definition of an PLC field to unsubscribe to.
  *
  */
-public class InternalInvalidSubscriptionException extends Exception
+public class UnsubscribeField
 {
     /**
-     * serial version
+     * The alias of the field to subscribe to.
      */
-    private static final long serialVersionUID= 1L;
+    @Parameter
+    @Expression(ExpressionSupport.SUPPORTED)
+    @Summary("The alias of the field to subscribe to.")
+    private String alias;
 
-    public InternalInvalidSubscriptionException( String message )
+    /**
+     * @return the alias
+     */
+    public String getAlias()
     {
-        super( message );
-    }
-
-    public InternalInvalidSubscriptionException( Throwable cause )
-    {
-        super( cause );
-    }
-
-    public InternalInvalidSubscriptionException( String message, Throwable cause )
-    {
-        super( message, cause );
+        return alias;
     }
 }

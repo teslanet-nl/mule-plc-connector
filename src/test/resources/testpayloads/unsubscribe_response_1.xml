@@ -21,6 +21,6 @@
   limitations under the License.
   #L%
   -->
-<plcUnsubscribeResponse handler= "handler1" subscription="subscription1"/>
+<plcUnsubscribeResponse uri="simulated:plc"/>
 
 

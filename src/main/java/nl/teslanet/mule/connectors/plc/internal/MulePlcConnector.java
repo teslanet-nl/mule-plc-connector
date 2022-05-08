@@ -38,7 +38,19 @@ import nl.teslanet.mule.connectors.plc.internal.error.Errors;
 @Xml( prefix= "plc", namespace= "http://www.teslanet.nl/schema/mule/plc" )
 @Extension( name= "PLC", vendor= "Teslanet.nl" )
 @Configurations( { MulePlcConfig.class } )
-@ErrorTypes(Errors.class)
+@ErrorTypes( Errors.class )
 public class MulePlcConnector
 {
+    /**
+     * The registry of event handlers.
+     */
+    private static EventHandlerRegistry eventHandlerRegistry= new EventHandlerRegistry();
+
+    /**
+     * @return the eventHandlerRegistry
+     */
+    public static EventHandlerRegistry getEventHandlerRegistry()
+    {
+        return eventHandlerRegistry;
+    }
 }

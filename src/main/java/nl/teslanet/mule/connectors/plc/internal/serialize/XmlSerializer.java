@@ -99,6 +99,7 @@ public class XmlSerializer
      */
     private XmlSerializer()
     {
+        //NOOP
     }
 
     /**
@@ -146,15 +147,14 @@ public class XmlSerializer
      * @return The serialized result.
      * @throws ParserConfigurationException On failing XML configuration.
      */
-    public static XmlSerializerResult xmlSerialize( String handlerName, String subscriptionName, PlcSubscriptionResponse response ) throws ParserConfigurationException
+    public static XmlSerializerResult xmlSerialize( String uri, PlcSubscriptionResponse response ) throws ParserConfigurationException
     {
         DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
         Document doc= dBuilder.newDocument();
 
         // root element
         Element rootElement= doc.createElement( "plcSubscribeResponse" );
-        rootElement.setAttribute( "handler", handlerName );
-        rootElement.setAttribute( "subscription", subscriptionName );
+        rootElement.setAttribute( "uri", uri );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response );
@@ -163,21 +163,20 @@ public class XmlSerializer
 
     /**
      * Serialize a unsubscription response.
-     * @param handlerName The name of the handler owning the subscription.
+     * @param uri The PLC uri.
      * @param subscriptionName The name of the subscription.
      * @param response The unsubscription response to serialize.
      * @return The serialized result.
      * @throws ParserConfigurationException On failing XML configuration.
      */
-    public static XmlSerializerResult xmlSerialize( String handlerName, String subscriptionName, PlcUnsubscriptionResponse response ) throws ParserConfigurationException
+    public static XmlSerializerResult xmlSerialize( String uri, PlcUnsubscriptionResponse response ) throws ParserConfigurationException
     {
         DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
         Document doc= dBuilder.newDocument();
 
         // root element
         Element rootElement= doc.createElement( "plcUnsubscribeResponse" );
-        rootElement.setAttribute( "handler", handlerName );
-        rootElement.setAttribute( "subscription", subscriptionName );
+        rootElement.setAttribute( "uri", uri );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response );
@@ -197,6 +196,7 @@ public class XmlSerializer
 
         // root element
         Element rootElement= doc.createElement( "plcEvent" );
+        //TODO add timestamp
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, event, alias -> event.getPlcValue( alias ) );
