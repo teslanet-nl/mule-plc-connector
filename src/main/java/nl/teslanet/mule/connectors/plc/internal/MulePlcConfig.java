@@ -23,7 +23,6 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -34,8 +33,6 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-
-import nl.teslanet.mule.connectors.plc.internal.exception.InternalInvalidHandlerNameException;
 
 
 /**
@@ -67,11 +64,6 @@ public class MulePlcConfig
     private TimeUnit timeoutUnits= TimeUnit.MILLISECONDS;
 
     /**
-     * The list of response handlers
-     */
-    private ConcurrentHashMap< String, EventListener > handlers= new ConcurrentHashMap<>();
-
-    /**
      * @return The configuration name.
      */
     public String getConfigName()
@@ -93,37 +85,5 @@ public class MulePlcConfig
     public TimeUnit getTimeoutUnits()
     {
         return timeoutUnits;
-    }
-
-    /**
-     * Add handler to process responses.
-     * @param handlerName the name of the handler
-     * @param callback the source callback that will process the responses
-     * @throws InternalInvalidHandlerNameException 
-     */
-    synchronized void addHandler( String handlerName, EventListener handler ) throws InternalInvalidHandlerNameException
-    {
-        if ( handlerName == null || handlerName.isEmpty() ) throw new InternalInvalidHandlerNameException( "empty response handler name not allowed" );
-        if ( handlers.get( handlerName ) != null ) throw new InternalInvalidHandlerNameException( "responsehandler name { " + handlerName + " } not unique" );
-        handlers.put( handlerName, handler );
-    }
-
-    /**
-     * Get handler by name.
-     * @param handlerName The name of the handler.
-     * @return The handler or null if no handler with given name exists.
-     */
-    public EventListener getHandler( String handlerName )
-    {
-        return handlers.get( handlerName );
-    }
-
-    /**
-     * Remove a handler
-     * @param handlerName the name of the handler to remove
-     */
-    void removeHandler( String handlerName )
-    {
-        handlers.remove( handlerName );
     }
 }

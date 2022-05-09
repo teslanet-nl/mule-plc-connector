@@ -37,19 +37,19 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 public class SubscribeField
 {
     /**
-     * The PLC address to be read.
+     * The alias of the field to subscribe to.
      */
     @Parameter
-    @Expression(ExpressionSupport.SUPPORTED)
-    @Summary("The alias of the field to subscribe to, for reference. ")
+    @Expression( ExpressionSupport.SUPPORTED )
+    @Summary( "The alias of the field to subscribe to." )
     private String alias;
 
     /**
      * The PLC address to be read.
      */
     @Parameter
-    @Expression(ExpressionSupport.SUPPORTED)
-    @Summary("The field address in protocol specific format.")
+    @Expression( ExpressionSupport.SUPPORTED )
+    @Summary( "The field address in protocol specific format." )
     private String address;
 
     /**

@@ -24,7 +24,6 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -34,7 +33,6 @@ import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcUnsubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
-import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -45,18 +43,17 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import nl.teslanet.mule.connectors.plc.api.ReadRequestBuilder;
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
 import nl.teslanet.mule.connectors.plc.api.Subscription;
-import nl.teslanet.mule.connectors.plc.api.UnSubscription;
+import nl.teslanet.mule.connectors.plc.api.Unsubscription;
 import nl.teslanet.mule.connectors.plc.api.WriteRequestBuilder;
 import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionException;
 import nl.teslanet.mule.connectors.plc.internal.error.InvalidHandlerNameException;
-import nl.teslanet.mule.connectors.plc.internal.error.InvalidSubscriptionException;
 import nl.teslanet.mule.connectors.plc.internal.error.IoErrorException;
 import nl.teslanet.mule.connectors.plc.internal.error.OperationErrorProvider;
 import nl.teslanet.mule.connectors.plc.internal.error.PingErrorProvider;
 import nl.teslanet.mule.connectors.plc.internal.error.SubscribeErrorProvider;
 import nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
-import nl.teslanet.mule.connectors.plc.internal.exception.InternalInvalidSubscriptionException;
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalInvalidHandlerNameException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
 import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer;
 import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSerializerResult;
@@ -218,10 +215,20 @@ public class MulePlcOperations
         {
             throw new UnsupportedException( "Protocol does not support subscribing." );
         }
+        String handlerName= subscription.getEventHandler().getHandlerName();
+        EventProcessor eventProcessor;
+        try
+        {
+            eventProcessor= MulePlcConnector.getEventHandlerRegistry().getEventProcessor( handlerName );
+        }
+        catch ( InternalInvalidHandlerNameException e )
+        {
+            throw new InvalidHandlerNameException( "Handler is invalid { " + handlerName + " }", e );
+        }
         PlcSubscriptionResponse response= null;
         try
         {
-            response= connection.subscribe( subscription.getSubscribeFieldsConfigs(), configuration.getTimeout(), configuration.getTimeoutUnits() );
+            response= connection.subscribe( subscription.getSubscribeFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
         }
         catch ( ExecutionException e )
         {
@@ -238,26 +245,15 @@ public class MulePlcOperations
         XmlSerializerResult responsePayload;
         try
         {
-            responsePayload= XmlSerializer.xmlSerialize( subscription.getEventHandler(), subscription.getSubscriptionName(), response );
+            responsePayload= XmlSerializer.xmlSerialize( connection.getUri(), response );
         }
         catch ( ParserConfigurationException e )
         {
             throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
         }
         if ( subscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
-        //TODO check already active
-        //find handler
-        EventListener handler= configuration.getHandler( subscription.getEventHandler() );
-        if ( handler == null ) throw new InvalidHandlerNameException( "No handler found with given name { " + subscription.getEventHandler() + " }" );
-        //activate subscription
-        try
-        {
-            handler.addSubscription( subscription, response );
-        }
-        catch ( InternalInvalidSubscriptionException e )
-        {
-            throw new InvalidSubscriptionException( "Subscription is invalid { " + subscription.getEventHandler() + "::" + subscription.getSubscriptionName() + " }", e );
-        }
+        //register subscription
+        eventProcessor.register( response );
         return XmlSerializer.createMuleResult( responsePayload );
     }
 
@@ -275,7 +271,7 @@ public class MulePlcOperations
     public Result< InputStream, ReceivedResponseAttributes > unsubscribe( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Subscription" )
-    UnSubscription unsubscription ) throws ConnectionException, InterruptedException
+    Unsubscription unsubscription ) throws ConnectionException, InterruptedException
     {
         // Check if this connection supports subscribing.
         if ( !connection.canSubscribe() )
@@ -283,21 +279,9 @@ public class MulePlcOperations
             throw new UnsupportedException( "Protocol does not support subscribing." );
         }
         PlcUnsubscriptionResponse response= null;
-        EventListener handler= configuration.getHandler( unsubscription.getEventHandler() );
-        if ( handler == null ) throw new InvalidHandlerNameException( "No handler found with given name { " + unsubscription.getEventHandler() + " }" );
         try
         {
-            Collection< PlcSubscriptionHandle > handles= handler.getHandles( unsubscription.getSubscriptionName() );
-            //TODO add selective unSubscribe field feature
-            response= connection.unSubscribe( handles, configuration.getTimeout(), configuration.getTimeoutUnits() );
-            handler.removeSubscription( unsubscription );
-        }
-        catch ( InternalInvalidSubscriptionException e )
-        {
-            throw new InvalidSubscriptionException(
-                "Unsubscription failed, invalid subscription { " + unsubscription.getEventHandler() + "::" + unsubscription.getSubscriptionName() + " }",
-                e
-            );
+            response= connection.unSubscribe( unsubscription.getUnsubscribeFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
         }
         catch ( ExecutionException e )
         {
@@ -314,7 +298,7 @@ public class MulePlcOperations
         XmlSerializerResult responsePayload;
         try
         {
-            responsePayload= XmlSerializer.xmlSerialize( unsubscription.getEventHandler(), unsubscription.getSubscriptionName(), response );
+            responsePayload= XmlSerializer.xmlSerialize( connection.getUri(), response );
         }
         catch ( ParserConfigurationException e )
         {

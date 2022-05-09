@@ -45,15 +45,10 @@ public enum Errors implements ErrorTypeDefinition< Errors >
     /**
     * An internal error occurred during execution of an operation.
     */
-    EXECUTION_ERROR, 
-    
+    EXECUTION_ERROR,
+
     /**
      * A handlername is used that is invalid.
      */
-    INVALID_HANDLER_NAME, 
-    
-    /**
-     *  One or more Subscription parameters are invalid.
-     */
-    INVALID_SUBSCRIPTION
+    INVALID_HANDLER_NAME,
 }

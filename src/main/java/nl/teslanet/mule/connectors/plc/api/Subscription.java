@@ -28,13 +28,22 @@ import java.util.List;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 
 /**
  * The Configuration of a subscription.
  */
-public class Subscription extends AbstractSubscriptionParams
+public class Subscription extends IoRequestBuilder
 {
+    /**
+     * The event handler that will collect the PLC events produced by the subscription.
+     */
+    @Parameter
+    @Expression( ExpressionSupport.SUPPORTED )
+    @Summary( "The event handler that will collect the PLC events produced by the subscription." )
+    private EventHandler eventHandler;
+
     /**
     * The PLC fields to subscribe to.
     */
@@ -43,11 +52,18 @@ public class Subscription extends AbstractSubscriptionParams
     private List< SubscribeField > subscribeFields= null;
 
     /**
+     * @return the handlerName
+     */
+    public EventHandler getEventHandler()
+    {
+        return eventHandler;
+    }
+
+    /**
      * @return the requested fields.
      */
-    public List< SubscribeField > getSubscribeFieldsConfigs()
+    public List< SubscribeField > getSubscribeFields()
     {
         return subscribeFields;
     }
-
 }

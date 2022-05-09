@@ -25,6 +25,23 @@
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
   <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+  <xs:complexType name="nl.teslanet.mule.connectors.plc.api.EventHandler">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:expressionString" use="optional" name="handlerName"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-event-handler"></xs:element>
+  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" substitutionGroup="plc:abstract-event-handler" name="event-handler">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="plc:nl.teslanet.mule.connectors.plc.api.EventHandler">
+          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
     <xs:complexType>
       <xs:complexContent>
@@ -67,36 +84,6 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns="http://www.teslanet.nl/schema/mule/plc" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EventListenerType" substitutionGroup="mule:abstract-message-source" name="event-listener">
-    <xs:annotation>
-      <xs:documentation>The EventListener message source receives PLC events. The received PLC messages are delivered to the listeners mule-flow.</xs:documentation>
-    </xs:annotation>
-  </xs:element>
-  <xs:complexType name="EventListenerType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="eventHandler">
-          <xs:annotation>
-            <xs:documentation>The handler of which events are listened to.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
-          <xs:annotation>
-            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
   <xs:element xmlns="http://www.teslanet.nl/schema/mule/plc" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PingType" substitutionGroup="mule:abstract-operator" name="ping">
     <xs:annotation>
       <xs:documentation>Ping the PLC.</xs:documentation>
@@ -224,14 +211,9 @@
             <xs:documentation>When true an exception is thrown on field io errrors.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="eventHandler">
+        <xs:attribute type="xs:string" use="required" name="eventHandler">
           <xs:annotation>
-            <xs:documentation>The handler that will process the events produced by the PLC on this subscription.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="subscriptionName">
-          <xs:annotation>
-            <xs:documentation>The name of the subscription.</xs:documentation>
+            <xs:documentation>The event handler that will collect the PLC events produced by the subscription.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="subscribeFields">
@@ -279,6 +261,16 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="unsubscribe-fields">
+            <xs:annotation>
+              <xs:documentation>The PLC fields to unsubscribe to.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" minOccurs="0" maxOccurs="unbounded" ref="plc:abstract-unsubscribe-field"></xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
         </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
@@ -290,14 +282,9 @@
             <xs:documentation>When true an exception is thrown on field io errrors.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="eventHandler">
+        <xs:attribute type="mule:expressionList" use="optional" name="unsubscribeFields">
           <xs:annotation>
-            <xs:documentation>The handler that will process the events produced by the PLC on this subscription.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="subscriptionName">
-          <xs:annotation>
-            <xs:documentation>The name of the subscription.</xs:documentation>
+            <xs:documentation>The PLC fields to unsubscribe to.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -313,6 +300,21 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:complexType name="nl.teslanet.mule.connectors.plc.api.UnsubscribeField">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:expressionString" use="required" name="alias"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" type="plc:nl.teslanet.mule.connectors.plc.api.UnsubscribeField" abstract="true" name="abstract-unsubscribe-field"></xs:element>
+  <xs:element xmlns:plc="http://www.teslanet.nl/schema/mule/plc" substitutionGroup="plc:abstract-unsubscribe-field" name="unsubscribe-field">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="plc:nl.teslanet.mule.connectors.plc.api.UnsubscribeField"></xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns="http://www.teslanet.nl/schema/mule/plc" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WriteType" substitutionGroup="mule:abstract-operator" name="write">
     <xs:annotation>
       <xs:documentation>Write PLC fields.</xs:documentation>
@@ -380,6 +382,31 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:element xmlns="http://www.teslanet.nl/schema/mule/plc" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EventListenerType" substitutionGroup="mule:abstract-message-source" name="event-listener">
+    <xs:annotation>
+      <xs:documentation>The EventListener message source receives PLC events. The received PLC messages are delivered to the listeners mule-flow.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="EventListenerType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="eventHandler">
+          <xs:annotation>
+            <xs:documentation>The handler that will deliver the events produced by the PLC on this subscription.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:simpleType name="java.util.concurrent.TimeUnitEnumType">
     <xs:union>
       <xs:simpleType>

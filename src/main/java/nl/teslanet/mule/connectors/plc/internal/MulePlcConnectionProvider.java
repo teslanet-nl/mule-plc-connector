@@ -62,7 +62,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     @Summary( "The uri of the PLC to connect to." )
     private String connectionUri;
 
-    private static final  PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
+    private static final PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
 
     /**
      * Connect to PLC using the connction uri.
@@ -75,7 +75,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         try
         {
             PlcConnection plcConnnection= driverManager.getConnection( connectionUri );
-            connection= new DefaultMulePlcConnection( plcConnnection );
+            connection= new DefaultMulePlcConnection( connectionUri, plcConnnection );
             connection.connect();
         }
         catch ( InternalConnectionException | PlcConnectionException e )

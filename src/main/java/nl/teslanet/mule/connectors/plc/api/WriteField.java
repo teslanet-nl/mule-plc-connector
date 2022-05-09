@@ -40,11 +40,11 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 public class WriteField
 {
     /**
-     * The PLC address to be written.
+     * The alias of the field to write.
      */
     @Parameter
     @Expression( ExpressionSupport.SUPPORTED )
-    @Summary( "The alias of the field to write, for reference. " )
+    @Summary( "The alias of the field to write." )
     private String alias;
 
     /**

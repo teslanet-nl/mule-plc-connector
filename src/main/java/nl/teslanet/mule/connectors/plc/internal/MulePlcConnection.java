@@ -23,7 +23,6 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -33,10 +32,10 @@ import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcUnsubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
-import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 
 import nl.teslanet.mule.connectors.plc.api.ReadField;
 import nl.teslanet.mule.connectors.plc.api.SubscribeField;
+import nl.teslanet.mule.connectors.plc.api.UnsubscribeField;
 import nl.teslanet.mule.connectors.plc.api.WriteField;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
@@ -130,14 +129,14 @@ public interface MulePlcConnection
     * @throws InterruptedException When the subscribe request is interrupted.
     * @throws InternalConnectionException when connection failed.
     */
-    PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+    public PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException;
 
     /**
     * Unsubscribe to fields from PLC using this connection.
-    * @param handles of the fields to unsubscribe to.
+    * @param fields to unsubscribe to.
     * @param timeout Subscribe response must be received within the timeout.
     * @param timeoutUnit Unit of the timeout parameter.
     * @return The unSubscribe response containing the results of the operation.
@@ -146,5 +145,13 @@ public interface MulePlcConnection
     * @throws InterruptedException When the subscribe request is interrupted.
     * @throws InternalConnectionException when connection failed.
     */
-    PlcUnsubscriptionResponse unSubscribe( Collection< PlcSubscriptionHandle > handles, long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, TimeoutException, InternalConnectionException;
+    public PlcUnsubscriptionResponse unSubscribe( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException;
+
+    /**
+     * @return the uri
+     */
+    public String getUri();
 }
