@@ -28,7 +28,9 @@
   <xs:complexType name="nl.teslanet.mule.connectors.plc.api.EventHandler">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionString" use="optional" name="handlerName"></xs:attribute>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -206,14 +208,14 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnIoError">
-          <xs:annotation>
-            <xs:documentation>When true an exception is thrown on field io errrors.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="xs:string" use="required" name="eventHandler">
           <xs:annotation>
             <xs:documentation>The event handler that will collect the PLC events produced by the subscription.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnIoError">
+          <xs:annotation>
+            <xs:documentation>When true an exception is thrown on field io errrors.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="subscribeFields">

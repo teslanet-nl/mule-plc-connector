@@ -99,11 +99,11 @@
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
                 </parameter>
-                <parameter name="throwExceptionOnIoError">
-                    <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
-                </parameter>
                 <parameter name="eventHandler">
                     <description><![CDATA[The event handler that will collect the PLC events produced by the subscription.]]></description>
+                </parameter>
+                <parameter name="throwExceptionOnIoError">
+                    <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
                 </parameter>
                 <parameter name="subscribeFields">
                     <description><![CDATA[The PLC fields to subscribe to.]]></description>
@@ -189,7 +189,7 @@
         <type name="nl.teslanet.mule.connectors.plc.api.EventHandler">
             <description><![CDATA[]]></description>
             <parameters>
-                <parameter name="handlerName">
+                <parameter name="description">
                     <description><![CDATA[]]></description>
                 </parameter>
             </parameters>
