@@ -56,33 +56,33 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     private static final Logger logger= LoggerFactory.getLogger( MulePlcConnectionProvider.class );
 
     /**
-     * The connection uri of the plc.
+     * The connection string of the plc.
      */
     @Parameter
-    @Summary( "The uri of the PLC to connect to." )
-    private String connectionUri;
+    @Summary( "The connection string of the PLC." )
+    private String connectionString;
 
     private static final PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
 
     /**
-     * Connect to PLC using the connction uri.
+     * Connect to PLC using the connection string.
      */
     @Override
     public MulePlcConnection connect() throws ConnectionException
     {
-        logger.info( "Start connect { " + connectionUri + " }" );
+        logger.info( "Start connect { " + connectionString + " }" );
         MulePlcConnection connection= null;
         try
         {
-            PlcConnection plcConnnection= driverManager.getConnection( connectionUri );
-            connection= new DefaultMulePlcConnection( connectionUri, plcConnnection );
+            PlcConnection plcConnnection= driverManager.getConnection( connectionString );
+            connection= new DefaultMulePlcConnection( connectionString, plcConnnection );
             connection.connect();
         }
         catch ( InternalConnectionException | PlcConnectionException e )
         {
-            throw new ConnectionException( "Cannot connect { " + connection + "::" + connectionUri + " }", e );
+            throw new ConnectionException( "Cannot connect { " + connection + "::" + connectionString + " }", e );
         }
-        logger.info( "Connected { " + connection + "::" + connectionUri + " }" );
+        logger.info( "Connected { " + connection + "::" + connectionString + " }" );
         return connection;
     }
 
@@ -92,23 +92,23 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     @Override
     public void disconnect( MulePlcConnection connection )
     {
-        logger.info( "Start disconnect { " + connection + "::" + connectionUri + " }" );
+        logger.info( "Start disconnect { " + connection + "::" + connectionString + " }" );
         connection.close();
-        logger.info( "Disconnected { " + connection + "::" + connectionUri + " }" );
+        logger.info( "Disconnected { " + connection + "::" + connectionString + " }" );
     }
 
     @Override
     public ConnectionValidationResult validate( MulePlcConnection connection )
     {
-        logger.info( "Start validation { " + connection + "::" + connectionUri + " }" );
+        logger.info( "Start validation { " + connection + "::" + connectionString + " }" );
         if ( connection == null || !connection.isConnected() )
         {
-            logger.warn( "No connection { " + connection + "::" + connectionUri + " }" );
-            return ConnectionValidationResult.failure( "Not connected { " + connection + "::" + connectionUri + " }", new Exception( "no connection" ) );
+            logger.warn( "No connection { " + connection + "::" + connectionString + " }" );
+            return ConnectionValidationResult.failure( "Not connected { " + connection + "::" + connectionString + " }", new Exception( "no connection" ) );
         }
         else
         {
-            logger.info( "Validation success { " + connection + "::" + connectionUri + " }" );
+            logger.info( "Validation success { " + connection + "::" + connectionString + " }" );
             return ConnectionValidationResult.success();
         }
     }

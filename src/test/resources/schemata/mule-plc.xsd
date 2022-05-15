@@ -75,9 +75,9 @@
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
           </xs:sequence>
-          <xs:attribute type="mule:expressionString" use="required" name="connectionUri">
+          <xs:attribute type="mule:expressionString" use="required" name="connectionString">
             <xs:annotation>
-              <xs:documentation>The connection uri of the plc.</xs:documentation>
+              <xs:documentation>The connection string of the plc.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
         </xs:extension>

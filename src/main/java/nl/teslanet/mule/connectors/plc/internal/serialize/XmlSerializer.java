@@ -141,20 +141,19 @@ public class XmlSerializer
 
     /**
      * Serialize a subscription response.
-     * @param handlerName The name of the handler owning the subscription.
-     * @param subscriptionName The name of the subscription.
+     * @param connectionString The connection string of the PLC.
      * @param response The subscription response to serialize.
      * @return The serialized result.
      * @throws ParserConfigurationException On failing XML configuration.
      */
-    public static XmlSerializerResult xmlSerialize( String uri, PlcSubscriptionResponse response ) throws ParserConfigurationException
+    public static XmlSerializerResult xmlSerialize( String connectionString, PlcSubscriptionResponse response ) throws ParserConfigurationException
     {
         DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
         Document doc= dBuilder.newDocument();
 
         // root element
         Element rootElement= doc.createElement( "plcSubscribeResponse" );
-        rootElement.setAttribute( "uri", uri );
+        rootElement.setAttribute( "connection", connectionString );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response );
@@ -163,20 +162,19 @@ public class XmlSerializer
 
     /**
      * Serialize a unsubscription response.
-     * @param uri The PLC uri.
-     * @param subscriptionName The name of the subscription.
-     * @param response The unsubscription response to serialize.
+     * @param connectionString The connection string of the PLC.
+     * @param response The subscription response to serialize.
      * @return The serialized result.
      * @throws ParserConfigurationException On failing XML configuration.
      */
-    public static XmlSerializerResult xmlSerialize( String uri, PlcUnsubscriptionResponse response ) throws ParserConfigurationException
+    public static XmlSerializerResult xmlSerialize( String connectionString, PlcUnsubscriptionResponse response ) throws ParserConfigurationException
     {
         DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
         Document doc= dBuilder.newDocument();
 
         // root element
         Element rootElement= doc.createElement( "plcUnsubscribeResponse" );
-        rootElement.setAttribute( "uri", uri );
+        rootElement.setAttribute( "connection", connectionString );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response );

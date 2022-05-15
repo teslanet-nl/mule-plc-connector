@@ -71,9 +71,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     private ConcurrentHashMap< String, PlcSubscriptionHandle > handles= new ConcurrentHashMap<>();
 
     /**
-     * The connection uri of the plc.
+     * The connection string of the plc.
      */
-    private String uri;
+    private String connectionString;
 
     /**
      * The underlying PLC plcConnection.
@@ -82,24 +82,24 @@ public class DefaultMulePlcConnection implements MulePlcConnection
 
     /**
      * Constructor.
-     * @param uri The uri of the PLC connection.
-     * @param plcConnection The PLC Connectionbe established. 
+     * @param connectionString The connection string of the PLC.
+     * @param plcConnection The PLC Connection. 
      * @throws ConnectionException When the conncetion couls not 
      */
-    public DefaultMulePlcConnection( String uri, PlcConnection plcConnection ) throws ConnectionException
+    public DefaultMulePlcConnection( String connectionString, PlcConnection plcConnection ) throws ConnectionException
     {
-        this.uri= uri;
+        this.connectionString= connectionString;
         this.plcConnection= plcConnection;
         logger.info( "Connection created { " + this + " }" );
     }
 
     /**
-     * @return the uri
+     * @return the connection string
      */
     @Override
-    public String getUri()
+    public String getConnectionString()
     {
-        return uri;
+        return connectionString;
     }
 
     /**
