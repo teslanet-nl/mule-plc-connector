@@ -25,6 +25,7 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
@@ -38,6 +39,7 @@ import nl.teslanet.mule.connectors.plc.internal.error.Errors;
 @Xml( prefix= "plc", namespace= "http://www.teslanet.nl/schema/mule/plc" )
 @Extension( name= "PLC", vendor= "Teslanet.nl" )
 @Configurations( { MulePlcConfig.class } )
+@Sources( { EventListener.class })
 @ErrorTypes( Errors.class )
 public class MulePlcConnector
 {

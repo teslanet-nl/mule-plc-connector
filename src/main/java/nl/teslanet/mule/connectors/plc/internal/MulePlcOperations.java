@@ -40,6 +40,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import nl.teslanet.mule.connectors.plc.api.EventHandlingGroup;
 import nl.teslanet.mule.connectors.plc.api.ReadRequestBuilder;
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
 import nl.teslanet.mule.connectors.plc.api.Subscription;
@@ -207,7 +208,8 @@ public class MulePlcOperations
     @Throws( SubscribeErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > subscribe( @Config
     MulePlcConfig configuration, @Connection
-    MulePlcConnection connection, @ParameterGroup( name= "Subscription" )
+    MulePlcConnection connection, @ParameterGroup( name= "Event Handling" )
+    EventHandlingGroup eventHandling, @ParameterGroup( name= "Subscription" )
     Subscription subscription ) throws ConnectionException, InterruptedException
     {
         // Check if this connection supports subscribing.
@@ -215,7 +217,7 @@ public class MulePlcOperations
         {
             throw new UnsupportedException( "Protocol does not support subscribing." );
         }
-        String handlerName= subscription.getEventHandler().getHandlerName();
+        String handlerName= eventHandling.getEventHandler().getHandlerName();
         EventProcessor eventProcessor;
         try
         {

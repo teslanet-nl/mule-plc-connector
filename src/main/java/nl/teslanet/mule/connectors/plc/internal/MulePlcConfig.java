@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -40,7 +39,6 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
  */
 @Configuration( name= "config" )
 @Operations( MulePlcOperations.class )
-@Sources( EventListener.class )
 @ConnectionProviders( MulePlcConnectionProvider.class )
 public class MulePlcConfig
 {

@@ -36,12 +36,35 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
 		<plc:connection connectionUri="simulated:plc" />
 	</plc:config>
 	
-    <plc:event-handler name="Event_handler"/>
+    <plc:event-handler name="Event_handler1"/>
+    <plc:event-handler name="Event_handler2"/>
 
-    <flow name="subscribe-subscribe" doc:id="27a936b4-f6ad-45ed-9ea9-cc7e389683e2" >
-        <plc:subscribe doc:name="Subscribe" config-ref="PLC_Config" eventHandler="Event_handler">
+    <flow name="subscribe-subscribe" doc:id="e977a19f-6693-4d08-8c08-1748921cac79" >
+        <plc:subscribe doc:name="Subscribe" config-ref="PLC_Config" eventHandler="Event_handler1">
             <plc:subscribe-fields >
                 <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
+                <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
+            </plc:subscribe-fields>
+        </plc:subscribe>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+    </flow>
+    
+    <flow name="subscribe-subscribe-2a" doc:id="95e15839-2b27-4d0d-b324-dca64ec21183" >
+        <plc:subscribe doc:name="Subscribe" config-ref="PLC_Config" eventHandler="Event_handler1">
+            <plc:subscribe-fields >
+                <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
+            </plc:subscribe-fields>
+        </plc:subscribe>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+    </flow>
+    
+    <flow name="subscribe-subscribe-2b" doc:id="12235d8c-07d7-4875-9463-7f4a071a7aa2" >
+        <plc:subscribe doc:name="Subscribe" config-ref="PLC_Config" eventHandler="Event_handler2">
+            <plc:subscribe-fields >
                 <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
             </plc:subscribe-fields>
         </plc:subscribe>
@@ -73,9 +96,9 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
         <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
     </flow>
     
-    <flow name="subscribe-eventhandler1" doc:id="9a650d61-0921-4b29-9390-2bdc0c6fb2ed" >
-        <plc:event-listener doc:name="Event listener" eventHandler="Event_handler"/>
-        <logger level="INFO" doc:name="Logger" message="#['EVENT1']" category="nl.teslanet.mule.connectors.plc.test"/>
+    <flow name="subscribe-eventhandler1a" doc:id="9a650d61-0921-4b29-9390-2bdc0c6fb2ed" >
+        <plc:event-listener doc:name="Event listener" eventHandler="Event_handler1"/>
+        <logger level="INFO" doc:name="Logger" message="#['EVENT1a']" category="nl.teslanet.mule.connectors.plc.test"/>
         <logger level="INFO" doc:name="Logger" message="#[message]" category="nl.teslanet.mule.connectors.plc.test"/>
         <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
             doc:name="Set Payload" />
@@ -83,7 +106,7 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
         <java:new doc:name="New spy"
             class="nl.teslanet.mule.connectors.plc.test.utils.MuleEventSpy"
             constructor="MuleEventSpy(String)" target="spy">
-            <java:args><![CDATA[#[{ arg0: "handler1" }]]]></java:args>
+            <java:args><![CDATA[#[{ arg0: "handler1a" }]]]></java:args>
         </java:new>
         <java:invoke doc:name="Invoke" instance="#[vars.spy]"
             class="nl.teslanet.mule.connectors.plc.test.utils.MuleEventSpy"
@@ -91,8 +114,27 @@ http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/jav
             <java:args><![CDATA[#[{ arg0: message }]]]></java:args>
         </java:invoke>
     </flow>
-    <flow name="subscribe-eventhandler2" doc:id="380ac43c-fc92-47b3-9bef-11cc6b9ef547" >
-        <plc:event-listener doc:name="Event listener" eventHandler="Event_handler"/>
+    <flow name="subscribe-eventhandler1b" doc:id="cf9c5e54-e7ec-48d6-9d1d-91cfa1bee3da" >
+        <plc:event-listener doc:name="Event listener" eventHandler="Event_handler1"/>
+        <logger level="INFO" doc:name="Logger" message="#['EVENT1b']" category="nl.teslanet.mule.connectors.plc.test"/>
+        <logger level="INFO" doc:name="Logger" message="#[message]" category="nl.teslanet.mule.connectors.plc.test"/>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+        <java:new doc:name="New spy"
+            class="nl.teslanet.mule.connectors.plc.test.utils.MuleEventSpy"
+            constructor="MuleEventSpy(String)" target="spy">
+            <java:args><![CDATA[#[{ arg0: "handler1b" }]]]></java:args>
+        </java:new>
+        <java:invoke doc:name="Invoke" instance="#[vars.spy]"
+            class="nl.teslanet.mule.connectors.plc.test.utils.MuleEventSpy"
+            method="event(Object)">
+            <java:args><![CDATA[#[{ arg0: message }]]]></java:args>
+        </java:invoke>
+    </flow>
+    
+    <flow name="subscribe-eventhandler2" doc:id="37d5696b-1b3c-459c-a28b-4e41a3f0d359" >
+        <plc:event-listener doc:name="Event listener" eventHandler="Event_handler2"/>
         <logger level="INFO" doc:name="Logger" message="#['EVENT2']" category="nl.teslanet.mule.connectors.plc.test"/>
         <logger level="INFO" doc:name="Logger" message="#[message]" category="nl.teslanet.mule.connectors.plc.test"/>
         <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
