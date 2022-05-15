@@ -43,16 +43,5 @@ import nl.teslanet.mule.connectors.plc.internal.error.Errors;
 @ErrorTypes( Errors.class )
 public class MulePlcConnector
 {
-    /**
-     * The registry of event handlers.
-     */
-    private static EventHandlerRegistry eventHandlerRegistry= new EventHandlerRegistry();
-
-    /**
-     * @return the eventHandlerRegistry
-     */
-    public static EventHandlerRegistry getEventHandlerRegistry()
-    {
-        return eventHandlerRegistry;
-    }
+    //NOOP
 }

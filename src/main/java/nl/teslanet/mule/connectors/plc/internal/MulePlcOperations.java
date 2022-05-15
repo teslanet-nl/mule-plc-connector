@@ -221,7 +221,7 @@ public class MulePlcOperations
         EventProcessor eventProcessor;
         try
         {
-            eventProcessor= MulePlcConnector.getEventHandlerRegistry().getEventProcessor( handlerName );
+            eventProcessor= EventProcessor.getEventProcessor( handlerName );
         }
         catch ( InternalInvalidHandlerNameException e )
         {

@@ -83,7 +83,7 @@ public class EventListener extends Source< InputStream, ReceivedResponseAttribut
         this.sourceCallback= sourceCallback;
         try
         {
-            EventProcessor processor= MulePlcConnector.getEventHandlerRegistry().getEventProcessor( eventHandler.getHandlerName() );
+            EventProcessor processor= EventProcessor.getEventProcessor( eventHandler.getHandlerName() );
             processor.addListener( this );
         }
         catch ( InternalInvalidHandlerNameException e )
@@ -102,7 +102,7 @@ public class EventListener extends Source< InputStream, ReceivedResponseAttribut
         EventProcessor processor;
         try
         {
-            processor= MulePlcConnector.getEventHandlerRegistry().getEventProcessor( eventHandler.getHandlerName() );
+            processor= EventProcessor.getEventProcessor( eventHandler.getHandlerName() );
             processor.removeListener( this );
         }
         catch ( InternalInvalidHandlerNameException e )
