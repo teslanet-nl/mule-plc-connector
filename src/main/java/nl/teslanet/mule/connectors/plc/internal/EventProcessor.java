@@ -24,6 +24,7 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -35,6 +36,7 @@ import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalInvalidHandlerNameException;
 import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer;
 import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSerializerResult;
 
@@ -48,6 +50,34 @@ public class EventProcessor implements Consumer< PlcSubscriptionEvent >
      * The logger of this class.
      */
     private static final Logger logger= LoggerFactory.getLogger( EventProcessor.class );
+
+    /**
+     * The registry of response processors
+     */
+    private static ConcurrentHashMap< String, EventProcessor > registry= new ConcurrentHashMap<>();
+
+    /**
+     * Get reponse processor of the handler..
+     * @param handlerName the name of the handler
+     * @throws InternalInvalidHandlerNameException When handler name is invalid
+     */
+    public static EventProcessor getEventProcessor( String handlerName ) throws InternalInvalidHandlerNameException
+    {
+        if ( handlerName == null || handlerName.isEmpty() ) throw new InternalInvalidHandlerNameException( "empty response handler name not allowed" );
+        registry.putIfAbsent( handlerName, new EventProcessor( handlerName ) );
+        return registry.get( handlerName );
+    }
+
+    /**
+     * Remove an event processor.
+     * @param handlerName the name of the handler to remove
+     * @throws InternalInvalidHandlerNameException When handler name is invalid
+     */
+    public static void removeEventProcessor( String handlerName ) throws InternalInvalidHandlerNameException
+    {
+        if ( handlerName == null || handlerName.isEmpty() ) throw new InternalInvalidHandlerNameException( "empty response handler name not allowed" );
+        registry.remove( handlerName );
+    }
 
     /**
      * Name of the handler.

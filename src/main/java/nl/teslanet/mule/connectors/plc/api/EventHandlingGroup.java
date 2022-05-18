@@ -23,30 +23,30 @@
 package nl.teslanet.mule.connectors.plc.api;
 
 
-import java.util.List;
-
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 
 /**
- * The Configuration of a subscription.
+ * The Configuration of event handling.
  */
-public class Subscription extends IoRequestBuilder
+public class EventHandlingGroup
 {
     /**
-    * The PLC fields to subscribe to.
-    */
+     * The event handler that will collect the PLC events produced by the subscription.
+     */
     @Parameter
     @Expression( ExpressionSupport.SUPPORTED )
-    private List< SubscribeField > subscribeFields= null;
+    @Summary( "The event handler that will collect the PLC events produced by the subscription." )
+    private EventHandler eventHandler;
 
     /**
-     * @return the requested fields.
+     * @return the handlerName
      */
-    public List< SubscribeField > getSubscribeFields()
+    public EventHandler getEventHandler()
     {
-        return subscribeFields;
+        return eventHandler;
     }
 }

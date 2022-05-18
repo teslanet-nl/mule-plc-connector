@@ -151,7 +151,7 @@ public interface MulePlcConnection
         InternalConnectionException;
 
     /**
-     * @return the uri
+     * @return the connection string
      */
-    public String getUri();
+    public String getConnectionString();
 }

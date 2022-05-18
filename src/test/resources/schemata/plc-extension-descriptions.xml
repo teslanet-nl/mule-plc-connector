@@ -42,8 +42,8 @@
         <connection name="connection">
             <description><![CDATA[This class (as it's name implies) provides connection instances and the functionality to disconnect and validate those connections. <p> All connection related parameters (values required in order to create a connection) are declared in the connection providers. <p> It implements CachedConnectionProvider which lazily creates and caches connections .]]></description>
             <parameters>
-                <parameter name="connectionUri">
-                    <description><![CDATA[The connection uri of the plc.]]></description>
+                <parameter name="connectionString">
+                    <description><![CDATA[The connection string of the plc.]]></description>
                 </parameter>
                 <parameter name="reconnection">
                     <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
@@ -99,11 +99,11 @@
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
                 </parameter>
-                <parameter name="throwExceptionOnIoError">
-                    <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
-                </parameter>
                 <parameter name="eventHandler">
                     <description><![CDATA[The event handler that will collect the PLC events produced by the subscription.]]></description>
+                </parameter>
+                <parameter name="throwExceptionOnIoError">
+                    <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
                 </parameter>
                 <parameter name="subscribeFields">
                     <description><![CDATA[The PLC fields to subscribe to.]]></description>
@@ -189,7 +189,7 @@
         <type name="nl.teslanet.mule.connectors.plc.api.EventHandler">
             <description><![CDATA[]]></description>
             <parameters>
-                <parameter name="handlerName">
+                <parameter name="description">
                     <description><![CDATA[]]></description>
                 </parameter>
             </parameters>

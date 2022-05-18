@@ -21,6 +21,7 @@
   limitations under the License.
   #L%
   -->
-<plcUnsubscribeResponse connection="simulated:plc"/>
-
+<plcSubscribeResponse connection="simulated:plc">
+	<field alias="coil1" responseCode="OK"/>
+</plcSubscribeResponse>
 

@@ -98,7 +98,7 @@ Xml configuration:
 ```
     <plc:config name="PLC_Config_Modbus">
         <plc:connection
-            connectionUri="modbus:tcp://plc.host.name:502" />
+            connectionString="modbus:tcp://plc.host.name:502" />
     </plc:config>
 ```
 

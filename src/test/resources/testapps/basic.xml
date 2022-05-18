@@ -33,7 +33,7 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 
 	<plc:config name="PLC_Config">
-		<plc:connection connectionUri="simulated:plc" />
+		<plc:connection connectionString="simulated:plc" />
 	</plc:config>
 	
 	<flow name="basic-ping">
