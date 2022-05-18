@@ -4,16 +4,23 @@ RUN apt-get update \
     && apt-get install -y gpg \
     && apt-get clean
 
-ENV MAVEN_CONFIG /home/jenkins
-
 ENV JENKINS_HOME /home/jenkins
 ENV JENKINS_KEYS /var/lib/jenkins_keys
 
+#set user
+ENV GNUPGHOME "${JENKINS_KEYS}/.gnupg"
+
+# Set user and group
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=800
+ARG gid=800
+RUN groupadd -g ${gid} ${group} 
+RUN useradd -u ${uid} -g ${group} -s /bin/sh -m ${user} # <--- the '-m' create a user home directory
 
 #set volumes
 VOLUME /home/jenkins
 VOLUME /var/lib/jenkins_keys
 
-#set user
-USER jenkins
-ENV GNUPGHOME "${JENKINS_KEYS}/.gnupg"
+# Switch to user
+USER ${uid}:${gid}
