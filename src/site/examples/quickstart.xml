@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:plc="http://www.teslanet.nl/schema/mule/plc" 
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd">
+
+    <plc:config name="PLC_Config_Modbus">
+        <plc:connection
+            connectionString="modbus:tcp://plc.host.name:502" />
+    </plc:config>
+
+    <plc:config name="PLC_Config_Simulated">
+        <plc:connection
+            connectionString="simulated://test" />
+    </plc:config>
+
+    <plc:event-handler name="Event_handler" doc:name="Event handler" description="asdasd" />
+    <flow name="flow-ping">
+    <plc:ping doc:name="Ping" config-ref="PLC_Config" />
+        <logger level="INFO" doc:name="Logger" doc:id="054c7d10-23d7-4a98-8272-7dcd0684c0f8" />
+    </flow>
+
+    <flow name="modbus-read">
+    <plc:read doc:name="Read" config-ref="PLC_Config_Modbus">
+        <plc:read-fields>
+            <plc:read-field alias="input1" address="discrete-input:1" />
+            <plc:read-field alias="coil2" address="coil:2" />
+            <plc:read-field alias="register34array2" address="holding-register:34[2]" />
+        </plc:read-fields>
+    </plc:read>
+        <logger level="INFO" doc:name="Logger" doc:id="d463e016-2e0e-4883-845d-410b7be78628" />
+    </flow>
+
+
+    <flow name="modbus-write">
+    <plc:write doc:name="Write" config-ref="PLC_Config_Modbus">
+        <plc:write-fields>
+            <plc:write-field alias="coil1" address="coil:1"
+                values="#[ [ true ] ]" />
+            <plc:write-field alias="register34array2" address="holding-register:34[2]"
+                values="#[ [ 11, 22 ] ]" />
+        </plc:write-fields>
+    </plc:write>
+        <logger level="INFO" doc:name="Logger" doc:id="03666c68-cebe-4a31-811b-61d2e15661fa" />
+    </flow>
+
+    <flow name="plc-subscribe">
+        <plc:subscribe config-ref="PLC_Config_Simulated" subscriptionName="subscription1" eventHandler="Event_handler">
+            <plc:subscribe-fields >
+                <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
+                <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
+            </plc:subscribe-fields>
+        </plc:subscribe>
+        <logger level="INFO" doc:name="Logger" doc:id="172340cf-1cbc-4677-83c9-fae7008d5415" />
+    </flow>
+
+    <flow name="plc-unsubscribe">
+        <plc:unsubscribe config-ref="PLC_Config_Simulated" subscriptionName="subscription1" eventHandler="Event_handler">
+            <plc:unsubscribe-fields >
+                <plc:unsubscribe-field alias="asdasd" />
+            </plc:unsubscribe-fields>
+        </plc:unsubscribe>
+        <logger level="INFO" doc:name="Logger" doc:id="bb566e6b-fba3-4fbf-bd08-8f2138a25b7c" />
+    </flow>
+    <flow name="plc-eventlistener">
+        <plc:event-listener doc:name="Event listener" config-ref="PLC_Config_Simulated" eventHandler="Event_handler"/>
+        <logger level="INFO" doc:name="Logger" message="#[payload]"/>
+    </flow>
+</mule>
