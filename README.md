@@ -35,7 +35,7 @@ The connector is installed by adding its Maven dependency to your Mule 4 applica
 <dependency>
     <groupId>nl.teslanet.mule.connectors.plc</groupId>
     <artifactId>mule-plc-connector</artifactId>
-    <version>1.0.0-M6</version>
+    <version>1.0.0-RC1</version>
     <classifier>mule-plugin</classifier>
 </dependency>
 ```
@@ -211,7 +211,7 @@ Subscribe example using the Simulated protocol:
 Xml configuration:
 
 ```
-    <flow name="simulated-subscribe">
+    <flow name="plc-subscribe">
         <plc:subscribe config-ref="PLC_Config_Simulated" subscriptionName="subscription1" handlerName="handler1">
             <plc:subscribe-fields >
                 <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
@@ -245,7 +245,7 @@ Unsubscribe example using the Simulated protocol:
 Xml configuration:
 
 ```
-    <flow name="simulated-unsubscribe">
+    <flow name="plc-unsubscribe">
         <plc:unsubscribe config-ref="PLC_Config_Simulated" handlerName="handler1" subscriptionName="subscription1"/>
     </flow>
 ```
@@ -270,7 +270,7 @@ Event handler example:
 Xml configuration:
 
 ```
-    <flow name="simulated-eventhandler">
+    <flow name="plc-eventhandler">
         <plc:event-handler config-ref="PLC_Config_Simulated" handlerName="handler1"/>
         <logger level="INFO" doc:name="Logger" message="#[payload]"/>
     </flow>
