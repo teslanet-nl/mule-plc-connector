@@ -21,7 +21,21 @@
   limitations under the License.
   #L%
   -->
-<plcSubscribeResponse>
-	<field alias="reg1" responseCode="OK"/>
-</plcSubscribeResponse>
+<plcWriteResponse>
+	<field alias="coil3" count="1" responseCode="OK"
+		type="BOOL">
+		<value>false</value>
+	</field>
+	<field alias="coil4" count="1" responseCode="OK"
+		type="BOOL">
+		<value>true</value>
+	</field>
+	<field alias="reg3" count="2" responseCode="OK"
+		type="INT">
+		<values>
+			<value>55</value>
+			<value>66</value>
+		</values>
+	</field>
+</plcWriteResponse>
 

@@ -247,7 +247,7 @@ public class MulePlcOperations
         XmlSerializerResult responsePayload;
         try
         {
-            responsePayload= XmlSerializer.xmlSerialize( connection.getConnectionString(), response );
+            responsePayload= XmlSerializer.xmlSerialize( response );
         }
         catch ( ParserConfigurationException e )
         {
@@ -300,7 +300,7 @@ public class MulePlcOperations
         XmlSerializerResult responsePayload;
         try
         {
-            responsePayload= XmlSerializer.xmlSerialize( connection.getConnectionString(), response );
+            responsePayload= XmlSerializer.xmlSerialize( response );
         }
         catch ( ParserConfigurationException e )
         {

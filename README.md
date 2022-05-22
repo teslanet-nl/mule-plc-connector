@@ -212,7 +212,7 @@ Xml configuration:
 
 ```
     <flow name="plc-subscribe">
-        <plc:subscribe config-ref="PLC_Config_Simulated" subscriptionName="subscription1" handlerName="handler1">
+        <plc:subscribe config-ref="PLC_Config_Simulated" eventHandler="handler1">
             <plc:subscribe-fields >
                 <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
                 <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
@@ -226,7 +226,7 @@ The result of the subscribe operation is a **plcSubscribeResponse** message desc
 The response on the request above could be:
 
 ```
-    <plcSubscribeResponse handler= "handler1" subscription="subscription1">
+    <plcSubscribeResponse>
         <field alias="coil1" responseCode="OK"/>
         <field alias="reg1" responseCode="OK"/>
     </plcSubscribeResponse>
@@ -246,7 +246,12 @@ Xml configuration:
 
 ```
     <flow name="plc-unsubscribe">
-        <plc:unsubscribe config-ref="PLC_Config_Simulated" handlerName="handler1" subscriptionName="subscription1"/>
+        <plc:unsubscribe config-ref="PLC_Config_Simulated">
+            <plc:unsubscribe-fields >
+                <plc:unsubscribe-field alias="coil1" />
+                <plc:unsubscribe-field alias="reg1" />
+            </plc:unsubscribe-fields>
+        </plc:unsubscribe>
     </flow>
 ```
 
@@ -255,7 +260,7 @@ The result of the unsubscribe operation is a **plcUnsubscribeResponse** message 
 The response on the request above could be:
 
 ```
-    <plcUnsubscribeResponse handler= "handler1" subscription="subscription1"/>
+    <plcUnsubscribeResponse/>
 
 ```
 
@@ -271,7 +276,7 @@ Xml configuration:
 
 ```
     <flow name="plc-eventhandler">
-        <plc:event-handler config-ref="PLC_Config_Simulated" handlerName="handler1"/>
+        <plc:event-handler config-ref="PLC_Config_Simulated" eventHandler="handler1"/>
         <logger level="INFO" doc:name="Logger" message="#[payload]"/>
     </flow>
 ```

@@ -141,19 +141,17 @@ public class XmlSerializer
 
     /**
      * Serialize a subscription response.
-     * @param connectionString The connection string of the PLC.
      * @param response The subscription response to serialize.
      * @return The serialized result.
      * @throws ParserConfigurationException On failing XML configuration.
      */
-    public static XmlSerializerResult xmlSerialize( String connectionString, PlcSubscriptionResponse response ) throws ParserConfigurationException
+    public static XmlSerializerResult xmlSerialize( PlcSubscriptionResponse response ) throws ParserConfigurationException
     {
         DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
         Document doc= dBuilder.newDocument();
 
         // root element
         Element rootElement= doc.createElement( "plcSubscribeResponse" );
-        rootElement.setAttribute( "connection", connectionString );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response );
@@ -162,19 +160,17 @@ public class XmlSerializer
 
     /**
      * Serialize a unsubscription response.
-     * @param connectionString The connection string of the PLC.
      * @param response The subscription response to serialize.
      * @return The serialized result.
      * @throws ParserConfigurationException On failing XML configuration.
      */
-    public static XmlSerializerResult xmlSerialize( String connectionString, PlcUnsubscriptionResponse response ) throws ParserConfigurationException
+    public static XmlSerializerResult xmlSerialize( PlcUnsubscriptionResponse response ) throws ParserConfigurationException
     {
         DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
         Document doc= dBuilder.newDocument();
 
         // root element
         Element rootElement= doc.createElement( "plcUnsubscribeResponse" );
-        rootElement.setAttribute( "connection", connectionString );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response );

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+#%L
+  Mule PLC Connector Test Utilities
+  %%
+  Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+  
+  Contributors:
+      (teslanet.nl) Rogier Cobben - initial creation
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+-->
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:plc="http://www.teslanet.nl/schema/mule/plc"
+    xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+
+	<plc:config name="PLC_Config">
+		<plc:connection connectionString="#[vars.connectionString]" />
+	</plc:config>
+	
+	<flow name="basic-ping">
+		<plc:ping doc:name="Ping" config-ref="PLC_Config" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+	</flow>
+	
+	<flow name="basic-read">
+		<plc:read doc:name="Read" config-ref="PLC_Config">
+            <non-repeatable-stream/>
+            <reconnect count="5" frequency="500" />
+			<plc:read-fields>
+				<plc:read-field alias="coil1"
+					address="RANDOM/coil1:BOOL[1]" />
+				<plc:read-field alias="reg1"
+					address="RANDOM/register1:INT[1]" />
+			</plc:read-fields>
+		</plc:read>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+		<logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+	</flow>
+	
+    <flow name="basic-write">
+        <plc:write doc:name="Write" config-ref="PLC_Config">
+            <reconnect count="5" frequency="500" />
+            <plc:write-fields>
+                <plc:write-field alias="coil1"
+                    address="STATE/coil1:BOOL[2]" values="#[ [ true, false ] ]" />
+                <plc:write-field alias="reg1"
+                    address="STATE/register1:INT[2]" values="#[[ '11', '22' ]]" />
+            </plc:write-fields>
+        </plc:write>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+    </flow>
+
+	<flow name="basic-writestate">
+		<plc:write doc:name="Write" config-ref="PLC_Config">
+            <reconnect count="5" frequency="500" />
+			<plc:write-fields>
+				<plc:write-field alias="coil3"
+					address="STATE/coil3:BOOL[1]" values="#[ [ true ] ]" />
+				<plc:write-field alias="coil4"
+					address="STATE/coil4:BOOL[1]" values="#[ [ false ] ]" />
+				<plc:write-field alias="reg3"
+					address="STATE/register3:INT[2]" values="#[[ '33', '44' ]]" />
+			</plc:write-fields>
+		</plc:write>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+		<logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+	</flow>
+	
+    <flow name="basic-writestate2">
+        <plc:write doc:name="Write" config-ref="PLC_Config">
+            <reconnect count="5" frequency="500" />
+            <plc:write-fields>
+                <plc:write-field alias="coil3"
+                    address="STATE/coil3:BOOL[1]" values="#[ [ false ] ]" />
+                <plc:write-field alias="coil4"
+                    address="STATE/coil4:BOOL[1]" values="#[ [ true ] ]" />
+                <plc:write-field alias="reg3"
+                    address="STATE/register3:INT[2]" values="#[[ '55', '66' ]]" />
+            </plc:write-fields>
+        </plc:write>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+    </flow>
+    
+    <flow name="basic-readstate">
+        <plc:read doc:name="Read" config-ref="PLC_Config">
+            <plc:read-fields>
+                <plc:read-field alias="coil3"
+                    address="STATE/coil3:BOOL[1]" />
+                <plc:read-field alias="coil4"
+                    address="STATE/coil4:BOOL[1]" />
+                <plc:read-field alias="reg3"
+                    address="STATE/register3:INT[2]" />
+            </plc:read-fields>
+        </plc:read>
+        <set-payload value="#[ output application/java --- write( payload, 'application/xml' ) ]"
+            doc:name="Set Payload" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+    </flow>
+
+</mule>
