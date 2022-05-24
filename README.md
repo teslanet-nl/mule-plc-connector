@@ -264,24 +264,24 @@ The response on the request above could be:
 
 ```
 
-### Event handler
+### Event listener
 
 The event handler listens to events that occur when values change of fields that are subscribed to. The event handler delivers an event message containing the new value(s) to the flow for processing.
 
 Event handler example: 
 
-![Image](src/site/images/plc_eventhandler.png "event handler")
+![Image](src/site/images/plc_eventlistener.png "event linstener")
 
 Xml configuration:
 
 ```
-    <flow name="plc-eventhandler">
-        <plc:event-handler config-ref="PLC_Config_Simulated" eventHandler="handler1"/>
+    <flow name="plc-eventlistener">
+        <plc:event-listener doc:name="Event listener" config-ref="PLC_Config_Simulated" eventHandler="Event_handler"/>
         <logger level="INFO" doc:name="Logger" message="#[payload]"/>
     </flow>
 ```
 
-The events are delivered using a **plcSubscribeResponse** message containing the new value(s) of the field. The field alias in the event messages matches the alias given in the subscription.
+The events are delivered using a **plcEvent** message containing the new value(s) of the field. The field alias in the event messages matches the alias given in the subscription.
 
 An event message from the subscription above could be:
 
