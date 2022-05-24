@@ -266,11 +266,11 @@ The response on the request above could be:
 
 ### Event listener
 
-The event handler listens to events that occur when values change of fields that are subscribed to. The event handler delivers an event message containing the new value(s) to the flow for processing.
+The event handler collects events that occur on subscribed fields. The event listener delivers the event message containing actual value(s) to the flow for processing.
 
-Event handler example: 
+Event listener example: 
 
-![Image](src/site/images/plc_eventlistener.png "event linstener")
+![Image](src/site/images/plc_eventlistener.png "event listener")
 
 Xml configuration:
 
@@ -281,7 +281,7 @@ Xml configuration:
     </flow>
 ```
 
-The events are delivered using a **plcEvent** message containing the new value(s) of the field. The field alias in the event messages matches the alias given in the subscription.
+The events are delivered using a **plcEvent** message containing actual value(s) of the field. The field alias in the event messages matches the alias given in the subscription.
 
 An event message from the subscription above could be:
 
