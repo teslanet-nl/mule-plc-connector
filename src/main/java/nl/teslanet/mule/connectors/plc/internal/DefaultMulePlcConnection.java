@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
@@ -43,6 +44,8 @@ import org.apache.plc4x.java.api.messages.PlcWriteRequest;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.lock.LockFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,16 +84,66 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     protected final PlcConnection plcConnection;
 
     /**
+     * The read lock pool to control concurrent reads.
+     */
+    protected final boolean readAllowed;
+
+    /**
+     * The read lock pool to control concurrent writes.
+     */
+    protected final boolean writeAllowed;
+
+    /**
+     * The read lock pool to control concurrent reads.
+     */
+    protected final LockPool readLocks;
+
+    /**
+     * The read lock pool to control concurrent writes.
+     */
+    protected final LockPool writeLocks;
+
+    /**
      * Constructor.
      * @param connectionString The connection string of the PLC.
      * @param plcConnection The PLC Connection. 
-     * @throws ConnectionException When the conncetion couls not 
+     * @throws ConnectionException When the conncetion failed.
      */
-    public DefaultMulePlcConnection( String connectionString, PlcConnection plcConnection ) throws ConnectionException
+    public DefaultMulePlcConnection( String connectionString, PlcConnection plcConnection, LockFactory lockFactory, int concurrentReads, int concurrentWrites ) throws ConnectionException
     {
         this.connectionString= connectionString;
         this.plcConnection= plcConnection;
-        logger.info( "Connection created { " + this + " }" );
+        if ( concurrentReads < 0 )
+        {
+            readAllowed= true;
+            readLocks= null;
+        }
+        else if ( concurrentReads == 0 )
+        {
+            readAllowed= false;
+            readLocks= null;
+        }
+        else
+        {
+            readAllowed= true;
+            readLocks= new LockPool( lockFactory, this.toString() + "-read-", concurrentReads );
+        }
+        if ( concurrentWrites < 0 )
+        {
+            writeAllowed= true;
+            writeLocks= null;
+        }
+        else if ( concurrentWrites == 0 )
+        {
+            writeAllowed= false;
+            writeLocks= null;
+        }
+        else
+        {
+            writeAllowed= true;
+            writeLocks= new LockPool( lockFactory, this.toString() + "-write-", concurrentWrites );
+        }
+        logger.info( "connection created { " + this + " }" );
     }
 
     /**
@@ -181,43 +234,93 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public boolean canRead()
     {
-        return plcConnection.getMetadata().canRead();
+        return( readAllowed && plcConnection.getMetadata().canRead() );
     }
 
     @Override
-    public synchronized PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+    public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException
+        InternalConnectionException, IllegalIoException
     {
+        if ( !readAllowed ) throw new IllegalIoException( "No read allowed on this connection." );
         connect();
         PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
         for ( ReadField field : fields )
         {
             builder.addItem( field.getAlias(), field.getAddress() );
         }
-        return builder.build().execute().get( timeout, timeOutUnit );
+        if ( readLocks == null )
+        {
+            return builder.build().execute().get( timeout, timeoutUnit );
+        }
+        else
+        {
+            Lock lock= readLocks.getLock();
+            //TODO separate timout config
+            if ( lock.tryLock( timeout, timeoutUnit ) )
+            {
+                try
+                {
+                    return builder.build().execute().get( timeout, timeoutUnit );
+                }
+                finally
+                {
+                    lock.unlock();
+                }
+            }
+            else
+            {
+                //TODO improve msg
+                throw new TimeoutException( "Read lock timeout exception" );
+            }
+        }
     }
 
     @Override
     public boolean canWrite()
     {
-        return plcConnection.getMetadata().canWrite();
+        return( writeAllowed && plcConnection.getMetadata().canWrite() );
     }
 
     @Override
-    public synchronized PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException
+        InternalConnectionException, IllegalIoException
     {
+        if ( !writeAllowed ) throw new IllegalIoException( "No write allowed on this connection." );
         connect();
         PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();
         for ( WriteField field : fields )
         {
             builder.addItem( field.getAlias(), field.getAddress(), field.getValues().toArray() );
         }
-        return builder.build().execute().get( timeout, timeoutUnit );
+        if ( writeLocks == null )
+        {
+            return builder.build().execute().get( timeout, timeoutUnit );
+        }
+        else
+        {
+            Lock lock= writeLocks.getLock();
+            //TODO separate timout config
+            if ( lock.tryLock( timeout, timeoutUnit ) )
+            {
+                try
+                {
+                    return builder.build().execute().get( timeout, timeoutUnit );
+                }
+                finally
+                {
+                    lock.unlock();
+                }
+            }
+            else
+            {
+                //TODO improve msg
+                throw new TimeoutException( "Write lock timeout exception" );
+            }
+        }
     }
 
     @Override

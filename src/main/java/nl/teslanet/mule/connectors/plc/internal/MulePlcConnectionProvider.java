@@ -23,13 +23,17 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
+import javax.inject.Inject;
+
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.slf4j.Logger;
@@ -56,11 +60,33 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     private static final Logger logger= LoggerFactory.getLogger( MulePlcConnectionProvider.class );
 
     /**
+     * Mule's lockfactory 
+     */
+    @Inject
+    private LockFactory lockFactory;
+
+    /**
      * The connection string of the plc.
      */
     @Parameter
     @Summary( "The connection string of the PLC." )
     private String connectionString;
+
+    /**
+     * Number of concurrent reads per connection.
+     */
+    @Parameter
+    @Optional(defaultValue= "16")
+    @Summary("The number of concurrent reads per connection.")
+    private int concurrentReads;
+
+    /**
+     * Number of concurrent writes per connection.
+     */
+    @Parameter
+    @Optional(defaultValue= "16")
+    @Summary("The number of concurrent writes per connection.")
+    private int concurrentWrites;
 
     private static final PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
 
@@ -75,7 +101,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         try
         {
             PlcConnection plcConnnection= driverManager.getConnection( connectionString );
-            connection= new DefaultMulePlcConnection( connectionString, plcConnnection );
+            connection= new DefaultMulePlcConnection( connectionString, plcConnnection, lockFactory, concurrentReads, concurrentReads );
             connection.connect();
         }
         catch ( InternalConnectionException | PlcConnectionException e )

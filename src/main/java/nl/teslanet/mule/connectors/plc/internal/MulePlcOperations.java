@@ -101,13 +101,14 @@ public class MulePlcOperations
     * @return The readResponse as Result
     * @throws ConnectionException 
     * @throws InterruptedException When the operation was interrupted.
+     * @throws IllegalIoException When the operation is not allowed.
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > read( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
-    ReadRequestBuilder requestBuilder ) throws ConnectionException, InterruptedException
+    ReadRequestBuilder requestBuilder ) throws ConnectionException, InterruptedException, IllegalIoException
     {
         // Check if this connection support reading of data.
         if ( !connection.canRead() )
@@ -152,13 +153,14 @@ public class MulePlcOperations
     * @return The writeResponse as Result.
     * @throws ConnectionException When connection is lost.
     * @throws InterruptedException When the operation was interrupted.
+     * @throws IllegalIoException 
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
     public Result< InputStream, ReceivedResponseAttributes > write( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
-    WriteRequestBuilder requestBuilder ) throws ConnectionException, InterruptedException
+    WriteRequestBuilder requestBuilder ) throws ConnectionException, InterruptedException, IllegalIoException
     {
         // Check if this connection support writing of data.
         if ( !connection.canWrite() )
