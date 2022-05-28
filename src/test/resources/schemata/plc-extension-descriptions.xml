@@ -45,6 +45,12 @@
                 <parameter name="connectionString">
                     <description><![CDATA[The connection string of the plc.]]></description>
                 </parameter>
+                <parameter name="concurrentReads">
+                    <description><![CDATA[Number of concurrent reads per connection.]]></description>
+                </parameter>
+                <parameter name="concurrentWrites">
+                    <description><![CDATA[Number of concurrent writes per connection.]]></description>
+                </parameter>
                 <parameter name="reconnection">
                     <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
                 </parameter>
