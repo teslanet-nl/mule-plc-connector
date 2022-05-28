@@ -35,7 +35,7 @@ L%
 	
 	<groupId>nl.teslanet.mule.connectors.plc</groupId>
 	<artifactId>mule-plc-connector</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>mule-extension</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>Mule extension that enables Mule-applications to communicate with PLC systems.</description>
@@ -71,7 +71,7 @@ L%
 		<connection>scm:git:https://github.com/teslanet-nl/mule-plc-connector.git</connection>
 		<developerConnection>scm:git:https://github.com/teslanet-nl/mule-plc-connector.git</developerConnection>
 		<url>http://github.com/teslanet-nl/mule-plc-connector/tree/master</url>
-		<tag>mule-plc-connector-1.0.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<distributionManagement>
