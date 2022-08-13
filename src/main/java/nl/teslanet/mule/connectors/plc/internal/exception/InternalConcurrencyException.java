@@ -20,10 +20,10 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.internal;
+package nl.teslanet.mule.connectors.plc.internal.exception;
 
 
-public class IllegalIoException extends Exception
+public class InternalConcurrencyException extends Exception
 {
 
     /**
@@ -34,7 +34,7 @@ public class IllegalIoException extends Exception
     /**
      * Default constructor.
      */
-    public IllegalIoException()
+    public InternalConcurrencyException()
     {
         super();
     }
@@ -42,7 +42,7 @@ public class IllegalIoException extends Exception
     /**
      * Construct exception with message.
      */
-    public IllegalIoException( String msg )
+    public InternalConcurrencyException( String msg )
     {
         super( msg );
     }

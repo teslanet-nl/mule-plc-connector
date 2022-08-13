@@ -43,6 +43,11 @@ public enum Errors implements ErrorTypeDefinition< Errors >
     IO_ERROR,
 
     /**
+    * Concurrency limitations prohibited IO.
+    */
+    CONCURRENCY_ERROR,
+
+    /**
     * An internal error occurred during execution of an operation.
     */
     EXECUTION_ERROR,

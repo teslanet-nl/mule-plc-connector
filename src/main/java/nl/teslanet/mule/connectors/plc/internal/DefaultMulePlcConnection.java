@@ -53,6 +53,7 @@ import nl.teslanet.mule.connectors.plc.api.ReadField;
 import nl.teslanet.mule.connectors.plc.api.SubscribeField;
 import nl.teslanet.mule.connectors.plc.api.UnsubscribeField;
 import nl.teslanet.mule.connectors.plc.api.WriteField;
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalConcurrencyException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
 
@@ -241,9 +242,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException, IllegalIoException
+        InternalConnectionException, InternalConcurrencyException
     {
-        if ( !readAllowed ) throw new IllegalIoException( "No read allowed on this connection." );
+        if ( !readAllowed ) throw new InternalConcurrencyException( "No read allowed on this connection." );
         connect();
         PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
         for ( ReadField field : fields )
@@ -287,9 +288,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException, IllegalIoException
+        InternalConnectionException, InternalConcurrencyException
     {
-        if ( !writeAllowed ) throw new IllegalIoException( "No write allowed on this connection." );
+        if ( !writeAllowed ) throw new InternalConcurrencyException( "No write allowed on this connection." );
         connect();
         PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();
         for ( WriteField field : fields )
