@@ -18,15 +18,9 @@ _field =
         attribute responseCode { _responseCodeContent },
         attribute count { xsd:int { minInclusive = "1" } } ? ,
         attribute type { _typeContent } ?,
-        (
-            _element_value
-            |
-            element values { _element_value + }
-        ) ?
+        element value { text } *
     }
 
-_element_value = 
-    element value { text }
     
 _responseCodeContent= 
     ( 

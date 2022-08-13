@@ -109,7 +109,7 @@ public class MulePlcOperations
     */
     @MediaType( value= MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
-    @OutputXmlType(qname = "https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd#plcReadResponse", schema = "nl/teslanet/mule/connectors/plc/v1/plc.xsd")
+    @OutputXmlType(qname = "{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcReadResponse", schema = "nl/teslanet/mule/connectors/plc/v1/plc.xsd")
     public Result< InputStream, ReceivedResponseAttributes > read( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )

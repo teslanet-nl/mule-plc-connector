@@ -37,10 +37,9 @@
   </xs:element>
   <xs:element name="field">
     <xs:complexType>
-      <xs:choice minOccurs="0">
-        <xs:element ref="plc.xsd:value"/>
-        <xs:element ref="plc.xsd:values"/>
-      </xs:choice>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:value"/>
+      </xs:sequence>
       <xs:attribute name="alias" use="required" type="xs:token"/>
       <xs:attribute name="responseCode" use="required" type="plc.xsd:_responseCodeContent"/>
       <xs:attribute name="count">
@@ -51,13 +50,6 @@
         </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="type" type="plc.xsd:_typeContent"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="values">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="plc.xsd:value"/>
-      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="value" type="xs:string"/>
