@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  
+    <!-- Map an absolute W3C XML Schema reference to a schema located relative to this XML catalog-->
+    <uri name="https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd" uri="./src/main/resources/nl/teslanet/mule/connectors/plc/v1/plc.xsd"/>
+</catalog>

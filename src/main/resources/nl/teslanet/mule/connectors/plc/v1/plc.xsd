@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd" xmlns:plc.xsd="https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd">
+  <xs:element name="plcReadResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:field"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcWriteResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:field"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcSubscribeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:field"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcEvent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:field"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcUnsubscribeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:field"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="field">
+    <xs:complexType>
+      <xs:choice minOccurs="0">
+        <xs:element ref="plc.xsd:value"/>
+        <xs:element ref="plc.xsd:values"/>
+      </xs:choice>
+      <xs:attribute name="alias" use="required" type="xs:token"/>
+      <xs:attribute name="responseCode" use="required" type="plc.xsd:_responseCodeContent"/>
+      <xs:attribute name="count">
+        <xs:simpleType>
+          <xs:restriction base="xs:int">
+            <xs:minInclusive value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type" type="plc.xsd:_typeContent"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="values">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="plc.xsd:value"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="value" type="xs:string"/>
+  <xs:simpleType name="_responseCodeContent">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="OK"/>
+      <xs:enumeration value="NOT_FOUND"/>
+      <xs:enumeration value="ACCESS_DENIED"/>
+      <xs:enumeration value="INVALID_ADDRESS"/>
+      <xs:enumeration value="INVALID_DATATYPE"/>
+      <xs:enumeration value="INVALID_DATA"/>
+      <xs:enumeration value="INTERNAL_ERROR"/>
+      <xs:enumeration value="REMOTE_BUSY"/>
+      <xs:enumeration value="REMOTE_ERROR"/>
+      <xs:enumeration value="UNSUPPORTED"/>
+      <xs:enumeration value="RESPONSE_PENDING"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="_typeContent">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="BOOLEAN"/>
+      <xs:enumeration value="BYTE"/>
+      <xs:enumeration value="SHORT"/>
+      <xs:enumeration value="INTEGER"/>
+      <xs:enumeration value="LONG"/>
+      <xs:enumeration value="FLOAT"/>
+      <xs:enumeration value="DOUBLE"/>
+      <xs:enumeration value="STRING"/>
+      <xs:enumeration value="TIME"/>
+      <xs:enumeration value="DATE"/>
+      <xs:enumeration value="DATE_TIME"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="_subscriptionTypeContent">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="CYCLIC"/>
+      <xs:enumeration value="CHANGE_OF_STATE"/>
+      <xs:enumeration value="EVENT"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

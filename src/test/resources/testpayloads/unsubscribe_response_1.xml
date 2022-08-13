@@ -21,6 +21,6 @@
   limitations under the License.
   #L%
   -->
-<plcUnsubscribeResponse/>
+<plcUnsubscribeResponse xmlns="https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd"/>
 
 

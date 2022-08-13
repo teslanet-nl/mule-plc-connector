@@ -21,7 +21,7 @@
   limitations under the License.
   #L%
   -->
-  <plcWriteResponse>
+<plcWriteResponse xmlns="https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd">
     <field alias="coil1" count="2" responseCode="OK"
         type="BOOL">
         <values>

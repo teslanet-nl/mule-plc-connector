@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
   #%L
   Mule CoAP Connector
@@ -21,7 +21,7 @@
   limitations under the License.
   #L%
   -->
-<plcWriteResponse>
+<plcWriteResponse xmlns="https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd">
 	<field alias="coil3" count="1" responseCode="OK"
 		type="BOOL">
 		<value>true</value>

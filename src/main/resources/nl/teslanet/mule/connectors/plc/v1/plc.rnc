@@ -1,0 +1,67 @@
+default namespace = "https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd"
+
+start =
+    element plcReadResponse { _field * }
+    | 
+    element plcWriteResponse { _field * }
+    |
+    element plcSubscribeResponse { _field * }
+    |
+    element plcEvent { _field * }
+    |
+    element plcUnsubscribeResponse { _field * }
+    
+_field =
+    element field
+    {
+        attribute alias { token },
+        attribute responseCode { _responseCodeContent },
+        attribute count { xsd:int { minInclusive = "1" } } ? ,
+        attribute type { _typeContent } ?,
+        (
+            _element_value
+            |
+            element values { _element_value + }
+        ) ?
+    }
+
+_element_value = 
+    element value { text }
+    
+_responseCodeContent= 
+    ( 
+          "OK"
+        | "NOT_FOUND"
+        | "ACCESS_DENIED"
+        | "INVALID_ADDRESS"
+        | "INVALID_DATATYPE"
+        | "INVALID_DATA"
+        | "INTERNAL_ERROR"
+        | "REMOTE_BUSY"
+        | "REMOTE_ERROR"
+        | "UNSUPPORTED"
+        | "RESPONSE_PENDING" 
+
+    )
+    
+_typeContent= 
+    ( 
+          "BOOLEAN"
+        | "BYTE"
+        | "SHORT"
+        | "INTEGER"
+        | "LONG"
+        | "FLOAT"
+        | "DOUBLE"
+        | "STRING"
+        | "TIME"
+        | "DATE"
+        | "DATE_TIME"
+    )
+
+_subscriptionTypeContent=
+    (
+          "CYCLIC"
+        | "CHANGE_OF_STATE"
+        | "EVENT"
+    )

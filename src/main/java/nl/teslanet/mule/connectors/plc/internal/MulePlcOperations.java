@@ -35,8 +35,10 @@ import org.apache.plc4x.java.api.messages.PlcUnsubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -103,8 +105,9 @@ public class MulePlcOperations
     * @throws InterruptedException When the operation was interrupted.
      * @throws IllegalIoException When the operation is not allowed.
     */
-    @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
+    @MediaType( value= MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
+    @OutputXmlType(qname = "https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd#plcReadResponse", schema = "nl/teslanet/mule/connectors/plc/v1/plc.xsd")
     public Result< InputStream, ReceivedResponseAttributes > read( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
