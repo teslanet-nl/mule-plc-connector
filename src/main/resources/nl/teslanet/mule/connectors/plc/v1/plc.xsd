@@ -1,58 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd" xmlns:plc.xsd="https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd">
+  <xs:element name="plcReadRequest">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:_readField"/>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="plcReadResponse">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:field"/>
-      </xs:sequence>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:_valueField"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcWriteRequest">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:_writeField"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="plcWriteResponse">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:field"/>
-      </xs:sequence>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:_valueField"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcSubscribeRequest">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:_subscribeField"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="plcSubscribeResponse">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:field"/>
-      </xs:sequence>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:_subscribeResultField"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="plcEvent">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:field"/>
-      </xs:sequence>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:_valueField"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcUnsubscribeRequest">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:_unsubscribeField"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="plcUnsubscribeResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:field"/>
-      </xs:sequence>
-    </xs:complexType>
+    <xs:complexType/>
   </xs:element>
-  <xs:element name="field">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:value"/>
-      </xs:sequence>
-      <xs:attribute name="alias" use="required" type="xs:token"/>
-      <xs:attribute name="responseCode" use="required" type="plc.xsd:_responseCodeContent"/>
-      <xs:attribute name="count">
-        <xs:simpleType>
-          <xs:restriction base="xs:int">
-            <xs:minInclusive value="1"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="type" type="plc.xsd:_typeContent"/>
-    </xs:complexType>
-  </xs:element>
+  <xs:group name="_readField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="adress" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="_writeField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:value"/>
+          </xs:sequence>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="adress" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
   <xs:element name="value" type="xs:string"/>
+  <xs:group name="_subscribeField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="adress" use="required"/>
+          <xs:attribute name="subscriptionType" use="required" type="plc.xsd:_subscriptionTypeContent"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="_subscribeResultField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="responseCode" use="required" type="plc.xsd:_responseCodeContent"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="_unsubscribeField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="_valueField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" ref="plc.xsd:value"/>
+          </xs:sequence>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="responseCode" use="required" type="plc.xsd:_responseCodeContent"/>
+          <xs:attribute name="count" use="required" type="xs:unsignedInt"/>
+          <xs:attribute name="type" use="required" type="plc.xsd:_typeContent"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
   <xs:simpleType name="_responseCodeContent">
     <xs:restriction base="xs:token">
       <xs:enumeration value="OK"/>

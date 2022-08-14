@@ -1,25 +1,81 @@
 default namespace = "https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd"
 
 start =
-    element plcReadResponse { _field * }
+    element plcReadRequest { _readField * }
     | 
-    element plcWriteResponse { _field * }
+    element plcReadResponse { _valueField * }
+    | 
+    element plcWriteRequest { _writeField * }
     |
-    element plcSubscribeResponse { _field * }
+    element plcWriteResponse { _valueField * }
     |
-    element plcEvent { _field * }
+    element plcSubscribeRequest { _subscribeField * }
     |
-    element plcUnsubscribeResponse { _field * }
+    element plcSubscribeResponse { _subscribeResultField * }
+    |
+    element plcEvent { _valueField * }
+    |
+    element plcUnsubscribeRequest { _unsubscribeField * }
+    |
+    element plcUnsubscribeResponse { empty }
     
-_field =
+_readField =
     element field
     {
-        attribute alias { token },
-        attribute responseCode { _responseCodeContent },
-        attribute count { xsd:int { minInclusive = "1" } } ? ,
-        attribute type { _typeContent } ?,
+        attribute alias { token }
+        ,
+        attribute address { text }
+    }
+
+_writeField =
+    element field
+    {
+        attribute alias { token }
+        ,
+        attribute address { text }
+        ,
         element value { text } *
     }
+
+_subscribeField =
+    element field
+    {
+        attribute alias { token }
+        ,
+        attribute address { text }
+        ,
+        attribute subscriptionType { _subscriptionTypeContent }
+    }
+
+_subscribeResultField =
+    element field
+    {
+        attribute alias { token }
+        ,
+        attribute responseCode { _responseCodeContent }
+    }
+
+    
+_unsubscribeField =
+    element field
+    {
+        attribute alias { token }
+    }
+
+_valueField =
+    element field
+    {
+        attribute alias { token }
+        ,
+        attribute responseCode { _responseCodeContent }
+        ,
+        attribute count { xsd:unsignedInt }
+        ,
+        attribute type { _typeContent }
+        ,
+        element value { text } *
+    }
+
 
     
 _responseCodeContent= 
