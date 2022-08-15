@@ -95,6 +95,16 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     protected final boolean writeAllowed;
 
     /**
+     * The subscribe lock pool to control concurrent subscribe and unsubscribe operations.
+     */
+    protected final boolean subscribeAllowed;
+
+    /**
+     * The IO lock pool to control overall concurrent operations.
+     */
+    protected final LockPool ioLocks;
+
+    /**
      * The read lock pool to control concurrent reads.
      */
     protected final LockPool readLocks;
@@ -105,45 +115,29 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     protected final LockPool writeLocks;
 
     /**
+     * The subscribe lock pool to control concurrent subscribe and unsubscribe operations.
+     */
+    protected final LockPool subscribeLocks;
+
+    /**
      * Constructor.
      * @param connectionString The connection string of the PLC.
      * @param plcConnection The PLC Connection. 
      * @throws ConnectionException When the conncetion failed.
      */
-    public DefaultMulePlcConnection( String connectionString, PlcConnection plcConnection, LockFactory lockFactory, int concurrentReads, int concurrentWrites ) throws ConnectionException
+    public DefaultMulePlcConnection( String connectionString, PlcConnection plcConnection, LockFactory lockFactory, ConcurrencyParams concurrencyParams ) throws ConnectionException
     {
         this.connectionString= connectionString;
         this.plcConnection= plcConnection;
-        if ( concurrentReads < 0 )
-        {
-            readAllowed= true;
-            readLocks= null;
-        }
-        else if ( concurrentReads == 0 )
-        {
-            readAllowed= false;
-            readLocks= null;
-        }
-        else
-        {
-            readAllowed= true;
-            readLocks= new LockPool( lockFactory, this.toString() + "-read-", concurrentReads );
-        }
-        if ( concurrentWrites < 0 )
-        {
-            writeAllowed= true;
-            writeLocks= null;
-        }
-        else if ( concurrentWrites == 0 )
-        {
-            writeAllowed= false;
-            writeLocks= null;
-        }
-        else
-        {
-            writeAllowed= true;
-            writeLocks= new LockPool( lockFactory, this.toString() + "-write-", concurrentWrites );
-        }
+
+        ioLocks= ( concurrencyParams.getConcurrentIo() >= 0 ? new LockPool( lockFactory, this.toString() + "-subscribe-", concurrencyParams.getConcurrentIo() ) : null );
+        readAllowed= ( concurrencyParams.getConcurrentReads() != 0 );
+        readLocks= ( concurrencyParams.getConcurrentReads() > 0 ? new LockPool( lockFactory, this.toString() + "-read-", concurrencyParams.getConcurrentReads() ) : null );
+        writeAllowed= ( concurrencyParams.getConcurrentWrites() != 0 );
+        writeLocks= ( concurrencyParams.getConcurrentWrites() > 0 ? new LockPool( lockFactory, this.toString() + "-write-", concurrencyParams.getConcurrentWrites() ) : null );
+        subscribeAllowed= ( concurrencyParams.getConcurrentWrites() != 0 );
+        subscribeLocks= ( concurrencyParams.getConcurrentWrites() > 0
+            ? new LockPool( lockFactory, this.toString() + "-subscribe-", concurrencyParams.getConcurrentWrites() ) : null );
         logger.info( "connection created { " + this + " }" );
     }
 
@@ -214,6 +208,10 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         return plcConnection.isConnected();
     }
 
+    //TODO concurrency
+    /**
+     * Ping operation
+     */
     @Override
     public synchronized Boolean ping() throws InterruptedException, InternalUnsupportedException
     {
@@ -238,104 +236,223 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         return( readAllowed && plcConnection.getMetadata().canRead() );
     }
 
+    /**
+     * Read PLC fields.
+     */
     @Override
     public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException, InternalConcurrencyException
+        InternalConnectionException,
+        InternalConcurrencyException
     {
         if ( !readAllowed ) throw new InternalConcurrencyException( "No read allowed on this connection." );
+        Lockable< PlcReadResponse > operation= () -> {
+            return readIoLocked( fields, timeout, timeoutUnit );
+        };
+        return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
+    }
+
+    /**
+     * Read PLC fields.
+     */
+    private PlcReadResponse readIoLocked( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException,
+        InternalConcurrencyException
+    {
+        if ( readLocks == null )
+        {
+            return readLocked( fields, timeout, timeoutUnit );
+        }
+        else
+        {
+            Lockable< PlcReadResponse > operation= () -> {
+                return readLocked( fields, timeout, timeoutUnit );
+            };
+            return operation.doLocked( readLocks, operation, timeout, timeoutUnit );
+        }
+    }
+
+    /**
+     * @param fields
+     * @param timeout
+     * @param timeoutUnit
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     * @throws InternalConnectionException
+     * @throws InternalConcurrencyException
+     */
+    private PlcReadResponse readLocked( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException,
+        InternalConcurrencyException
+    {
         connect();
         PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
         for ( ReadField field : fields )
         {
             builder.addItem( field.getAlias(), field.getAddress() );
         }
-        if ( readLocks == null )
-        {
-            return builder.build().execute().get( timeout, timeoutUnit );
-        }
-        else
-        {
-            Lock lock= readLocks.getLock();
-            //TODO separate timout config
-            if ( lock.tryLock( timeout, timeoutUnit ) )
-            {
-                try
-                {
-                    return builder.build().execute().get( timeout, timeoutUnit );
-                }
-                finally
-                {
-                    lock.unlock();
-                }
-            }
-            else
-            {
-                //TODO improve msg
-                throw new TimeoutException( "Read lock timeout exception" );
-            }
-        }
+        return builder.build().execute().get( timeout, timeoutUnit );
     }
 
+    /**
+     * Estblish that the connection can write.
+     */
     @Override
     public boolean canWrite()
     {
         return( writeAllowed && plcConnection.getMetadata().canWrite() );
     }
 
+    /**
+     * Read PLC fields.
+     */
     @Override
     public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException, InternalConcurrencyException
+        InternalConnectionException,
+        InternalConcurrencyException
     {
         if ( !writeAllowed ) throw new InternalConcurrencyException( "No write allowed on this connection." );
+        Lockable< PlcWriteResponse > operation= () -> {
+            return writeIoLocked( fields, timeout, timeoutUnit );
+        };
+        return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
+    }
+
+    /**
+     * @param fields
+     * @param timeout
+     * @param timeoutUnit
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     * @throws InternalConnectionException
+     * @throws InternalConcurrencyException
+     */
+    private PlcWriteResponse writeIoLocked( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException,
+        InternalConcurrencyException
+    {
+        if ( writeLocks == null )
+        {
+            return writeLocked( fields, timeout, timeoutUnit );
+        }
+        else
+        {
+            Lockable< PlcWriteResponse > operation= () -> {
+                return writeLocked( fields, timeout, timeoutUnit );
+            };
+            return operation.doLocked( writeLocks, operation, timeout, timeoutUnit );
+        }
+    }
+
+    /**
+     * @param fields
+     * @param timeout
+     * @param timeoutUnit
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     * @throws InternalConnectionException
+     * @throws InternalConcurrencyException
+     */
+    private PlcWriteResponse writeLocked( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException,
+        InternalConcurrencyException
+    {
         connect();
         PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();
         for ( WriteField field : fields )
         {
             builder.addItem( field.getAlias(), field.getAddress(), field.getValues().toArray() );
         }
-        if ( writeLocks == null )
-        {
-            return builder.build().execute().get( timeout, timeoutUnit );
-        }
-        else
-        {
-            Lock lock= writeLocks.getLock();
-            //TODO separate timout config
-            if ( lock.tryLock( timeout, timeoutUnit ) )
-            {
-                try
-                {
-                    return builder.build().execute().get( timeout, timeoutUnit );
-                }
-                finally
-                {
-                    lock.unlock();
-                }
-            }
-            else
-            {
-                //TODO improve msg
-                throw new TimeoutException( "Write lock timeout exception" );
-            }
-        }
+        return builder.build().execute().get( timeout, timeoutUnit );
     }
 
+    /**
+     *
+     */
     @Override
     public boolean canSubscribe()
     {
-        return plcConnection.getMetadata().canSubscribe();
+        return( subscribeAllowed && plcConnection.getMetadata().canSubscribe() );
     }
 
     @Override
-    public synchronized PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+    public synchronized PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException,
+        InternalConcurrencyException
+    {
+        if ( !subscribeAllowed ) throw new InternalConcurrencyException( "No subscribe allowed on this connection." );
+        Lockable< PlcSubscriptionResponse > operation= () -> {
+            return subscribeIoLocked( fields, timeout, timeoutUnit );
+        };
+        return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
+    }
+
+    /**
+     * @param fields
+     * @param timeout
+     * @param timeoutUnit
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     * @throws InternalConnectionException
+     * @throws InternalConcurrencyException 
+     */
+    public synchronized PlcSubscriptionResponse subscribeIoLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException,
+        InternalConcurrencyException
+    {
+        if ( subscribeLocks == null )
+        {
+            return subscribeLocked( fields, timeout, timeoutUnit );
+        }
+        else
+        {
+            Lockable< PlcSubscriptionResponse > operation= () -> {
+                return subscribeLocked( fields, timeout, timeoutUnit );
+            };
+            return operation.doLocked( subscribeLocks, operation, timeout, timeoutUnit );
+        }
+    }
+
+    /**
+     * @param fields
+     * @param timeout
+     * @param timeoutUnit
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     * @throws InternalConnectionException
+     */
+    public synchronized PlcSubscriptionResponse subscribeLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException
     {
+        PlcSubscriptionResponse subscribeResponse;
+
         connect();
         PlcSubscriptionRequest.Builder builder= plcConnection.subscriptionRequestBuilder();
         for ( SubscribeField field : fields )
@@ -343,7 +460,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
             //TODO make configurable what type of subscription is wanted
             builder.addChangeOfStateField( field.getAlias(), field.getAddress() );
         }
-        PlcSubscriptionResponse subscribeResponse= builder.build().execute().get( timeout, timeOutUnit );
+        subscribeResponse= builder.build().execute().get( timeout, timeoutUnit );
         for ( String fieldName : subscribeResponse.getFieldNames() )
         {
             handles.put( fieldName, subscribeResponse.getSubscriptionHandle( fieldName ) );
@@ -351,12 +468,69 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         return subscribeResponse;
     }
 
+    /**
+     *
+     */
     @Override
-    public PlcUnsubscriptionResponse unSubscribe( List< UnsubscribeField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+    public PlcUnsubscriptionResponse unSubscribe( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException,
+        InternalConcurrencyException
+    {
+        if ( !subscribeAllowed ) throw new InternalConcurrencyException( "No subscribe allowed on this connection." );
+        Lockable< PlcUnsubscriptionResponse > operation= () -> {
+            return unSubscribeIoLocked( fields, timeout, timeoutUnit );
+        };
+        return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
+    }
+
+    /**
+     * @param fields
+     * @param timeout
+     * @param timeoutUnit
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     * @throws InternalConnectionException
+     * @throws InternalConcurrencyException
+     */
+    public PlcUnsubscriptionResponse unSubscribeIoLocked( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        ExecutionException,
+        TimeoutException,
+        InternalConnectionException,
+        InternalConcurrencyException
+    {
+        if ( subscribeLocks == null )
+        {
+            return unSubscribeLocked( fields, timeout, timeoutUnit );
+        }
+        else
+        {
+            Lockable< PlcUnsubscriptionResponse > operation= () -> {
+                return unSubscribeLocked( fields, timeout, timeoutUnit );
+            };
+            return operation.doLocked( subscribeLocks, operation, timeout, timeoutUnit );
+        }
+    }
+
+    /**
+     * @param fields
+     * @param timeout
+     * @param timeoutUnit
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     * @throws InternalConnectionException
+     */
+    public PlcUnsubscriptionResponse unSubscribeLocked( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException
     {
+        PlcUnsubscriptionResponse subscribeResponse;
         connect();
         List< PlcSubscriptionHandle > toUnsubscribe= new ArrayList<>();
         for ( UnsubscribeField field : fields )
@@ -369,6 +543,60 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         }
         PlcUnsubscriptionRequest.Builder builder= plcConnection.unsubscriptionRequestBuilder();
         builder.addHandles( toUnsubscribe );
-        return builder.build().execute().get( timeout, timeOutUnit );
+        subscribeResponse= builder.build().execute().get( timeout, timeoutUnit );
+        fields.forEach( (field) -> handles.remove( field.getAlias() ) );
+        return subscribeResponse;
+    }
+
+    /**
+     * Interface for IO lockable operations.
+     *
+     */
+    @FunctionalInterface
+    private interface Lockable< R >
+    {
+        R run() throws InterruptedException, ExecutionException, TimeoutException, InternalConnectionException, InternalConcurrencyException;
+
+        /**
+         * @param fields
+         * @param timeout
+         * @param timeoutUnit
+         * @return
+         * @throws InterruptedException
+         * @throws ExecutionException
+         * @throws TimeoutException
+         * @throws InternalConnectionException
+         * @throws InternalConcurrencyException
+         */
+        default R doLocked( LockPool pool, Lockable< R > operation, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+            ExecutionException,
+            TimeoutException,
+            InternalConnectionException,
+            InternalConcurrencyException
+        {
+            if ( pool == null )
+            {
+                return operation.run();
+            }
+            else
+            {
+                Lock lock= pool.getLock();
+                if ( lock.tryLock( timeout, timeoutUnit ) )
+                {
+                    try
+                    {
+                        return operation.run();
+                    }
+                    finally
+                    {
+                        lock.unlock();
+                    }
+                }
+                else
+                {
+                    throw new TimeoutException( "Timeout on getting lock." );
+                }
+            }
+        }
     }
 }

@@ -62,18 +62,23 @@ import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionExceptio
 public class XmlSerializer
 {
     /**
+     * The XML namspace to use.
+     */
+    public static final String NS= "https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd";
+            
+    /**
     * Xml transformer factory for processing responses.
     */
-    private static final TransformerFactory transformerFactory;
+    private static final TransformerFactory TRANSFORMER_FACTORY;
 
     /**
     * Create and configures transformerfactory instance.
     */
     static
     {
-        transformerFactory= javax.xml.transform.TransformerFactory.newInstance();
-        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_DTD, "" );
-        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "" );
+        TRANSFORMER_FACTORY= javax.xml.transform.TransformerFactory.newInstance();
+        TRANSFORMER_FACTORY.setAttribute( XMLConstants.ACCESS_EXTERNAL_DTD, "" );
+        TRANSFORMER_FACTORY.setAttribute( XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "" );
     }
 
     /**
@@ -113,7 +118,7 @@ public class XmlSerializer
         Document doc= dBuilder.newDocument();
 
         // root element
-        Element rootElement= doc.createElement( "plcReadResponse" );
+        Element rootElement= doc.createElementNS( NS, "plcReadResponse" );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response, alias -> response.getPlcValue( alias ) );
@@ -132,7 +137,7 @@ public class XmlSerializer
         Document doc= dBuilder.newDocument();
 
         // root element
-        Element rootElement= doc.createElement( "plcWriteResponse" );
+        Element rootElement= doc.createElementNS( NS, "plcWriteResponse" );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response, alias -> response.getRequest().getPlcValue( alias ) );
@@ -151,7 +156,7 @@ public class XmlSerializer
         Document doc= dBuilder.newDocument();
 
         // root element
-        Element rootElement= doc.createElement( "plcSubscribeResponse" );
+        Element rootElement= doc.createElementNS( NS, "plcSubscribeResponse" );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response );
@@ -170,7 +175,7 @@ public class XmlSerializer
         Document doc= dBuilder.newDocument();
 
         // root element
-        Element rootElement= doc.createElement( "plcUnsubscribeResponse" );
+        Element rootElement= doc.createElementNS( NS, "plcUnsubscribeResponse" );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response );
@@ -189,7 +194,7 @@ public class XmlSerializer
         Document doc= dBuilder.newDocument();
 
         // root element
-        Element rootElement= doc.createElement( "plcEvent" );
+        Element rootElement= doc.createElementNS( NS, "plcEvent" );
         //TODO add timestamp
         doc.appendChild( rootElement );
         //build content
@@ -207,7 +212,7 @@ public class XmlSerializer
         StringWriter writer= new StringWriter();
         try
         {
-            Transformer transformer= transformerFactory.newTransformer();
+            Transformer transformer= TRANSFORMER_FACTORY.newTransformer();
             transformer.setOutputProperty( OutputKeys.ENCODING, "ISO-8859-1" );
             transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
             transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "no" );

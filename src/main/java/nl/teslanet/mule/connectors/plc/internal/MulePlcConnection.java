@@ -88,11 +88,12 @@ public interface MulePlcConnection
     * @throws InterruptedException When the read operation is interrupted.
     * @throws InternalConnectionException when connection failed.
      * @throws InternalConcurrencyException When a read operation is not allowed.
-     */ 
+     */
     public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException, InternalConcurrencyException;
+        InternalConnectionException,
+        InternalConcurrencyException;
 
     /**
      * @return {@code true} when the connection can be used to write, otherwise {@code false}.
@@ -109,12 +110,13 @@ public interface MulePlcConnection
     * @throws ExecutionException When the write could not be executed.
     * @throws InterruptedException When the write operation is interrupted.
     * @throws InternalConnectionException when connection failed.
-     * @throws InternalConcurrencyException  When a write operation is not allowed.
+    * @throws InternalConcurrencyException  When the number of concurrent write operation is not allowed.
     */
     public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException, InternalConcurrencyException;
+        InternalConnectionException,
+        InternalConcurrencyException;
 
     /**
      * @return {@code true} when the connection can be used to subscribe, otherwise {@code false}.
@@ -131,11 +133,13 @@ public interface MulePlcConnection
     * @throws ExecutionException When the subscribe request could not be executed.
     * @throws InterruptedException When the subscribe request is interrupted.
     * @throws InternalConnectionException when connection failed.
+    * @throws InternalConcurrencyException When the number of concurrent subscribe operation is not allowed.
     */
     public PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException;
+        InternalConnectionException,
+        InternalConcurrencyException;
 
     /**
     * Unsubscribe to fields from PLC using this connection.
@@ -147,11 +151,13 @@ public interface MulePlcConnection
     * @throws ExecutionException When the subscribe request could not be executed.
     * @throws InterruptedException When the subscribe request is interrupted.
     * @throws InternalConnectionException when connection failed.
+    * @throws InternalConcurrencyException When the number of concurrent subscribe operation is not allowed.
     */
     public PlcUnsubscriptionResponse unSubscribe( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException;
+        InternalConnectionException,
+        InternalConcurrencyException;
 
     /**
      * @return the connection string
