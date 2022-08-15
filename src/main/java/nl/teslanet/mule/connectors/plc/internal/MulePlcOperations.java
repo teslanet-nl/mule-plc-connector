@@ -252,6 +252,10 @@ public class MulePlcOperations
         {
             throw new ConnectionException( "Connection Error on subscription.", e );
         }
+        catch ( InternalConcurrencyException e )
+        {
+            throw new ConcurrencyException( "Concurrency Error on subscribe.", e );
+        }
         if ( response == null )
         {
             throw new ConnectorExecutionException( "Null response on subscription." );
@@ -304,6 +308,10 @@ public class MulePlcOperations
         catch ( InternalConnectionException | TimeoutException e )
         {
             throw new ConnectionException( "Connection Error on subscription.", e );
+        }
+        catch ( InternalConcurrencyException e )
+        {
+            throw new ConcurrencyException( "Concurrency Error on unsubscribe.", e );
         }
         if ( response == null )
         {

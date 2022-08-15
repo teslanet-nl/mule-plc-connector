@@ -45,11 +45,17 @@
                 <parameter name="connectionString">
                     <description><![CDATA[The connection string of the plc.]]></description>
                 </parameter>
+                <parameter name="concurrentIo">
+                    <description><![CDATA[The number of concurrent IO per connection. The total number of concurrent read, write and subscribe operations is limited to this number. When negative the number is unlimited.]]></description>
+                </parameter>
                 <parameter name="concurrentReads">
                     <description><![CDATA[Number of concurrent reads per connection.]]></description>
                 </parameter>
                 <parameter name="concurrentWrites">
                     <description><![CDATA[Number of concurrent writes per connection.]]></description>
+                </parameter>
+                <parameter name="concurrentSubscribes">
+                    <description><![CDATA[Number of concurrent subscribes per connection.]]></description>
                 </parameter>
                 <parameter name="reconnection">
                     <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>

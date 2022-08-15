@@ -35,6 +35,7 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,21 +74,14 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     private String connectionString;
 
     /**
-     * Number of concurrent reads per connection.
+     * The concurrency parameters controlling the number of allowed concurrent IO on the connection.
      */
-    @Parameter
-    @Optional(defaultValue= "16")
-    @Summary("The number of concurrent reads per connection.")
-    private int concurrentReads;
+    @ParameterGroup( name= "Concurrency" )
+    private ConcurrencyParams concurrencyParams;
 
     /**
-     * Number of concurrent writes per connection.
+     * The PLC driver manager.
      */
-    @Parameter
-    @Optional(defaultValue= "16")
-    @Summary("The number of concurrent writes per connection.")
-    private int concurrentWrites;
-
     private static final PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
 
     /**
@@ -101,7 +95,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         try
         {
             PlcConnection plcConnnection= driverManager.getConnection( connectionString );
-            connection= new DefaultMulePlcConnection( connectionString, plcConnnection, lockFactory, concurrentReads, concurrentReads );
+            connection= new DefaultMulePlcConnection( connectionString, plcConnnection, lockFactory, concurrencyParams );
             connection.connect();
         }
         catch ( InternalConnectionException | PlcConnectionException e )
@@ -123,6 +117,9 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         logger.info( "Disconnected { " + connection + "::" + connectionString + " }" );
     }
 
+    /**
+     * Validate the connection.
+     */
     @Override
     public ConnectionValidationResult validate( MulePlcConnection connection )
     {
