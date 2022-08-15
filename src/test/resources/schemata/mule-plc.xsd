@@ -82,7 +82,11 @@
               <xs:documentation>The connection string of the plc.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentIo"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentIo">
+            <xs:annotation>
+              <xs:documentation>The number of concurrent IO per connection. The total number of concurrent read, write and subscribe operations is limited to this number. When negative the number is unlimited.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentReads">
             <xs:annotation>
               <xs:documentation>Number of concurrent reads per connection.</xs:documentation>
@@ -93,7 +97,11 @@
               <xs:documentation>Number of concurrent writes per connection.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentSubscribes"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentSubscribes">
+            <xs:annotation>
+              <xs:documentation>Number of concurrent subscribes per connection.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
