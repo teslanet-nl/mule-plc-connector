@@ -46,7 +46,7 @@
                     <description><![CDATA[The connection string of the plc.]]></description>
                 </parameter>
                 <parameter name="concurrentIo">
-                    <description><![CDATA[The number of concurrent IO per connection. The total number of concurrent read, write and subscribe operations is limited to this number. When negative the number is unlimited.]]></description>
+                    <description><![CDATA[]]></description>
                 </parameter>
                 <parameter name="concurrentReads">
                     <description><![CDATA[Number of concurrent reads per connection.]]></description>
@@ -55,7 +55,7 @@
                     <description><![CDATA[Number of concurrent writes per connection.]]></description>
                 </parameter>
                 <parameter name="concurrentSubscribes">
-                    <description><![CDATA[Number of concurrent subscribes per connection.]]></description>
+                    <description><![CDATA[]]></description>
                 </parameter>
                 <parameter name="reconnection">
                     <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
@@ -85,6 +85,9 @@
         <operation name="read">
             <description><![CDATA[Read PLC flields.]]></description>
             <parameters>
+                <parameter name="xmlReadFields">
+                    <description><![CDATA[]]></description>
+                </parameter>
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
                 </parameter>
@@ -254,6 +257,54 @@
                     <description><![CDATA[]]></description>
                 </parameter>
                 <parameter name="values">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcEvent">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcEvent">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcReadRequest">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcReadRequest">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcReadResponse">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcReadResponse">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcSubscribeResponse">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcSubscribeResponse">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcUnsubscribeResponse">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcUnsubscribeResponse">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcWriteResponse">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcWriteResponse">
                     <description><![CDATA[]]></description>
                 </parameter>
             </parameters>
