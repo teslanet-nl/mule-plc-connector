@@ -11,3 +11,5 @@ syntax: regexp
 ^bin$
 syntax: regexp
 ^oxygenProject\.xpr$
+syntax: regexp
+\.bak$

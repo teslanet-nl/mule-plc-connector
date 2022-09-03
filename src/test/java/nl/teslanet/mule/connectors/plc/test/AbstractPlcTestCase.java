@@ -23,6 +23,8 @@
 package nl.teslanet.mule.connectors.plc.test;
 
 
+import java.util.Optional;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
@@ -30,29 +32,28 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 @ArtifactClassLoaderRunnerConfig
 (
     providedExclusions=
-    { 
-        "org.mule.tests:*:*:*:*", 
+    {
+        "org.mule.tests:*:*:*:*",
         "com.mulesoft.compatibility.tests:*:*:*:*"
-    }, 
+    },
     applicationRuntimeLibs=
     {
-        "org.apache.plc4x:plc4j-driver-simulated",
-        "org.apache.plc4x:plc4j-api",
-        "org.apache.plc4x:plc4j-spi",
         "org.apache.commons:commons-lang3",
         "com.github.jinahya:bit-io"
     }, 
-    testRunnerExportedRuntimeLibs=
-    { 
-    }, 
     applicationSharedRuntimeLibs=
     {
+        "org.apache.plc4x:plc4j-driver-mock",
         "org.apache.plc4x:plc4j-driver-simulated",
         "org.apache.plc4x:plc4j-api",
         "org.apache.plc4x:plc4j-spi",
     }, 
-    exportPluginClasses= {
-        nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException.class
+    exportPluginClasses=
+    {
+        //TODO move to api package
+        nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException.class,
+    
+        nl.teslanet.mule.connectors.plc.internal.MulePlcConnectionProvider.class
     },
     testExclusions= 
     {
@@ -64,12 +65,16 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
         "org.mule.connectors:*:*:*:*",
         "org.mule.tests.plugin:*:*:*:*",
         "com.mulesoft.mule.runtime*:*:*:*:*",
-        "com.mulesoft.licm:*:*:*:*",
-    }, 
-    testInclusions= 
+        "com.mulesoft.licm:*:*:*:*"
+    },
+    testInclusions=
     {
         "*:*:jar:tests:*",
-        "*:*:test-jar:*:*" 
+        "*:*:test-jar:*:*"
+    },
+    testRunnerExportedRuntimeLibs=
+    {
+        "org.mule.tests:mule-tests-functional"
     }, 
     extraPrivilegedArtifacts=
     {
@@ -77,4 +82,20 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 )
 public abstract class AbstractPlcTestCase extends MuleArtifactFunctionalTestCase
 {
+    private static TestClassLoaderRepository connectorClassLoaderRepository;
+
+    protected Optional< ClassLoader > getConnectorClassLoader()
+    {
+        synchronized ( AbstractPlcTestCase.class )
+        {
+            if ( connectorClassLoaderRepository == null )
+            {
+                connectorClassLoaderRepository= new TestClassLoaderRepository();
+            }
+            return connectorClassLoaderRepository.find( "Region/plugin/nl.teslanet.mule.connectors.plc:mule-plc-connector:mule-extension:1.1.0-SNAPSHOT" );
+            //return connectorClassLoaderRepository.find( "Region/plugin/nl.teslanet.mule.connectors.plc:mule-plc-connector:mule-extension" );
+            //return connectorClassLoaderRepository.find( "Region/plugin/test-runner" );
+            //return connectorClassLoaderRepository.find( "Region/plugin/org.mule.tests.plugin:mule-tests-component-plugin:jar:mule-plugin:4.1.1" );
+        }
+    }
 }

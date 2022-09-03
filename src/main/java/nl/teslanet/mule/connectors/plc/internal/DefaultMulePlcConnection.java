@@ -174,27 +174,30 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public synchronized void connect() throws InternalConnectionException
     {
+        ClassLoader actualClassLoader= plcConnection.getClass().getClassLoader();
         if ( !plcConnection.isConnected() )
         {
             try
             {
                 plcConnection.connect();
-                logger.info( "(re)Connected connection { " + this + " }" );
+                logger.info( "(re)Connected connection { " + this + "::" + plcConnection + " }" );
             }
             catch ( PlcConnectionException e )
             {
-                logger.error( "Failed reconnecting { " + this + " }" );
+                logger.error( "Failed reconnecting { " + this + "::" + plcConnection + " }" );
             }
-            if ( !plcConnection.isConnected() )
-            {
-                throw new InternalConnectionException( "Error on connection { " + this + " }" );
-            }
+            //TODO
+//            if ( !plcConnection.isConnected() )
+//            {
+//                throw new InternalConnectionException( "Error on connection { " + this + " }" );
+//            }
         }
     }
 
     @Override
     public boolean isConnected()
     {
+        ClassLoader actualClassLoader= plcConnection.getClass().getClassLoader();
         //in case connection lost, try to reconnect first
         //TODO remove connect attempt
         try

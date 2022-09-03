@@ -32,9 +32,12 @@
 		</Console>
 	</Appenders>
 	<Loggers>
+		<Logger name="org.mule.test.runner.api.AetherClassPathClassifier" level="debug"/>
+		<Logger name="org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader" level="warn"/>
 		<Logger name="org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader" level="warn"/>
 		<Logger name="nl.teslanet" level="info"/>
-		<Logger name="org.apache.plc4x" level="warn" />
+		<Logger name="org.apache.plc4x.java.mock" level="info"/>
+		<Logger name="org.apache.plc4x" level="info" />
 		<Root level="warn">
 			<AppenderRef ref="Console" />
 		</Root>

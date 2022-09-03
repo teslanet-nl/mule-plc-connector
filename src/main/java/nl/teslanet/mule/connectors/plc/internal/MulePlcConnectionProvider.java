@@ -33,7 +33,6 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -82,7 +81,16 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     /**
      * The PLC driver manager.
      */
-    private static final PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
+    //private static final PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
+    private static final PlcDriverManager driverManager= new PlcDriverManager( );
+
+    /**
+     * @return the drivermanager
+     */
+    public static PlcDriverManager getDrivermanager()
+    {
+        return driverManager;
+    }
 
     /**
      * Connect to PLC using the connection string.

@@ -35,7 +35,7 @@ L%
 	
 	<groupId>nl.teslanet.mule.connectors.plc</groupId>
 	<artifactId>mule-plc-connector</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<packaging>mule-extension</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>Mule extension that enables Mule-applications to communicate with PLC systems.</description>
@@ -65,6 +65,8 @@ L%
 		<category>Community</category>
 		<licensePath>LICENSE.txt</licensePath>
 		<plc4j.version>0.9.1</plc4j.version>
+        <slf4jVersion>1.7.36</slf4jVersion>
+		<!--munit.version>2.3.12</munit.version-->
 	</properties>
 
 	<scm>
@@ -138,6 +140,31 @@ Contributors:
 					</execution>
 				</executions>
 			</plugin>
+			<!--
+			<plugin>
+              <groupId>com.mulesoft.munit</groupId>
+              <artifactId>munit-extensions-maven-plugin</artifactId>
+              <dependencies>
+                <dependency>
+                  <groupId>com.mulesoft.munit</groupId>
+                  <artifactId>munit-runner</artifactId>
+                  <version>${munit.version}</version>
+                  <classifier>mule-plugin</classifier>
+                </dependency>
+                <dependency>
+                  <groupId>com.mulesoft.munit</groupId>
+                  <artifactId>munit-tools</artifactId>
+                  <version>${munit.version}</version>
+                  <classifier>mule-plugin</classifier>
+                </dependency>
+		        <dependency>
+		    	    <groupId>com.mulesoft.munit</groupId>
+					<artifactId>munit-maven-plugins-common</artifactId>
+		            <version>${munit.version}</version>
+		        </dependency>
+              </dependencies>
+            </plugin>
+            -->
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<executions>
@@ -201,6 +228,23 @@ Contributors:
 			</plugin>
 		</plugins>
 	</build>
+	<dependencyManagement>
+	<!--
+		<dependencies>
+		<dependency>
+			<groupId>org.apache.plc4x</groupId>
+			<artifactId>plc4j-driver-simulated</artifactId>
+			<version>${plc4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+			<dependency>
+				<groupId>org.apache.plc4x</groupId>
+				<artifactId>plc4j-driver-mock</artifactId>
+				<version>${plc4j.version}</version>
+			</dependency>
+		</dependencies>
+		-->
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -218,25 +262,26 @@ Contributors:
 			<artifactId>plc4j-spi</artifactId>
 			<version>${plc4j.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.36</version>
-		</dependency>
 				
 		<!--  test dependencies  -->
 
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4jVersion}</version>
+			<scope>provided</scope>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.17.2</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.mule.runtime</groupId>
 			<artifactId>mule-module-extensions-support</artifactId>
 			<version>${mule.version}</version>
 			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.plc4x</groupId>
-			<artifactId>plc4j-driver-simulated</artifactId>
-			<version>${plc4j.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -257,6 +302,24 @@ Contributors:
             <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
+		<dependency>
+			<groupId>org.apache.plc4x</groupId>
+			<artifactId>plc4j-driver-simulated</artifactId>
+			<version>${plc4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.plc4x</groupId>
+		  <artifactId>plc4j-transport-test</artifactId>
+		  <version>${plc4j.version}</version>
+		  <scope>test</scope>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.plc4x</groupId>
+		  <artifactId>plc4j-driver-mock</artifactId>
+		  <version>${plc4j.version}</version>
+		  <scope>test</scope>
+		</dependency>
         <dependency>
             <groupId>org.mule.module</groupId>
             <artifactId>mule-java-module</artifactId>
