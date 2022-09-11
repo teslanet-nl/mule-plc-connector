@@ -21,59 +21,99 @@
   limitations under the License.
   #L%
 -->
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:plc="http://www.teslanet.nl/schema/mule/plc"
-    xmlns:java="http://www.mulesoft.org/schema/mule/java"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    xmlns:plc="http://www.teslanet.nl/schema/mule/plc"
+	xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd
-http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 
-	<plc:config name="PLC_Config"  timeout="10" timeoutUnits="SECONDS">
-		<plc:connection connectionString="mock:test-plc" />
+	
+	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config">
+		<os:connection >
+			<reconnection >
+				<reconnect-forever frequency="500" />
+			</reconnection>
+		</os:connection>
+	</os:config>
+	<os:object-store name="read-responses" doc:name="Object store" config-ref="ObjectStore_Config" persistent="false"/>
+	<os:object-store name="write-responses" doc:name="Object store" config-ref="ObjectStore_Config" persistent="false"/>
+
+	<plc:config name="PLC_Config_Concurrent"  timeout="20" timeoutUnits="SECONDS">
+		<plc:connection connectionString="mock:test-plc" concurrentIo="1" />
 	</plc:config>
 	
 	<flow name="concurrent-ping">
 		<!-- parallel-foreach collection="#[[ 1,2,3,4 ]]" -->
-			<plc:ping doc:name="Ping" config-ref="PLC_Config" />
+			<plc:ping doc:name="Ping" config-ref="PLC_Config_Concurrent" />
 		<!--/parallel-foreach-->
         <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
 	</flow>
 	
+
 	<flow name="concurrent-read">
-		<!-- parallel-foreach collection="#[[ 1,2,3,4 ]]" -->
-			<plc:read doc:name="Read" config-ref="PLC_Config">
-				<repeatable-in-memory-stream />
-	            <reconnect count="5" frequency="500" />
-				<plc:read-fields>
-					<plc:read-field alias="one"
-						address="address1" />
-					<plc:read-field alias="two"
-						address="address2" />
-				</plc:read-fields>
-			</plc:read>
-		<!--/parallel-foreach -->
-		<logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
-		
+		<foreach collection="#[[ 1,2, 3, 4 ]]" doc:name="Four times">
+			<async doc:name="Async" >
+				<plc:read doc:name="Read" config-ref="PLC_Config_Concurrent">
+					<repeatable-in-memory-stream />
+		            <reconnect count="5" frequency="500" />
+					<plc:read-fields>
+						<plc:read-field alias="one" address="address1" />
+						<plc:read-field alias="two" address="address2" />
+					</plc:read-fields>
+				</plc:read>
+				<logger level="INFO" doc:name="Logger" message="STORE" category="nl.teslanet.mule.connectors.plc.test" />
+				<logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test" />
+				<os:store doc:name="Store" key="#[vars.counter as String]" objectStore="read-responses">
+					<os:value ><![CDATA[#[payload]]]></os:value>
+				</os:store>
+				<logger level="INFO" doc:name="Logger" message="STORED" category="nl.teslanet.mule.connectors.plc.test" />
+				<logger level="INFO" doc:name="Logger" message="#[payload as String]" category="nl.teslanet.mule.connectors.plc.test" />
+			</async>
+		</foreach>
 	</flow>
 	
-    <flow name="concurrent-write">
-		<!-- parallel-foreach collection="#[[ 1,2,3,4 ]]" -->
-	        <plc:write doc:name="Write" config-ref="PLC_Config">
-	            <reconnect count="5" frequency="500" />
-	            <plc:write-fields>
-	                <plc:write-field alias="one"
-	                    address="address1" values="#[ [ true, false ] ]" />
-	                <plc:write-field alias="two"
-	                    address="address2" values="#[[ '11', '22' ]]" />
-	            </plc:write-fields>
-	        </plc:write>
-		<!--/parallel-foreach-->
-        <logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test"/>
+ 	<flow name="concurrent-read-retrieve" >
+		<os:retrieve-all doc:name="Retrieve all" objectStore="read-responses" />
+		<logger level="INFO" doc:name="Logger" message="RETRIEVED" category="nl.teslanet.mule.connectors.plc.test" />
+		<logger level="INFO" doc:name="Logger" message="#[sizeOf( payload )]" category="nl.teslanet.mule.connectors.plc.test" />
+		<logger level="INFO" doc:name="Logger" category="nl.teslanet.mule.connectors.plc.test" />
+	</flow>   
+	
+	<flow name="concurrent-write">
+		<foreach collection="#[[ 1,2, 3, 4 ]]" doc:name="Four times">
+			<async doc:name="Async" >
+		        <plc:write doc:name="Write" config-ref="PLC_Config_Concurrent">
+		            <reconnect count="5" frequency="500" />
+		            <plc:write-fields>
+		                <plc:write-field alias="one"
+		                    address="address1" values="#[ [ true, false ] ]" />
+		                <plc:write-field alias="two"
+		                    address="address2" values="#[[ '11', '22' ]]" />
+		            </plc:write-fields>
+		        </plc:write>
+				<logger level="INFO" doc:name="Logger" message="STORE" category="nl.teslanet.mule.connectors.plc.test" />
+				<logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test" />
+				<os:store doc:name="Store" key="#[vars.counter as String]" objectStore="write-responses">
+					<os:value ><![CDATA[#[payload]]]></os:value>
+				</os:store>
+				<logger level="INFO" doc:name="Logger" message="STORED" category="nl.teslanet.mule.connectors.plc.test" />
+				<logger level="INFO" doc:name="Logger" message="#[payload as String]" category="nl.teslanet.mule.connectors.plc.test" />
+			</async>
+		</foreach>
     </flow>
 
+ 	<flow name="concurrent-write-retrieve" >
+		<os:retrieve-all doc:name="Retrieve all" objectStore="write-responses" />
+		<logger level="INFO" doc:name="Logger" message="RETRIEVED" category="nl.teslanet.mule.connectors.plc.test" />
+		<logger level="INFO" doc:name="Logger" message="#[sizeOf( payload )]" category="nl.teslanet.mule.connectors.plc.test" />
+		<logger level="INFO" doc:name="Logger" category="nl.teslanet.mule.connectors.plc.test" />
+	</flow>   
 
 </mule>

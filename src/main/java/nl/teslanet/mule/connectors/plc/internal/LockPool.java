@@ -23,7 +23,7 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.ArrayDeque;
 import java.util.concurrent.locks.Lock;
 
 import org.mule.runtime.api.lock.LockFactory;
@@ -36,34 +36,34 @@ import org.mule.runtime.api.lock.LockFactory;
 public class LockPool
 {
     /**
-     * The locks of this pool are stored in a queue to create rotating usage of locks.
+     * The locks of this pool are stored in a deque to create rotating usage of locks.
      */
-    private final ArrayBlockingQueue< Lock > lockQueue;
+    private final ArrayDeque< Lock > locks;
 
     /**
      * Construct a lockpool.
-     * @param lockFactory The lockafactory used to create locks.
+     * @param lockFactory The lock factory used to create locks.
      * @param lockPrefix The lock id prefix that distinguishes locks of this pool.
      * @param poolSize The number of locks this pool has.
      */
     public LockPool( LockFactory lockFactory, String lockPrefix, int poolSize )
     {
-        lockQueue= new ArrayBlockingQueue< Lock >( poolSize );
+        locks= new ArrayDeque< Lock >();
         for ( int i= 0; i < poolSize; i++ )
         {
-            lockQueue.add( lockFactory.createLock( lockPrefix + i ) );
+            locks.add( lockFactory.createLock( lockPrefix + i ) );
         }
     }
 
     /**
-     * Allocate a lock. A lock is chosen that is free (is not actually locked) or - when no lock s free - is chosen using the round robin pointer.
+     * Allocate a lock. The lock is chosen using the round robin pointer.
      * The method blocks until 
      * @return the chosen lock in a locked state.
      */
-    public Lock getLock()
+    public synchronized Lock getLock()
     {
-        Lock lock= lockQueue.remove();
-        lockQueue.add( lock );
+        Lock lock= locks.removeFirst();
+        locks.addLast( lock );
         return lock;
     }
 }

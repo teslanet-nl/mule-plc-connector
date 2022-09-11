@@ -23,6 +23,7 @@
 package nl.teslanet.mule.connectors.plc.test;
 
 
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -31,11 +32,16 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.mock.connection.MockConnection;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -65,6 +71,12 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         return "testapps/concurrent.xml";
     }
 
+    @Before
+    public void settings()
+    {
+    	setDisposeContextPerClass( true );
+    }
+    
     /**
      * Setup the PLC mock.
      * @throws PlcConnectionException When retrieving the mock connection failed.
@@ -106,17 +118,14 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     }
 
     /**
-     * Test the ping operation.
+     * Test the ping operation. (MockDriver does not support ping).
      * @throws Exception When an error occurs.
      */
     @Test
     public void executePingOperation() throws Exception
     {
-        Exception e= assertThrows( Exception.class, () -> {
-            flowRunner( "concurrent-ping" ).run().getMessage().getPayload().getValue();
-        } );
-        assertTrue( "wrong exception message", e.getMessage().contains( "Protocol does not support ping." ) );
-        assertEquals( "wrong exception cause", UnsupportedException.class, e.getCause().getClass() );
+    	Message message= flowRunner( "concurrent-ping" ).run().getMessage();
+        assertEquals( "wrong ping result expected of responses", "false", getPayloadAsString( message ) );
     }
 
     /**
@@ -127,24 +136,38 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     public void executeReadOperation() throws Exception
     {
         Message message= flowRunner( "concurrent-read" ).keepStreamsOpen().run().getMessage();
-        String payloadValue= getPayloadAsString( message );
-        assertNotNull( payloadValue );
-        Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/concurrent_read_response_1.xml" ) ).withTest(
-            payloadValue
-        ).ignoreComments().ignoreWhitespace().build();
-        for ( Difference difference : diff.getDifferences() )
-        {
-            assertThat(
-                difference.toString(),
-                difference.getComparison().getControlDetails().getXPath(),
-                Matchers.either( 
-                    Matchers.is( "/plcReadResponse[1]/field[1]/values[1]/value[2]/text()[1]" ) ).or( 
-                    Matchers.is( "/plcReadResponse[1]/field[2]/values[1]/value[2]/text()[1]" ) ).or(
-                    Matchers.is( "/plcReadResponse[1]/field[1]/values[1]/value[3]/text()[1]" ) ).or( 
-                    Matchers.is( "/plcReadResponse[1]/field[2]/values[1]/value[3]/text()[1]" ) )
-            );
-        }
+        //let handler do its asynchronous work, if any
+        await( "retrieve responses" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+            Message retieved= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
+            @SuppressWarnings( "unchecked" )
+            Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
+            return responses.size() >= 4;
+        } );
 
+        message= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
+        @SuppressWarnings( "unchecked" )
+        Map< String, Object > responses= (Map< String, Object >) message.getPayload().getValue();
+        assertEquals( "wrong number of responses", 4, responses.size() );
+        for ( Entry< ? , ? > response : responses.entrySet() )
+        {
+            String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
+            assertNotNull( payloadValue );
+            Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/concurrent_read_response_1.xml" ) ).withTest(
+                payloadValue
+            ).ignoreComments().ignoreWhitespace().build();
+            for ( Difference difference : diff.getDifferences() )
+            {
+                assertThat(
+                    difference.toString(),
+                    difference.getComparison().getControlDetails().getXPath(),
+                    Matchers.either( Matchers.is( "/plcReadResponse[1]/field[1]/values[1]/value[2]/text()[1]" ) ).or(
+                        Matchers.is( "/plcReadResponse[1]/field[2]/values[1]/value[2]/text()[1]" )
+                    ).or( Matchers.is( "/plcReadResponse[1]/field[1]/values[1]/value[3]/text()[1]" ) ).or(
+                        Matchers.is( "/plcReadResponse[1]/field[2]/values[1]/value[3]/text()[1]" )
+                    )
+                );
+            }
+        }
     }
 
     /**
@@ -154,9 +177,39 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     @Test
     public void executeWriteOperation() throws Exception
     {
-        String payloadValue= TestUtils.toString( flowRunner( "concurrent-write" ).run().getMessage().getPayload().getValue() );
-        Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/write_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( diff.toString(), diff.hasDifferences() );
+        Message message= flowRunner( "concurrent-write" ).keepStreamsOpen().run().getMessage();
+        //let handler do its asynchronous work, if any
+        await( "retrieve responses" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 2, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+            Message retieved= flowRunner( "concurrent-write-retrieve" ).keepStreamsOpen().run().getMessage();
+            @SuppressWarnings( "unchecked" )
+            Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
+            return responses.size() >= 4;
+        } );
+
+        message= flowRunner( "concurrent-write-retrieve" ).keepStreamsOpen().run().getMessage();
+        @SuppressWarnings( "unchecked" )
+        Map< String, Object > responses= (Map< String, Object >) message.getPayload().getValue();
+        assertEquals( "wrong number of responses", 4, responses.size() );
+        for ( Entry< ? , ? > response : responses.entrySet() )
+        {
+            String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
+            assertNotNull( payloadValue );
+            Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/concurrent_write_response_1.xml" ) ).withTest(
+                payloadValue
+            ).ignoreComments().ignoreWhitespace().build();
+            for ( Difference difference : diff.getDifferences() )
+            {
+                assertThat(
+                    difference.toString(),
+                    difference.getComparison().getControlDetails().getXPath(),
+                    Matchers.either( Matchers.is( "/plcWriteResponse[1]/field[1]/values[1]/value[2]/text()[1]" ) ).or(
+                        Matchers.is( "/plcWriteResponse[1]/field[2]/values[1]/value[2]/text()[1]" )
+                    ).or( Matchers.is( "/plcWriteResponse[1]/field[1]/values[1]/value[3]/text()[1]" ) ).or(
+                        Matchers.is( "/plcWriteResponse[1]/field[2]/values[1]/value[3]/text()[1]" )
+                    )
+                );
+            }
+        }
     }
 
     /**

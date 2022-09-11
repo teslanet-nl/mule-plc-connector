@@ -32,7 +32,9 @@ import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.meta.ExternalLibraryType;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -52,6 +54,10 @@ import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionExce
  * It implements {@link CachedConnectionProvider} which lazily creates and caches connections .
  */
 @Alias( "connection" )
+@ExternalLib
+(
+    name= "PLC4X Driver", type= ExternalLibraryType.DEPENDENCY, requiredClassName= "org.apache.plc4x.java.api.PlcDriver", coordinates= "org.apache.plc4x:plc4j-driver-simulated:jar::0.9.1"
+)
 public class MulePlcConnectionProvider implements CachedConnectionProvider< MulePlcConnection >
 {
     /**
@@ -82,7 +88,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
      * The PLC driver manager.
      */
     //private static final PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
-    private static final PlcDriverManager driverManager= new PlcDriverManager( );
+    private static final PlcDriverManager driverManager= new PlcDriverManager();
 
     /**
      * @return the drivermanager

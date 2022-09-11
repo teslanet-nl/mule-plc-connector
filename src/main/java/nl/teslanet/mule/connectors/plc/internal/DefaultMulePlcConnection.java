@@ -130,7 +130,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         this.connectionString= connectionString;
         this.plcConnection= plcConnection;
 
-        ioLocks= ( concurrencyParams.getConcurrentIo() >= 0 ? new LockPool( lockFactory, this.toString() + "-subscribe-", concurrencyParams.getConcurrentIo() ) : null );
+        ioLocks= ( concurrencyParams.getConcurrentIo() >= 0 ? new LockPool( lockFactory, this.toString() + "-io-", concurrencyParams.getConcurrentIo() ) : null );
         readAllowed= ( concurrencyParams.getConcurrentReads() != 0 );
         readLocks= ( concurrencyParams.getConcurrentReads() > 0 ? new LockPool( lockFactory, this.toString() + "-read-", concurrencyParams.getConcurrentReads() ) : null );
         writeAllowed= ( concurrencyParams.getConcurrentWrites() != 0 );
