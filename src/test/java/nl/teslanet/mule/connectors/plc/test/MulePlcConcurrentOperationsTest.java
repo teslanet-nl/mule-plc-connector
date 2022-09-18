@@ -26,10 +26,7 @@ package nl.teslanet.mule.connectors.plc.test;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.xmlunit.matchers.HasXPathMatcher.hasXPath;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -40,19 +37,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.mock.connection.MockConnection;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.diff.Diff;
-import org.xmlunit.diff.Difference;
 
 import nl.teslanet.mule.connectors.plc.internal.MulePlcConnectionProvider;
-import nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException;
 import nl.teslanet.mule.connectors.plc.test.utils.TestPlc;
 
 
@@ -74,9 +66,9 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     @Before
     public void settings()
     {
-    	setDisposeContextPerClass( true );
+        setDisposeContextPerClass( true );
     }
-    
+
     /**
      * Setup the PLC mock.
      * @throws PlcConnectionException When retrieving the mock connection failed.
@@ -122,9 +114,9 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
      * @throws Exception When an error occurs.
      */
     @Test
-    public void executePingOperation() throws Exception
+    public void concurrentPingOperation() throws Exception
     {
-    	Message message= flowRunner( "concurrent-ping" ).run().getMessage();
+        Message message= flowRunner( "concurrent-ping" ).run().getMessage();
         assertEquals( "wrong ping result expected of responses", "false", getPayloadAsString( message ) );
     }
 
@@ -133,11 +125,11 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
      * @throws Exception When an error occurs.
      */
     @Test
-    public void executeReadOperation() throws Exception
+    public void concurrentReadOperation() throws Exception
     {
         Message message= flowRunner( "concurrent-read" ).keepStreamsOpen().run().getMessage();
         //let handler do its asynchronous work, if any
-        await( "retrieve responses" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+        await( "retrieve responses" ).pollDelay( 16, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
             Message retieved= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
             @SuppressWarnings( "unchecked" )
             Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
@@ -151,22 +143,8 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         for ( Entry< ? , ? > response : responses.entrySet() )
         {
             String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
-            assertNotNull( payloadValue );
-            Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/concurrent_read_response_1.xml" ) ).withTest(
-                payloadValue
-            ).ignoreComments().ignoreWhitespace().build();
-            for ( Difference difference : diff.getDifferences() )
-            {
-                assertThat(
-                    difference.toString(),
-                    difference.getComparison().getControlDetails().getXPath(),
-                    Matchers.either( Matchers.is( "/plcReadResponse[1]/field[1]/values[1]/value[2]/text()[1]" ) ).or(
-                        Matchers.is( "/plcReadResponse[1]/field[2]/values[1]/value[2]/text()[1]" )
-                    ).or( Matchers.is( "/plcReadResponse[1]/field[1]/values[1]/value[3]/text()[1]" ) ).or(
-                        Matchers.is( "/plcReadResponse[1]/field[2]/values[1]/value[3]/text()[1]" )
-                    )
-                );
-            }
+            assertThat( payloadValue, hasXPath( "/plcReadResponse/field[@alias = 'one' and @responseCode = 'OK']/values/value[text() = 'empty'] " ) );
+            assertThat( payloadValue, hasXPath( "/plcReadResponse/field[@alias = 'two' and @responseCode = 'OK']/values/value[text() = 'empty'] " ) );
         }
     }
 
@@ -175,11 +153,11 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
      * @throws Exception When an error occurs.
      */
     @Test
-    public void executeWriteOperation() throws Exception
+    public void concurrentWriteOperation() throws Exception
     {
         Message message= flowRunner( "concurrent-write" ).keepStreamsOpen().run().getMessage();
         //let handler do its asynchronous work, if any
-        await( "retrieve responses" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 2, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+        await( "retrieve responses" ).pollDelay( 16, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
             Message retieved= flowRunner( "concurrent-write-retrieve" ).keepStreamsOpen().run().getMessage();
             @SuppressWarnings( "unchecked" )
             Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
@@ -193,23 +171,55 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         for ( Entry< ? , ? > response : responses.entrySet() )
         {
             String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
-            assertNotNull( payloadValue );
-            Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/concurrent_write_response_1.xml" ) ).withTest(
-                payloadValue
-            ).ignoreComments().ignoreWhitespace().build();
-            for ( Difference difference : diff.getDifferences() )
-            {
-                assertThat(
-                    difference.toString(),
-                    difference.getComparison().getControlDetails().getXPath(),
-                    Matchers.either( Matchers.is( "/plcWriteResponse[1]/field[1]/values[1]/value[2]/text()[1]" ) ).or(
-                        Matchers.is( "/plcWriteResponse[1]/field[2]/values[1]/value[2]/text()[1]" )
-                    ).or( Matchers.is( "/plcWriteResponse[1]/field[1]/values[1]/value[3]/text()[1]" ) ).or(
-                        Matchers.is( "/plcWriteResponse[1]/field[2]/values[1]/value[3]/text()[1]" )
-                    )
-                );
-            }
+            assertThat( payloadValue, hasXPath( "/plcWriteResponse/field[@alias = 'one' and @responseCode = 'OK']" ) );
+            assertThat( payloadValue, hasXPath( "/plcWriteResponse/field[@alias = 'two' and @responseCode = 'OK']" ) );
         }
+    }
+
+    /**
+     * Test the write operation.
+     * @throws Exception When an error occurs.
+     */
+    @Test
+    public void concurrentSubscribeOperation() throws Exception
+    {
+        Message message= flowRunner( "concurrent-subscribe" ).keepStreamsOpen().run().getMessage();
+        //let handler do its asynchronous work, if any
+        await( "retrieve responses" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 2, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+            Message retieved= flowRunner( "concurrent-subscribe-retrieve" ).keepStreamsOpen().run().getMessage();
+            @SuppressWarnings( "unchecked" )
+            Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
+            return responses.size() >= 4;
+        } );
+
+        message= flowRunner( "concurrent-subscribe-retrieve" ).keepStreamsOpen().run().getMessage();
+        @SuppressWarnings( "unchecked" )
+        Map< String, Object > responses= (Map< String, Object >) message.getPayload().getValue();
+        assertEquals( "wrong number of responses", 4, responses.size() );
+        for ( Entry< ? , ? > response : responses.entrySet() )
+        {
+            String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
+            assertThat( payloadValue, hasXPath( "/plcSubscribeResponse/field[@alias = 'one' and @responseCode = 'OK']" ) );
+            assertThat( payloadValue, hasXPath( "/plcSubscribeResponse/field[@alias = 'two' and @responseCode = 'OK']" ) );
+        }
+        /*
+        message= flowRunner( "concurrent-write" ).keepStreamsOpen().run().getMessage();
+        await( "retrieve responses" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 2, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+            Message retieved= flowRunner( "concurrent-write-retrieve" ).keepStreamsOpen().run().getMessage();
+            @SuppressWarnings( "unchecked" )
+            Map< String, Object > responses2= (Map< String, Object >) retieved.getPayload().getValue();
+            return responses.size() >= 4;
+        } );
+        message= flowRunner( "concurrent-read" ).keepStreamsOpen().run().getMessage();
+        await( "retrieve responses" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 2, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+            Message retieved= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
+            @SuppressWarnings( "unchecked" )
+            Map< String, Object > responses3= (Map< String, Object >) retieved.getPayload().getValue();
+            return responses.size() >= 4;
+        } );
+        message= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
+        String result= getPayloadAsString( message );
+        */
     }
 
     /**

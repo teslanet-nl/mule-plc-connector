@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.test;
+package nl.teslanet.mule.connectors.plc.test.utils;
 
 
 import java.io.ByteArrayOutputStream;

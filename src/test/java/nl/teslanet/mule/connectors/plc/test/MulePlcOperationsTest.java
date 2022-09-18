@@ -43,6 +43,7 @@ import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;
 
 import nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException;
+import nl.teslanet.mule.connectors.plc.test.utils.TestUtils;
 
 
 public class MulePlcOperationsTest extends AbstractPlcTestCase
