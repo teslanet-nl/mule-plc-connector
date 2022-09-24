@@ -66,7 +66,6 @@ L%
 		<licensePath>LICENSE.txt</licensePath>
 		<plc4j.version>0.9.1</plc4j.version>
         <slf4jVersion>1.7.36</slf4jVersion>
-		<!--munit.version>2.3.12</munit.version-->
 		<xmlunit.version>2.9.0</xmlunit.version>
 	</properties>
 
@@ -141,31 +140,6 @@ Contributors:
 					</execution>
 				</executions>
 			</plugin>
-			<!--
-			<plugin>
-              <groupId>com.mulesoft.munit</groupId>
-              <artifactId>munit-extensions-maven-plugin</artifactId>
-              <dependencies>
-                <dependency>
-                  <groupId>com.mulesoft.munit</groupId>
-                  <artifactId>munit-runner</artifactId>
-                  <version>${munit.version}</version>
-                  <classifier>mule-plugin</classifier>
-                </dependency>
-                <dependency>
-                  <groupId>com.mulesoft.munit</groupId>
-                  <artifactId>munit-tools</artifactId>
-                  <version>${munit.version}</version>
-                  <classifier>mule-plugin</classifier>
-                </dependency>
-		        <dependency>
-		    	    <groupId>com.mulesoft.munit</groupId>
-					<artifactId>munit-maven-plugins-common</artifactId>
-		            <version>${munit.version}</version>
-		        </dependency>
-              </dependencies>
-            </plugin>
-            -->
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<executions>
@@ -179,9 +153,7 @@ Contributors:
 				</executions>
 				<configuration>
 					<forkCount>1</forkCount>
-					<!-- don't reuse because threads hang in mule tests -->
 					<reuseForks>false</reuseForks>
-					<!-- argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine -->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -258,7 +230,6 @@ Contributors:
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.17.2</version>
             <scope>test</scope>
         </dependency>
 		<dependency>
