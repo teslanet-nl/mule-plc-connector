@@ -44,6 +44,7 @@ import org.xmlunit.diff.Diff;
 
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
 import nl.teslanet.mule.connectors.plc.test.utils.MuleEventSpy;
+import nl.teslanet.mule.connectors.plc.test.utils.TestUtils;
 
 
 public class MulePlcSubscribeTest extends AbstractPlcTestCase
