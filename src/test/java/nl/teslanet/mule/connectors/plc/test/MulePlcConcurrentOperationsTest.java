@@ -40,6 +40,7 @@ import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.mock.connection.MockConnection;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -52,7 +53,7 @@ import org.slf4j.LoggerFactory;
 import nl.teslanet.mule.connectors.plc.internal.MulePlcConnectionProvider;
 import nl.teslanet.mule.connectors.plc.test.utils.TestPlc;
 
-
+@Ignore
 @RunnerDelegateTo( Parameterized.class )
 public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
 {
@@ -68,7 +69,15 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     {
         return Arrays.asList(
             new Object [] []
-            { { "testapps/concurrent-io.xml" }, { "testapps/concurrent-read.xml" }, { "testapps/concurrent-write.xml" }, { "testapps/concurrent-subscribe.xml" } }
+            {
+                { "testapps/concurrent-io.xml" },
+                { "testapps/concurrent-io-read.xml" },
+                { "testapps/concurrent-io-write.xml" },
+                { "testapps/concurrent-io-subscribe.xml" },
+                { "testapps/concurrent-read.xml" },
+                { "testapps/concurrent-write.xml" },
+                { "testapps/concurrent-subscribe.xml" },
+                { "testapps/concurrent-default.xml" } }
         );
     }
 
@@ -83,9 +92,10 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
      * @throws PlcConnectionException when connection failed
      */
     @Override
-    protected String getConfigFile()
+    protected String[] getConfigFiles()
     {
-        return config;
+        String[] configs= { "testapps/concurrent.xml", config };
+        return configs;
     }
 
     @Before

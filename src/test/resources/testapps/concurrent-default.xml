@@ -25,7 +25,7 @@
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-    xmlns:plc="http://www.teslanet.nl/schema/mule/plc"
+	xmlns:plc="http://www.teslanet.nl/schema/mule/plc"
 	xmlns:java="http://www.mulesoft.org/schema/mule/java"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
@@ -35,9 +35,9 @@ http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/cu
 http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 
-
-	<plc:config name="PLC_Config_Concurrent"  timeout="20" timeoutUnits="SECONDS">
-		<plc:connection connectionString="mock:test-plc" concurrentReads="1" />
+	<plc:config name="PLC_Config_Concurrent" timeout="20"
+		timeoutUnits="SECONDS">
+		<plc:connection connectionString="mock:test-plc" />
 	</plc:config>
-	
+
 </mule>
