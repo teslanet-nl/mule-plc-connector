@@ -229,23 +229,6 @@ Contributors:
 			</plugin>
 		</plugins>
 	</build>
-	<dependencyManagement>
-	<!--
-		<dependencies>
-		<dependency>
-			<groupId>org.apache.plc4x</groupId>
-			<artifactId>plc4j-driver-simulated</artifactId>
-			<version>${plc4j.version}</version>
-			<scope>test</scope>
-		</dependency>
-			<dependency>
-				<groupId>org.apache.plc4x</groupId>
-				<artifactId>plc4j-driver-mock</artifactId>
-				<version>${plc4j.version}</version>
-			</dependency>
-		</dependencies>
-		-->
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
