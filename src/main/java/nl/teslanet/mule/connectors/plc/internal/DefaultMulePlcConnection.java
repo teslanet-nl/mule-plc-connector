@@ -135,9 +135,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         readLocks= ( concurrencyParams.getConcurrentReads() > 0 ? new LockPool( lockFactory, this.toString() + "-read-", concurrencyParams.getConcurrentReads() ) : null );
         writeAllowed= ( concurrencyParams.getConcurrentWrites() != 0 );
         writeLocks= ( concurrencyParams.getConcurrentWrites() > 0 ? new LockPool( lockFactory, this.toString() + "-write-", concurrencyParams.getConcurrentWrites() ) : null );
-        subscribeAllowed= ( concurrencyParams.getConcurrentWrites() != 0 );
-        subscribeLocks= ( concurrencyParams.getConcurrentWrites() > 0
-            ? new LockPool( lockFactory, this.toString() + "-subscribe-", concurrencyParams.getConcurrentWrites() ) : null );
+        subscribeAllowed= ( concurrencyParams.getConcurrentSubscribes() != 0 );
+        subscribeLocks= ( concurrencyParams.getConcurrentSubscribes() > 0
+            ? new LockPool( lockFactory, this.toString() + "-subscribe-", concurrencyParams.getConcurrentSubscribes() ) : null );
         logger.info( "connection created { " + this + " }" );
     }
 
@@ -174,7 +174,6 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public synchronized void connect() throws InternalConnectionException
     {
-        ClassLoader actualClassLoader= plcConnection.getClass().getClassLoader();
         if ( !plcConnection.isConnected() )
         {
             try
@@ -187,10 +186,10 @@ public class DefaultMulePlcConnection implements MulePlcConnection
                 logger.error( "Failed reconnecting { " + this + "::" + plcConnection + " }" );
             }
             //TODO
-//            if ( !plcConnection.isConnected() )
-//            {
-//                throw new InternalConnectionException( "Error on connection { " + this + " }" );
-//            }
+            //            if ( !plcConnection.isConnected() )
+            //            {
+            //                throw new InternalConnectionException( "Error on connection { " + this + " }" );
+            //            }
         }
     }
 
@@ -396,7 +395,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     @Override
-    public synchronized PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
@@ -420,7 +419,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * @throws InternalConnectionException
      * @throws InternalConcurrencyException 
      */
-    public synchronized PlcSubscriptionResponse subscribeIoLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcSubscriptionResponse subscribeIoLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
@@ -449,7 +448,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * @throws TimeoutException
      * @throws InternalConnectionException
      */
-    public synchronized PlcSubscriptionResponse subscribeLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcSubscriptionResponse subscribeLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException
@@ -547,7 +546,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         PlcUnsubscriptionRequest.Builder builder= plcConnection.unsubscriptionRequestBuilder();
         builder.addHandles( toUnsubscribe );
         subscribeResponse= builder.build().execute().get( timeout, timeoutUnit );
-        fields.forEach( (field) -> handles.remove( field.getAlias() ) );
+        fields.forEach( ( field ) -> handles.remove( field.getAlias() ) );
         return subscribeResponse;
     }
 

@@ -23,8 +23,15 @@
 package nl.teslanet.mule.connectors.plc.test.utils;
 
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,13 +39,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Consumer;
 
+import org.apache.plc4x.java.api.messages.PlcReadRequest;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionEvent;
 import org.apache.plc4x.java.api.model.PlcConsumerRegistration;
+import org.apache.plc4x.java.api.model.PlcField;
 import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.apache.plc4x.java.api.value.PlcValue;
 import org.apache.plc4x.java.mock.connection.MockDevice;
+import org.apache.plc4x.java.mock.field.MockField;
 import org.apache.plc4x.java.mock.field.MockPlcValue;
+import org.apache.plc4x.java.mock.field.MockType;
 import org.apache.plc4x.java.spi.messages.utils.ResponseItem;
 import org.apache.plc4x.java.spi.values.PlcDATE_AND_TIME;
 import org.apache.plc4x.java.spi.values.PlcSTRING;
@@ -54,7 +65,7 @@ public class TestPlc implements MockDevice
     /**
      * The fields of the PLC.
      */
-    private ConcurrentHashMap< String, TestPlcValue > fields= new ConcurrentHashMap<>();
+    private ConcurrentHashMap< String, TestPlcField > fields= new ConcurrentHashMap<>();
 
     public TestPlc()
     {
@@ -63,12 +74,12 @@ public class TestPlc implements MockDevice
     @Override
     public ResponseItem< PlcValue > read( String fieldQuery )
     {
-        TestPlcValue field= fields.get( fieldQuery );
+        TestPlcField field= fields.get( fieldQuery );
         if ( field == null )
         {
-            field= new TestPlcValue();
-            field.setMember( "field", new PlcSTRING( fieldQuery ) );
-            field.setMember( "value", new PlcSTRING( "empty") );
+            field= new TestPlcField(fieldQuery);
+            field.setMember( "address", new PlcSTRING( fieldQuery ) );
+            field.setMember( "value", new PlcSTRING( "empty" ) );
             fields.put( fieldQuery, field );
         }
         field.setMember( "read_begin_dt", plcNow() );
@@ -87,15 +98,15 @@ public class TestPlc implements MockDevice
     @Override
     public PlcResponseCode write( String fieldQuery, Object value )
     {
-        TestPlcValue field= fields.get( fieldQuery );
+        TestPlcField field= fields.get( fieldQuery );
         //TestPlcValue field= null;
         if ( field == null )
         {
-            field= new TestPlcValue();
-            field.setMember( "field", new PlcSTRING( fieldQuery ) );
+            field= new TestPlcField(fieldQuery);
+            field.setMember( "address", new PlcSTRING( fieldQuery ) );
             fields.put( fieldQuery, field );
         }
-        field.setMember( "value", ((MockPlcValue) value) );
+        field.setMember( "value", new PlcSTRING( ( (MockPlcValue) value ).getObject(0).toString()) );
         field.setMember( "write_begin_dt", plcNow() );
         try
         {
@@ -106,20 +117,23 @@ public class TestPlc implements MockDevice
             return PlcResponseCode.REMOTE_BUSY;
         }
         field.setMember( "write_end_dt", plcNow() );
+        for ( Consumer< PlcSubscriptionEvent > client : field.consumers )
+        {
+            client.accept( new TestPlcSubscriptionEvent( field ) );
+        }
         return PlcResponseCode.OK;
     }
 
     @Override
     public ResponseItem< PlcSubscriptionHandle > subscribe( String fieldQuery )
     {
-        //TestPlcValue field= fields.get( fieldQuery );
-        TestPlcValue field= null;
+        TestPlcField field= fields.get( fieldQuery );
         if ( field == null )
         {
-            field= new TestPlcValue();
-            field.setMember( "field", new PlcSTRING( fieldQuery ) );
-            field.setMember( "value", new PlcSTRING( "empty") );
-            //fields.put( fieldQuery, field );
+            field= new TestPlcField(fieldQuery);
+            field.setMember( "address", new PlcSTRING( fieldQuery ) );
+            field.setMember( "value", new PlcSTRING( "empty" ) );
+            fields.put( fieldQuery, field );
         }
         field.setMember( "subscribe_begin_dt", plcNow() );
         try
@@ -153,17 +167,17 @@ public class TestPlc implements MockDevice
     }
 
     /**
-     * Handle storing subscriptions
      *
      */
-    class TestPlcValue implements PlcSubscriptionHandle
+    class TestPlcField extends MockField implements PlcSubscriptionHandle
     {
         private final ConcurrentHashMap< String, PlcValue > members= new ConcurrentHashMap<>();
 
         private final CopyOnWriteArraySet< Consumer< PlcSubscriptionEvent > > consumers= new CopyOnWriteArraySet<>();
 
-        public TestPlcValue()
+        public TestPlcField( String address )
         {
+            super(address, MockType.BOOL);
         }
 
         public PlcValue getMember( String key )
@@ -193,6 +207,552 @@ public class TestPlc implements MockDevice
         {
             consumers.remove( consumer );
         }
+
+        public void notifyConsumers()
+        {
+            for ( Consumer< PlcSubscriptionEvent > consumer : consumers )
+            {
+                consumer.accept( new TestPlcSubscriptionEvent( this ) );
+            }
+        }
+    }
+   
+    class TestPlcSubscriptionEvent implements PlcSubscriptionEvent
+    {
+        private final TestPlcField field;
+
+        private Instant ts;
+
+        public TestPlcSubscriptionEvent( TestPlcField testPlcField )
+        {
+            this.field= testPlcField;
+            this.ts= Instant.now();
+        }
+
+        @Override
+        public PlcReadRequest getRequest()
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public PlcValue getAsPlcValue()
+        {
+            return new PlcStruct( field.getMembers() );
+        }
+
+        @Override
+        public PlcValue getPlcValue( String name )
+        {
+            return new PlcStruct( field.getMembers() );
+        }
+
+        @Override
+        public int getNumberOfValues( String name )
+        {
+            return( field.getMember( name ) == null ? 0 : 1 );
+        }
+
+        @Override
+        public Object getObject( String name )
+        {
+            return field.getMember( name );
+        }
+
+        @Override
+        public Object getObject( String name, int index )
+        {
+            return( index == 0 ? field.getMember( name ) : null );
+        }
+
+        @Override
+        public Collection< Object > getAllObjects( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidBoolean( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidBoolean( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public Boolean getBoolean( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Boolean getBoolean( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< Boolean > getAllBooleans( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidByte( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidByte( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public Byte getByte( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Byte getByte( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< Byte > getAllBytes( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidShort( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidShort( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public Short getShort( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Short getShort( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< Short > getAllShorts( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidInteger( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidInteger( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public Integer getInteger( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Integer getInteger( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< Integer > getAllIntegers( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidBigInteger( String name )
+        {
+            // TODO Auto-generated method stubnull
+            return false;
+        }
+
+        @Override
+        public boolean isValidBigInteger( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public BigInteger getBigInteger( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public BigInteger getBigInteger( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< BigInteger > getAllBigIntegers( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidLong( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidLong( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public Long getLong( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Long getLong( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< Long > getAllLongs( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidFloat( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidFloat( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public Float getFloat( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Float getFloat( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< Float > getAllFloats( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidDouble( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidDouble( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public Double getDouble( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Double getDouble( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< Double > getAllDoubles( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidBigDecimal( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidBigDecimal( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public BigDecimal getBigDecimal( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public BigDecimal getBigDecimal( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< BigDecimal > getAllBigDecimals( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidString( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidString( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public String getString( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String getString( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< String > getAllStrings( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidTime( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidTime( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public LocalTime getTime( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public LocalTime getTime( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< LocalTime > getAllTimes( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidDate( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidDate( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public LocalDate getDate( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public LocalDate getDate( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< LocalDate > getAllDates( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isValidDateTime( String name )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isValidDateTime( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public LocalDateTime getDateTime( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public LocalDateTime getDateTime( String name, int index )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< LocalDateTime > getAllDateTimes( String name )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection< String > getFieldNames()
+        {
+            ArrayList< String > list= new ArrayList<>();
+            list.add( field.getMember( "address" ).getString() );
+            return Collections.unmodifiableList( list );
+        }
+
+        @Override
+        public PlcField getField( String name )
+        {
+            return field;
+        }
+
+        @Override
+        public PlcResponseCode getResponseCode( String name )
+        {
+            return( !name.equals( field.getMember( "address" ).getString() ) ? PlcResponseCode.INVALID_ADDRESS : PlcResponseCode.OK );
+        }
+
+        @Override
+        public Instant getTimestamp()
+        {
+            return ts;
+        }
     }
 
     class TestPlcConsumerRegistration implements PlcConsumerRegistration
@@ -207,7 +767,7 @@ public class TestPlc implements MockDevice
             this.handles.addAll( handles );
             for ( PlcSubscriptionHandle handle : this.handles )
             {
-                TestPlcValue field= (TestPlcValue) handle;
+                TestPlcField field= (TestPlcField) handle;
                 field.register( consumer );
             }
         }
@@ -230,7 +790,7 @@ public class TestPlc implements MockDevice
         {
             for ( PlcSubscriptionHandle handle : this.handles )
             {
-                TestPlcValue field= (TestPlcValue) handle;
+                TestPlcField field= (TestPlcField) handle;
                 field.unregister( consumer );
             }
         }

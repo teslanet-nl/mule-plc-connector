@@ -25,11 +25,13 @@ package nl.teslanet.mule.connectors.plc.test;
 
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
 import static org.junit.Assert.assertEquals;
 import static org.xmlunit.matchers.HasXPathMatcher.hasXPath;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -39,8 +41,11 @@ import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.mock.connection.MockConnection;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.test.runner.RunnerDelegateTo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +53,30 @@ import nl.teslanet.mule.connectors.plc.internal.MulePlcConnectionProvider;
 import nl.teslanet.mule.connectors.plc.test.utils.TestPlc;
 
 
+@RunnerDelegateTo( Parameterized.class )
 public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
 {
     @SuppressWarnings( "unused" )
-    private final Logger logger= LoggerFactory.getLogger( MulePlcConcurrentOperationsTest.class );
+    private final Logger LOGGER= LoggerFactory.getLogger( MulePlcConcurrentOperationsTest.class );
+
+    /**
+     * The list of tests with their parameters
+     * @return Test parameters.
+     */
+    @Parameters( name= "config= {0}" )
+    public static Collection< Object[] > data()
+    {
+        return Arrays.asList(
+            new Object [] []
+            { { "testapps/concurrent-io.xml" }, { "testapps/concurrent-read.xml" }, { "testapps/concurrent-write.xml" }, { "testapps/concurrent-subscribe.xml" } }
+        );
+    }
+
+    /**
+     * The mule flow to call.
+     */
+    @Parameter( 0 )
+    public String config;
 
     /**
      * Specifies the mule config xml with the flows that are going to be executed in the tests, this file lives in the test resources.
@@ -60,7 +85,7 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     @Override
     protected String getConfigFile()
     {
-        return "testapps/concurrent.xml";
+        return config;
     }
 
     @Before
@@ -77,36 +102,9 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        //super.doSetUpBeforeMuleContextCreation();
-        ClassLoader classLoader= getExecutionClassLoader();
-        //ClassLoader classLoader= getConnectorClassLoader().get();
-        //        //Class<?> drivermanagerClass= Class.forName( "org.apache.plc4x.java.PlcDriverManager", true, classLoader );
-        //        Class<?> drivermanagerClass= classLoader.loadClass("org.apache.plc4x.java.PlcDriverManager");
-        //        PlcDriverManager driverManager = (PlcDriverManager) drivermanagerClass.newInstance();
-        //        Method getConnection = drivermanagerClass.getDeclaredMethod("getConnection", String.class);
-        //        MockConnection connection= (MockConnection) getConnection.invoke( driverManager, "mock:test-plc");
-        //        connection.setDevice( new TestPlc() );
-        //        ClassLoader actualClassLoader= connection.getClass().getClassLoader();
-
-        ClassLoader contextClassLoader= Thread.currentThread().getContextClassLoader();
-        try
-        {
-            //Thread.currentThread().setContextClassLoader( classLoader );
-            //PlcDriverManager driverManager= new PlcDriverManager( classLoader );
-            PlcDriverManager driverManager= MulePlcConnectionProvider.getDrivermanager();
-            MockConnection connection= (MockConnection) driverManager.getConnection( "mock:test-plc" );
-            ClassLoader actualClassLoader= connection.getClass().getClassLoader();
-            connection.setDevice( new TestPlc() );
-        }
-        finally
-        {
-            //Thread.currentThread().setContextClassLoader( contextClassLoader );
-        }
-
-        //       PlcDriverManager driverManager = new PlcDriverManager();
-        //      MockConnection connection= (MockConnection) driverManager.getConnection( "mock:test-plc");
-        //      connection.setDevice( new TestPlc() );
-        //      ClassLoader actualClassLoader= connection.getClass().getClassLoader();
+        PlcDriverManager driverManager= MulePlcConnectionProvider.getDrivermanager();
+        MockConnection connection= (MockConnection) driverManager.getConnection( "mock:test-plc" );
+        connection.setDevice( new TestPlc() );
     }
 
     /**
@@ -129,7 +127,7 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     {
         Message message= flowRunner( "concurrent-read" ).keepStreamsOpen().run().getMessage();
         //let handler do its asynchronous work, if any
-        await( "retrieve responses" ).pollDelay( 16, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+        await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
             Message retieved= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
             @SuppressWarnings( "unchecked" )
             Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
@@ -157,7 +155,7 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     {
         Message message= flowRunner( "concurrent-write" ).keepStreamsOpen().run().getMessage();
         //let handler do its asynchronous work, if any
-        await( "retrieve responses" ).pollDelay( 16, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+        await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
             Message retieved= flowRunner( "concurrent-write-retrieve" ).keepStreamsOpen().run().getMessage();
             @SuppressWarnings( "unchecked" )
             Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
@@ -180,20 +178,19 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
      * Test the write operation.
      * @throws Exception When an error occurs.
      */
+    @SuppressWarnings( "unchecked" )
     @Test
     public void concurrentSubscribeOperation() throws Exception
     {
         Message message= flowRunner( "concurrent-subscribe" ).keepStreamsOpen().run().getMessage();
         //let handler do its asynchronous work, if any
-        await( "retrieve responses" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 2, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+        await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
             Message retieved= flowRunner( "concurrent-subscribe-retrieve" ).keepStreamsOpen().run().getMessage();
-            @SuppressWarnings( "unchecked" )
             Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
             return responses.size() >= 4;
         } );
 
         message= flowRunner( "concurrent-subscribe-retrieve" ).keepStreamsOpen().run().getMessage();
-        @SuppressWarnings( "unchecked" )
         Map< String, Object > responses= (Map< String, Object >) message.getPayload().getValue();
         assertEquals( "wrong number of responses", 4, responses.size() );
         for ( Entry< ? , ? > response : responses.entrySet() )
@@ -202,35 +199,27 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
             assertThat( payloadValue, hasXPath( "/plcSubscribeResponse/field[@alias = 'one' and @responseCode = 'OK']" ) );
             assertThat( payloadValue, hasXPath( "/plcSubscribeResponse/field[@alias = 'two' and @responseCode = 'OK']" ) );
         }
-        /*
-        message= flowRunner( "concurrent-write" ).keepStreamsOpen().run().getMessage();
-        await( "retrieve responses" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 2, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
-            Message retieved= flowRunner( "concurrent-write-retrieve" ).keepStreamsOpen().run().getMessage();
-            @SuppressWarnings( "unchecked" )
-            Map< String, Object > responses2= (Map< String, Object >) retieved.getPayload().getValue();
-            return responses.size() >= 4;
-        } );
-        message= flowRunner( "concurrent-read" ).keepStreamsOpen().run().getMessage();
-        await( "retrieve responses" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 2, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
-            Message retieved= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
-            @SuppressWarnings( "unchecked" )
-            Map< String, Object > responses3= (Map< String, Object >) retieved.getPayload().getValue();
-            return responses.size() >= 4;
-        } );
-        message= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
-        String result= getPayloadAsString( message );
-        */
-    }
 
-    /**
-     * Read resource as string.
-     *
-     * @param resourcePath the resource path
-     * @return the string
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private String readResourceAsString( String resourcePath ) throws IOException
-    {
-        return IOUtils.getResourceAsString( resourcePath, this.getClass() );
+        message= flowRunner( "concurrent-write-single" ).keepStreamsOpen().run().getMessage();
+
+        await( "retrieve events" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+            Message retieved= flowRunner( "concurrent-event-retrieve" ).keepStreamsOpen().run().getMessage();
+            Map< String, Object > responses3= (Map< String, Object >) retieved.getPayload().getValue();
+            return responses3.size() >= 2;
+        } );
+        message= flowRunner( "concurrent-event-retrieve" ).keepStreamsOpen().run().getMessage();
+        responses= (Map< String, Object >) message.getPayload().getValue();
+        assertEquals( "wrong number of responses", 2, responses.size() );
+        for ( Entry< ? , ? > response : responses.entrySet() )
+        {
+            String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
+            assertThat(
+                payloadValue,
+                anyOf(
+                    hasXPath( "/plcEvent/field[@alias = 'address_one:BOOL' and @responseCode = 'OK' and @type='BOOL']/values/value[@key='value' and text() = 'true'] " ),
+                    hasXPath( "/plcEvent/field[@alias = 'address_two:BOOL' and @responseCode = 'OK' and @type='BOOL']/values/value[@key='value' and text() = 'false'] " )
+                )
+            );
+        }
     }
 }
