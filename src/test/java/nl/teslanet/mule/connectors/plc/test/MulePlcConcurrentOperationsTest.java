@@ -40,6 +40,7 @@ import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.mock.connection.MockConnection;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -52,7 +53,7 @@ import org.slf4j.LoggerFactory;
 import nl.teslanet.mule.connectors.plc.internal.MulePlcConnectionProvider;
 import nl.teslanet.mule.connectors.plc.test.utils.TestPlc;
 
-
+@Ignore
 @RunnerDelegateTo( Parameterized.class )
 public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
 {
