@@ -68,7 +68,15 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     {
         return Arrays.asList(
             new Object [] []
-            { { "testapps/concurrent-io.xml" }, { "testapps/concurrent-read.xml" }, { "testapps/concurrent-write.xml" }, { "testapps/concurrent-subscribe.xml" } }
+            {
+                { "testapps/concurrent-io.xml" },
+                { "testapps/concurrent-io-read.xml" },
+                { "testapps/concurrent-io-write.xml" },
+                { "testapps/concurrent-io-subscribe.xml" },
+                { "testapps/concurrent-read.xml" },
+                { "testapps/concurrent-write.xml" },
+                { "testapps/concurrent-subscribe.xml" },
+                { "testapps/concurrent-default.xml" } }
         );
     }
 
@@ -83,9 +91,10 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
      * @throws PlcConnectionException when connection failed
      */
     @Override
-    protected String getConfigFile()
+    protected String[] getConfigFiles()
     {
-        return config;
+        String[] configs= { "testapps/concurrent.xml", config };
+        return configs;
     }
 
     @Before
