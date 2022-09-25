@@ -1,4 +1,3 @@
-default namespace = "https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd"
 
 start =
     element plcReadRequest { _readField * }
@@ -69,14 +68,22 @@ _valueField =
         ,
         attribute responseCode { _responseCodeContent }
         ,
-        attribute count { xsd:unsignedInt }
+        attribute count { xsd:unsignedInt } ?
         ,
-        attribute type { _typeContent }
+        attribute type { _typeContent } ?
         ,
-        element value { text } *
+        _values
     }
 
+_values=
+(
+	element values { _value * }
+	|
+	_value
+)
 
+_value= 
+	element value { text }
     
 _responseCodeContent= 
     ( 
@@ -97,9 +104,11 @@ _responseCodeContent=
 _typeContent= 
     ( 
           "BOOLEAN"
+        | "BOOL"
         | "BYTE"
         | "SHORT"
         | "INTEGER"
+        | "INT"
         | "LONG"
         | "FLOAT"
         | "DOUBLE"

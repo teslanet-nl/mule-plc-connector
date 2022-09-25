@@ -48,7 +48,7 @@ import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSeria
  * The received PLC messages are delivered to the listeners mule-flow.
  */
 @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
-@OutputXmlType(qname = "{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcEvent", schema = "nl/teslanet/mule/connectors/plc/v1/plc.xsd")
+@OutputXmlType(qname = "plcEvent", schema = "nl/teslanet/mule/connectors/plc/v1/plc.xsd")
 public class EventListener extends Source< InputStream, ReceivedResponseAttributes >
 {
     /**

@@ -30,12 +30,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.builder.DiffBuilder;
@@ -84,8 +81,9 @@ public class MulePlcDynamicConnectionTest extends AbstractPlcTestCase
     {
 
         String payloadValue= TestUtils.toString( flowRunner( "basic-read" ).withVariable( "connectionString", "simulated:plc2" ).run().getMessage().getPayload().getValue() );
+        TestUtils.validate( payloadValue );
         assertNotNull( payloadValue );
-        Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/read_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/read_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
         for ( Difference difference : diff.getDifferences() )
         {
             assertThat(
@@ -105,7 +103,10 @@ public class MulePlcDynamicConnectionTest extends AbstractPlcTestCase
     public void executeWriteOperation() throws Exception
     {
         String payloadValue= TestUtils.toString( flowRunner( "basic-write" ).withVariable( "connectionString", "simulated:plc2" ).run().getMessage().getPayload().getValue() );
-        Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/write_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/write_response_1.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
@@ -116,15 +117,19 @@ public class MulePlcDynamicConnectionTest extends AbstractPlcTestCase
     @Test
     public void executeWriteAndReadOperation() throws Exception
     {
-        String payloadWriteValue= TestUtils.toString( flowRunner( "basic-writestate" ).withVariable( "connectionString", "simulated:plc2" ).run().getMessage().getPayload().getValue() );
-        Diff writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/writestate_response_1.xml" ) ).withTest(
+        String payloadWriteValue= TestUtils.toString(
+            flowRunner( "basic-writestate" ).withVariable( "connectionString", "simulated:plc2" ).run().getMessage().getPayload().getValue()
+        );
+        TestUtils.validate( payloadWriteValue );
+        Diff writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/writestate_response_1.xml" ) ).withTest(
             payloadWriteValue
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         String payloadReadValue= (String) flowRunner( "basic-readstate" ).withVariable( "connectionString", "simulated:plc2" ).run().getMessage().getPayload().getValue();
+        TestUtils.validate( payloadReadValue );
         assertNotNull( payloadReadValue );
-        Diff readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/readstate_response_1.xml" ) ).withTest(
+        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/readstate_response_1.xml" ) ).withTest(
             payloadReadValue
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
@@ -137,35 +142,28 @@ public class MulePlcDynamicConnectionTest extends AbstractPlcTestCase
     @Test
     public void executeWriteAndReadOperation2() throws Exception
     {
-        String payloadWriteValue= TestUtils.toString( flowRunner( "basic-writestate" ).withVariable( "connectionString", "simulated:plc1" ).run().getMessage().getPayload().getValue() );
-        Diff writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/writestate_response_1.xml" ) ).withTest(
+        String payloadWriteValue= TestUtils.toString(
+            flowRunner( "basic-writestate" ).withVariable( "connectionString", "simulated:plc1" ).run().getMessage().getPayload().getValue()
+        );
+        TestUtils.validate( payloadWriteValue );
+        Diff writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/writestate_response_1.xml" ) ).withTest(
             payloadWriteValue
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         payloadWriteValue= TestUtils.toString( flowRunner( "basic-writestate2" ).withVariable( "connectionString", "simulated:plc2" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/writestate_response_2.xml" ) ).withTest(
+        TestUtils.validate( payloadWriteValue );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/writestate_response_2.xml" ) ).withTest(
             payloadWriteValue
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         String payloadReadValue= (String) flowRunner( "basic-readstate" ).withVariable( "connectionString", "simulated:plc1" ).run().getMessage().getPayload().getValue();
+        TestUtils.validate( payloadReadValue );
         assertNotNull( payloadReadValue );
-        Diff readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/readstate_response_1.xml" ) ).withTest(
+        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/readstate_response_1.xml" ) ).withTest(
             payloadReadValue
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
-    }
-
-    /**
-     * Read resource as string.
-     *
-     * @param resourcePath the resource path
-     * @return the string
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private String readResourceAsString( String resourcePath ) throws IOException
-    {
-        return IOUtils.getResourceAsString( resourcePath, this.getClass() );
     }
 }

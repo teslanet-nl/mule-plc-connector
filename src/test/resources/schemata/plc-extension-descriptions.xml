@@ -261,7 +261,7 @@
                 </parameter>
             </parameters>
         </type>
-        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcEvent">
+        <type name="plcEvent">
             <description><![CDATA[]]></description>
             <parameters>
                 <parameter name="plcEvent">
@@ -269,7 +269,7 @@
                 </parameter>
             </parameters>
         </type>
-        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcReadRequest">
+        <type name="plcReadRequest">
             <description><![CDATA[]]></description>
             <parameters>
                 <parameter name="plcReadRequest">
@@ -277,7 +277,7 @@
                 </parameter>
             </parameters>
         </type>
-        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcReadResponse">
+        <type name="plcReadResponse">
             <description><![CDATA[]]></description>
             <parameters>
                 <parameter name="plcReadResponse">
@@ -285,7 +285,7 @@
                 </parameter>
             </parameters>
         </type>
-        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcSubscribeResponse">
+        <type name="plcSubscribeResponse">
             <description><![CDATA[]]></description>
             <parameters>
                 <parameter name="plcSubscribeResponse">
@@ -293,7 +293,7 @@
                 </parameter>
             </parameters>
         </type>
-        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcUnsubscribeResponse">
+        <type name="plcUnsubscribeResponse">
             <description><![CDATA[]]></description>
             <parameters>
                 <parameter name="plcUnsubscribeResponse">
@@ -301,7 +301,7 @@
                 </parameter>
             </parameters>
         </type>
-        <type name="{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcWriteResponse">
+        <type name="plcWriteResponse">
             <description><![CDATA[]]></description>
             <parameters>
                 <parameter name="plcWriteResponse">

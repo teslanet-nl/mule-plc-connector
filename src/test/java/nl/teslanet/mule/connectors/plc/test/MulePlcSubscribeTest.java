@@ -26,17 +26,14 @@ package nl.teslanet.mule.connectors.plc.test;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.junit.Test;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.builder.DiffBuilder;
@@ -75,7 +72,8 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         spy2.clear();
 
         String response= TestUtils.toString( flowRunner( "subscribe-write-1" ).run().getMessage().getPayload().getValue() );
-        Diff writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
+        TestUtils.validate( response );
+        Diff writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
             response
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
@@ -90,12 +88,18 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
 
         //subscribe
         response= TestUtils.toString( flowRunner( "subscribe-subscribe" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscribe_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscribe_response_1.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //second write
         response= TestUtils.toString( flowRunner( "subscribe-write-1" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -115,8 +119,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         ReceivedResponseAttributes attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         String payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        Diff readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
 
         spyMessage= (Message) spy2.getEvents().get( 0 ).getContent();
@@ -128,13 +134,18 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
 
         //third write
         response= TestUtils.toString( flowRunner( "subscribe-write-2" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_2.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_2.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -154,8 +165,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
 
         spyMessage= (Message) spy2.getEvents().get( 1 ).getContent();
@@ -167,8 +180,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
     }
 
@@ -185,7 +200,8 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         spy2.clear();
 
         String response= TestUtils.toString( flowRunner( "subscribe-write-1" ).run().getMessage().getPayload().getValue() );
-        Diff writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
+        TestUtils.validate( response );
+        Diff writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
             response
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
@@ -200,17 +216,26 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
 
         //subscribe 2a
         response= TestUtils.toString( flowRunner( "subscribe-subscribe-2a" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscribe_response_2a.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscribe_response_2a.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //subscribe 2b
         response= TestUtils.toString( flowRunner( "subscribe-subscribe-2b" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscribe_response_2b.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscribe_response_2b.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //second write
         response= TestUtils.toString( flowRunner( "subscribe-write-1" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -230,13 +255,18 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         ReceivedResponseAttributes attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         String payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        Diff readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
 
         //third write
         response= TestUtils.toString( flowRunner( "subscribe-write-2" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_2.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_2.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -256,8 +286,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
     }
 
@@ -274,7 +306,8 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         spy2.clear();
 
         String response= TestUtils.toString( flowRunner( "subscribe-write-1" ).run().getMessage().getPayload().getValue() );
-        Diff writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
+        TestUtils.validate( response );
+        Diff writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
             response
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
@@ -289,12 +322,18 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
 
         //subscribe
         response= TestUtils.toString( flowRunner( "subscribe-subscribe" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscribe_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscribe_response_1.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //second write
         response= TestUtils.toString( flowRunner( "subscribe-write-1" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -314,8 +353,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         ReceivedResponseAttributes attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         String payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        Diff readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
 
         spyMessage= (Message) spy2.getEvents().get( 0 ).getContent();
@@ -327,13 +368,18 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
 
         //third write
         response= TestUtils.toString( flowRunner( "subscribe-write-2" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_2.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_2.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -353,8 +399,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
 
         spyMessage= (Message) spy2.getEvents().get( 1 ).getContent();
@@ -366,18 +414,26 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
 
         //unsubscribe
         response= TestUtils.toString( flowRunner( "subscribe-unsubscribe" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/unsubscribe_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/unsubscribe_response_1.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //fourth write
         response= TestUtils.toString( flowRunner( "subscribe-write-3" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_3.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_3.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -400,7 +456,8 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         spy.clear();
 
         String response= TestUtils.toString( flowRunner( "subscribe-write-1" ).run().getMessage().getPayload().getValue() );
-        Diff writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
+        TestUtils.validate( response );
+        Diff writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
             response
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
@@ -412,12 +469,18 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
 
         //subscribe
         response= TestUtils.toString( flowRunner( "subscribe-subscribe" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscribe_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscribe_response_1.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //second write
         response= TestUtils.toString( flowRunner( "subscribe-write-1" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_1.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -434,13 +497,18 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         ReceivedResponseAttributes attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         String payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        Diff readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
 
         //third write
         response= TestUtils.toString( flowRunner( "subscribe-write-2" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_2.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_2.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -457,18 +525,26 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
 
         //unsubscribe
         response= TestUtils.toString( flowRunner( "subscribe-unsubscribe-partial" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/unsubscribe_response_1.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/unsubscribe_response_1.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //fourth write
         response= TestUtils.toString( flowRunner( "subscribe-write-3" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_3.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_3.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -478,7 +554,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
 
         //fifth write
         response= TestUtils.toString( flowRunner( "subscribe-write-2" ).run().getMessage().getPayload().getValue() );
-        writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_write_response_2.xml" ) ).withTest( response ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( response );
+        writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_write_response_2.xml" ) ).withTest(
+            response
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         //let handler do its asynchronous work, if any
@@ -495,20 +574,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         attributes= (ReceivedResponseAttributes) spyMessage.getAttributes().getValue();
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
-        assertNotNull( payloadValue );
-        readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
-    }
-
-    /**
-     * Read resource as string.
-     *
-     * @param resourcePath the resource path
-     * @return the string
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private String readResourceAsString( String resourcePath ) throws IOException
-    {
-        return IOUtils.getResourceAsString( resourcePath, this.getClass() );
     }
 }

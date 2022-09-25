@@ -44,7 +44,6 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -116,11 +115,11 @@ public class MulePlcOperations
     */
     @MediaType( value= MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
-    @OutputXmlType( qname= "{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcReadResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
+    @OutputXmlType( qname= "plcReadResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
     public Result< InputStream, ReceivedResponseAttributes > read( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection,
-        @InputXmlType( qname= "{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcReadRequest", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
+        @InputXmlType( qname= "plcReadRequest", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
         @Content
         @Optional
         @Expression( ExpressionSupport.SUPPORTED )
@@ -182,7 +181,7 @@ public class MulePlcOperations
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
-    @OutputXmlType( qname= "{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcWriteResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
+    @OutputXmlType( qname= "plcWriteResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
     public Result< InputStream, ReceivedResponseAttributes > write( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
@@ -238,7 +237,7 @@ public class MulePlcOperations
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( SubscribeErrorProvider.class )
-    @OutputXmlType( qname= "{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcSubscribeResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
+    @OutputXmlType( qname= "plcSubscribeResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
     public Result< InputStream, ReceivedResponseAttributes > subscribe( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Event Handling" )
@@ -307,7 +306,7 @@ public class MulePlcOperations
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( SubscribeErrorProvider.class )
-    @OutputXmlType( qname= "{https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd}plcUnsubscribeResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
+    @OutputXmlType( qname= "plcUnsubscribeResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
     public Result< InputStream, ReceivedResponseAttributes > unsubscribe( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Subscription" )

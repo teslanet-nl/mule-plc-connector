@@ -62,11 +62,6 @@ import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionExceptio
 public class XmlSerializer
 {
     /**
-     * The XML namspace to use.
-     */
-    public static final String NS= "https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd";
-            
-    /**
     * Xml transformer factory for processing responses.
     */
     private static final TransformerFactory TRANSFORMER_FACTORY;
@@ -118,7 +113,7 @@ public class XmlSerializer
         Document doc= dBuilder.newDocument();
 
         // root element
-        Element rootElement= doc.createElementNS( NS, "plcReadResponse" );
+        Element rootElement= doc.createElement( "plcReadResponse" );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response, alias -> response.getPlcValue( alias ) );
@@ -137,7 +132,7 @@ public class XmlSerializer
         Document doc= dBuilder.newDocument();
 
         // root element
-        Element rootElement= doc.createElementNS( NS, "plcWriteResponse" );
+        Element rootElement= doc.createElement( "plcWriteResponse" );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response, alias -> response.getRequest().getPlcValue( alias ) );
@@ -156,7 +151,7 @@ public class XmlSerializer
         Document doc= dBuilder.newDocument();
 
         // root element
-        Element rootElement= doc.createElementNS( NS, "plcSubscribeResponse" );
+        Element rootElement= doc.createElement( "plcSubscribeResponse" );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response );
@@ -175,7 +170,7 @@ public class XmlSerializer
         Document doc= dBuilder.newDocument();
 
         // root element
-        Element rootElement= doc.createElementNS( NS, "plcUnsubscribeResponse" );
+        Element rootElement= doc.createElement( "plcUnsubscribeResponse" );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, response );
@@ -194,7 +189,7 @@ public class XmlSerializer
         Document doc= dBuilder.newDocument();
 
         // root element
-        Element rootElement= doc.createElementNS( NS, "plcEvent" );
+        Element rootElement= doc.createElement( "plcEvent" );
         //TODO add timestamp
         doc.appendChild( rootElement );
         //build content

@@ -196,7 +196,6 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public boolean isConnected()
     {
-        ClassLoader actualClassLoader= plcConnection.getClass().getClassLoader();
         //in case connection lost, try to reconnect first
         //TODO remove connect attempt
         try

@@ -52,6 +52,8 @@ import org.slf4j.LoggerFactory;
 
 import nl.teslanet.mule.connectors.plc.internal.MulePlcConnectionProvider;
 import nl.teslanet.mule.connectors.plc.test.utils.TestPlc;
+import nl.teslanet.mule.connectors.plc.test.utils.TestUtils;
+
 
 @Ignore
 @RunnerDelegateTo( Parameterized.class )
@@ -151,6 +153,7 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         for ( Entry< ? , ? > response : responses.entrySet() )
         {
             String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
+            TestUtils.validate( payloadValue );
             assertThat( payloadValue, hasXPath( "/plcReadResponse/field[@alias = 'one' and @responseCode = 'OK']/values/value[text() = 'empty'] " ) );
             assertThat( payloadValue, hasXPath( "/plcReadResponse/field[@alias = 'two' and @responseCode = 'OK']/values/value[text() = 'empty'] " ) );
         }
@@ -179,6 +182,7 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         for ( Entry< ? , ? > response : responses.entrySet() )
         {
             String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
+            TestUtils.validate( payloadValue );
             assertThat( payloadValue, hasXPath( "/plcWriteResponse/field[@alias = 'one' and @responseCode = 'OK']" ) );
             assertThat( payloadValue, hasXPath( "/plcWriteResponse/field[@alias = 'two' and @responseCode = 'OK']" ) );
         }
@@ -206,6 +210,7 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         for ( Entry< ? , ? > response : responses.entrySet() )
         {
             String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
+            TestUtils.validate( payloadValue );
             assertThat( payloadValue, hasXPath( "/plcSubscribeResponse/field[@alias = 'one' and @responseCode = 'OK']" ) );
             assertThat( payloadValue, hasXPath( "/plcSubscribeResponse/field[@alias = 'two' and @responseCode = 'OK']" ) );
         }
@@ -223,6 +228,7 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         for ( Entry< ? , ? > response : responses.entrySet() )
         {
             String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
+            TestUtils.validate( payloadValue );
             assertThat(
                 payloadValue,
                 anyOf(

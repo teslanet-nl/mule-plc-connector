@@ -21,7 +21,7 @@
   limitations under the License.
   #L%
   -->
-<plcEvent xmlns="https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd">
+<plcEvent >
   <field alias="coil1" responseCode="OK">
     <values>
       <value>true</value>

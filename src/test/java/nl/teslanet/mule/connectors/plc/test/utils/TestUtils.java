@@ -26,12 +26,21 @@ package nl.teslanet.mule.connectors.plc.test.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -40,6 +49,28 @@ import org.mule.runtime.core.api.util.IOUtils;
  */
 public class TestUtils
 {
+    static final String JAXP_SCHEMA_LANGUAGE= "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+
+    static final String W3C_XML_SCHEMA= "http://www.w3.org/2001/XMLSchema";
+
+    static final DocumentBuilderFactory dbf= DocumentBuilderFactory.newInstance();
+
+    private static Schema schema;
+
+    static
+    {
+        try
+        {
+            String xsd= readResourceAsString( "nl/teslanet/mule/connectors/plc/v1/plc.xsd" );
+            SchemaFactory sf= SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+            schema= sf.newSchema( new StreamSource( new StringReader( xsd ) ) );
+        }
+        catch ( SAXException | IOException e1 )
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+    }
 
     /**
      * No instances needed.
@@ -47,6 +78,12 @@ public class TestUtils
     private TestUtils()
     {
         // NOOP
+    }
+
+    public static void validate( String xml ) throws SAXException, IOException
+    {
+        Validator validator= schema.newValidator();
+        validator.validate( new StreamSource( new StringReader( xml ) ) );
     }
 
     /**
@@ -60,7 +97,19 @@ public class TestUtils
     {
         return IOUtils.getResourceAsString( resourcePath, TestUtils.class );
     }
-    
+
+    /**
+     * Read resource as string.
+     *
+     * @param resourcePath the resource path
+     * @return the input stream
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public static InputStream readResourceAsInputStream( String resourcePath ) throws IOException
+    {
+        return IOUtils.getResourceAsStream( resourcePath, TestUtils.class );
+    }
+
     /**
      * Convert some payload to string.
      *
@@ -95,7 +144,7 @@ public class TestUtils
         }
         else if ( object instanceof InputStream )
         {
-            return IOUtils.toString( (InputStream) object, StandardCharsets.UTF_8  );
+            return IOUtils.toString( (InputStream) object, StandardCharsets.UTF_8 );
         }
         else if ( object instanceof byte[] )
         {

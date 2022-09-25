@@ -21,7 +21,7 @@
   limitations under the License.
   #L%
   -->
-<plcSubscribeResponse xmlns="https://www.teslanet.nl/schema/mule/connectors/plc/v1/plc.xsd">
+<plcSubscribeResponse >
 	<field alias="coil1" responseCode="OK"/>
 </plcSubscribeResponse>
 
