@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -20,40 +20,30 @@
  * limitations under the License.
  * #L%
  */
-package nl.teslanet.mule.connectors.plc.internal.error;
+package nl.teslanet.mule.connectors.plc.internal.exception;
 
 
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-
-
-/**
- * PLC Connector Errors.
- *
- */
-public enum Errors implements ErrorTypeDefinition< Errors >
+public class InternalConcurrencyException extends Exception
 {
+
     /**
-     * The operation called is not supported by the protocol used.
+     * Serial version id.
      */
-    UNSUPPORTED,
+    private static final long serialVersionUID= 1L;
 
     /**
-    * One or more fields could not be read or written successfully.
-    */
-    IO_ERROR,
-
-    /**
-    * Concurrency limitations prohibited IO.
-    */
-    CONCURRENCY_ERROR,
-
-    /**
-    * An internal error occurred during execution of an operation.
-    */
-    EXECUTION_ERROR,
-
-    /**
-     * A handlername is used that is invalid.
+     * Default constructor.
      */
-    INVALID_HANDLER_NAME,
+    public InternalConcurrencyException()
+    {
+        super();
+    }
+
+    /**
+     * Construct exception with message.
+     */
+    public InternalConcurrencyException( String msg )
+    {
+        super( msg );
+    }
 }

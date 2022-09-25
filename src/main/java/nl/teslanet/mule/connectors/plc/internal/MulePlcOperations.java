@@ -46,6 +46,7 @@ import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
 import nl.teslanet.mule.connectors.plc.api.Subscription;
 import nl.teslanet.mule.connectors.plc.api.Unsubscription;
 import nl.teslanet.mule.connectors.plc.api.WriteRequestBuilder;
+import nl.teslanet.mule.connectors.plc.internal.error.ConcurrencyException;
 import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionException;
 import nl.teslanet.mule.connectors.plc.internal.error.InvalidHandlerNameException;
 import nl.teslanet.mule.connectors.plc.internal.error.IoErrorException;
@@ -53,6 +54,7 @@ import nl.teslanet.mule.connectors.plc.internal.error.OperationErrorProvider;
 import nl.teslanet.mule.connectors.plc.internal.error.PingErrorProvider;
 import nl.teslanet.mule.connectors.plc.internal.error.SubscribeErrorProvider;
 import nl.teslanet.mule.connectors.plc.internal.error.UnsupportedException;
+import nl.teslanet.mule.connectors.plc.internal.exception.InternalConcurrencyException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalInvalidHandlerNameException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
@@ -101,6 +103,7 @@ public class MulePlcOperations
     * @return The readResponse as Result
     * @throws ConnectionException 
     * @throws InterruptedException When the operation was interrupted.
+     * @throws InternalConcurrencyException When the operation is not allowed.
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
@@ -127,6 +130,10 @@ public class MulePlcOperations
         {
             throw new ConnectionException( "Connection Error on read.", e );
         }
+        catch ( InternalConcurrencyException e )
+        {
+            throw new ConcurrencyException( "Concurrency Error on read.", e );
+        }
         if ( response == null )
         {
             throw new ConnectorExecutionException( "Null response on read." );
@@ -152,6 +159,7 @@ public class MulePlcOperations
     * @return The writeResponse as Result.
     * @throws ConnectionException When connection is lost.
     * @throws InterruptedException When the operation was interrupted.
+     * @throws InternalConcurrencyException 
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
@@ -177,6 +185,10 @@ public class MulePlcOperations
         catch ( InternalConnectionException | TimeoutException e )
         {
             throw new ConnectionException( "Connection Error on write.", e );
+        }
+        catch ( InternalConcurrencyException e )
+        {
+            throw new ConcurrencyException( "Concurrency Error on read.", e );
         }
         if ( response == null )
         {
@@ -240,6 +252,10 @@ public class MulePlcOperations
         {
             throw new ConnectionException( "Connection Error on subscription.", e );
         }
+        catch ( InternalConcurrencyException e )
+        {
+            throw new ConcurrencyException( "Concurrency Error on subscribe.", e );
+        }
         if ( response == null )
         {
             throw new ConnectorExecutionException( "Null response on subscription." );
@@ -292,6 +308,10 @@ public class MulePlcOperations
         catch ( InternalConnectionException | TimeoutException e )
         {
             throw new ConnectionException( "Connection Error on subscription.", e );
+        }
+        catch ( InternalConcurrencyException e )
+        {
+            throw new ConcurrencyException( "Concurrency Error on unsubscribe.", e );
         }
         if ( response == null )
         {

@@ -23,14 +23,20 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
+import javax.inject.Inject;
+
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.meta.ExternalLibraryType;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +54,10 @@ import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionExce
  * It implements {@link CachedConnectionProvider} which lazily creates and caches connections .
  */
 @Alias( "connection" )
+@ExternalLib
+(
+    name= "PLC4X Driver", type= ExternalLibraryType.DEPENDENCY, requiredClassName= "org.apache.plc4x.java.api.PlcDriver", coordinates= "org.apache.plc4x:plc4j-driver-simulated:jar::0.9.1"
+)
 public class MulePlcConnectionProvider implements CachedConnectionProvider< MulePlcConnection >
 {
     /**
@@ -56,13 +66,37 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     private static final Logger logger= LoggerFactory.getLogger( MulePlcConnectionProvider.class );
 
     /**
+     * Mule's lockfactory 
+     */
+    @Inject
+    private LockFactory lockFactory;
+
+    /**
      * The connection string of the plc.
      */
     @Parameter
     @Summary( "The connection string of the PLC." )
     private String connectionString;
 
-    private static final PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
+    /**
+     * The concurrency parameters controlling the number of allowed concurrent IO on the connection.
+     */
+    @ParameterGroup( name= "Concurrency" )
+    private ConcurrencyParams concurrencyParams;
+
+    /**
+     * The PLC driver manager.
+     */
+    //private static final PlcDriverManager driverManager= new PlcDriverManager( MulePlcConnectionProvider.class.getClassLoader() );
+    private static final PlcDriverManager driverManager= new PlcDriverManager();
+
+    /**
+     * @return the drivermanager
+     */
+    public static PlcDriverManager getDrivermanager()
+    {
+        return driverManager;
+    }
 
     /**
      * Connect to PLC using the connection string.
@@ -75,7 +109,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         try
         {
             PlcConnection plcConnnection= driverManager.getConnection( connectionString );
-            connection= new DefaultMulePlcConnection( connectionString, plcConnnection );
+            connection= new DefaultMulePlcConnection( connectionString, plcConnnection, lockFactory, concurrencyParams );
             connection.connect();
         }
         catch ( InternalConnectionException | PlcConnectionException e )
@@ -97,6 +131,9 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         logger.info( "Disconnected { " + connection + "::" + connectionString + " }" );
     }
 
+    /**
+     * Validate the connection.
+     */
     @Override
     public ConnectionValidationResult validate( MulePlcConnection connection )
     {

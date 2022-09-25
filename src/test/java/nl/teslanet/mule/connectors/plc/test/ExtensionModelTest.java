@@ -82,7 +82,6 @@ public class ExtensionModelTest extends AbstractGeneratedResourceFactoryTestCase
         assertEquals( resource.getPath(), modelResourcePath );
         String expected= IOUtils.toString( currentThread().getContextClassLoader().getResource( expectedResourcePath ).openStream() );
         String content= new String( resource.getContent() );
-        logger.info( "\n---\n" + content + "\n---" );
         Source expectedSource= Input.from( expected ).build();
         Source contentSource= Input.from( content ).build();
         Diff diff= DiffBuilder.compare( expectedSource ).withTest( contentSource ).checkForSimilar()
@@ -100,6 +99,10 @@ public class ExtensionModelTest extends AbstractGeneratedResourceFactoryTestCase
                         //.withDocumentBuilerFactory(factory)
                         .ignoreElementContentWhitespace().build();
 
+        if ( diff.hasDifferences() )
+        {
+            logger.warn( "\n---\n" + content + "\n---" );
+        }
         assertFalse( diff.toString(), diff.hasDifferences() );
 
     }

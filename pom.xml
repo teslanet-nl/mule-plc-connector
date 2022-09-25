@@ -30,12 +30,12 @@ L%
 	<parent>
 		<groupId>org.mule.extensions</groupId>
 		<artifactId>mule-modules-parent</artifactId>
-		<version>1.1.9</version>
+		<version>1.1.10</version>
 	</parent>
 	
 	<groupId>nl.teslanet.mule.connectors.plc</groupId>
 	<artifactId>mule-plc-connector</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<packaging>mule-extension</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>Mule extension that enables Mule-applications to communicate with PLC systems.</description>
@@ -65,12 +65,14 @@ L%
 		<category>Community</category>
 		<licensePath>LICENSE.txt</licensePath>
 		<plc4j.version>0.9.1</plc4j.version>
+        <slf4jVersion>1.7.36</slf4jVersion>
+		<xmlunit.version>2.9.0</xmlunit.version>
 	</properties>
 
 	<scm>
 		<connection>scm:git:https://github.com/teslanet-nl/mule-plc-connector.git</connection>
 		<developerConnection>scm:git:https://github.com/teslanet-nl/mule-plc-connector.git</developerConnection>
-		<url>http://github.com/teslanet-nl/mule-plc-connector/tree/main</url>
+		<url>https://github.com/teslanet-nl/mule-plc-connector/tree/main</url>
 		<tag>HEAD</tag>
 	</scm>
 
@@ -151,9 +153,7 @@ Contributors:
 				</executions>
 				<configuration>
 					<forkCount>1</forkCount>
-					<!-- don't reuse because threads hang in mule tests -->
 					<reuseForks>false</reuseForks>
-					<!-- argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine -->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -218,14 +218,21 @@ Contributors:
 			<artifactId>plc4j-spi</artifactId>
 			<version>${plc4j.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.36</version>
-		</dependency>
 				
 		<!--  test dependencies  -->
 
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4jVersion}</version>
+			<scope>provided</scope>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.17.2</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.mule.runtime</groupId>
 			<artifactId>mule-module-extensions-support</artifactId>
@@ -234,15 +241,15 @@ Contributors:
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.plc4x</groupId>
-			<artifactId>plc4j-driver-simulated</artifactId>
-			<version>${plc4j.version}</version>
+			<groupId>org.xmlunit</groupId>
+			<artifactId>xmlunit-core</artifactId>
+			<version>${xmlunit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.xmlunit</groupId>
-			<artifactId>xmlunit-core</artifactId>
-			<version>2.9.0</version>
+			<artifactId>xmlunit-matchers</artifactId>
+			<version>${xmlunit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -257,6 +264,24 @@ Contributors:
             <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
+		<dependency>
+			<groupId>org.apache.plc4x</groupId>
+			<artifactId>plc4j-driver-simulated</artifactId>
+			<version>${plc4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.plc4x</groupId>
+		  <artifactId>plc4j-transport-test</artifactId>
+		  <version>${plc4j.version}</version>
+		  <scope>test</scope>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.plc4x</groupId>
+		  <artifactId>plc4j-driver-mock</artifactId>
+		  <version>0.9.1</version>
+		  <scope>test</scope>
+		</dependency>
         <dependency>
             <groupId>org.mule.module</groupId>
             <artifactId>mule-java-module</artifactId>
@@ -264,7 +289,13 @@ Contributors:
             <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
-        
+        <dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-objectstore-connector</artifactId>
+			<version>1.2.1</version>
+			<classifier>mule-plugin</classifier>
+		    <scope>test</scope>
+		</dependency>
         
         <!--  explicit transients needed for ArtifactClassLoaderRunnerConfig -->
         

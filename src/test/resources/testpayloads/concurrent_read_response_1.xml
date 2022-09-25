@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  #%L
+  Mule PLC Connector
+  %%
+  Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+  
+  Contributors:
+      (teslanet.nl) Rogier Cobben - initial creation
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+  <plcReadResponse>
+<field alias="one" responseCode="OK">
+<values>
+<value key="field">address1</value>
+<value key="end">2022-09-03T17:35:43</value>
+<value key="begin">2022-09-03T17:35:41</value>
+</values>
+</field>
+<field alias="two" responseCode="OK">
+<values>
+<value key="field">address2</value>
+<value key="end">2022-09-03T17:35:45</value>
+<value key="begin">2022-09-03T17:35:43</value>
+</values>
+</field>
+</plcReadResponse>
