@@ -34,18 +34,12 @@ import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcUnsubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.annotation.metadata.fixed.InputXmlType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import nl.teslanet.mule.connectors.plc.api.EventHandlingGroup;
@@ -122,17 +116,8 @@ public class MulePlcOperations
     @OutputXmlType( qname= "plcReadResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
     public Result< InputStream, ReceivedResponseAttributes > read( @Config
     MulePlcConfig configuration, @Connection
-    MulePlcConnection connection,
-        @InputXmlType( qname= "plcReadRequest", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
-        @Content
-        @Optional
-        @Expression( ExpressionSupport.SUPPORTED )
-        @Summary( "The XML specification of PLC items to read." )
-        InputStream xmlReadFields,
-        @ParameterGroup( name= "Request" )
-        ReadRequestBuilder requestBuilder
-    ) throws ConnectionException,
-        InterruptedException
+    MulePlcConnection connection, @ParameterGroup( name= "Request" )
+    ReadRequestBuilder requestBuilder ) throws ConnectionException, InterruptedException
     {
         // Check if this connection support reading of data.
         if ( !connection.canRead() )

@@ -88,9 +88,6 @@
         <operation name="read">
             <description><![CDATA[Read PLC flields.]]></description>
             <parameters>
-                <parameter name="xmlReadFields">
-                    <description><![CDATA[]]></description>
-                </parameter>
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
                 </parameter>
@@ -268,14 +265,6 @@
             <description><![CDATA[]]></description>
             <parameters>
                 <parameter name="plcEvent">
-                    <description><![CDATA[]]></description>
-                </parameter>
-            </parameters>
-        </type>
-        <type name="plcReadRequest">
-            <description><![CDATA[]]></description>
-            <parameters>
-                <parameter name="plcReadRequest">
                     <description><![CDATA[]]></description>
                 </parameter>
             </parameters>
