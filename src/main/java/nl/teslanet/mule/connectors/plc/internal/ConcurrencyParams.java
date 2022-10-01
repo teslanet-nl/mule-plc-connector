@@ -47,6 +47,14 @@ public class ConcurrencyParams
     private int concurrentIo;
 
     /**
+     * Number of concurrent ping operations per connection.
+     */
+    @Parameter
+    @Optional( defaultValue= "-1" )
+    @Summary( "The number of concurrent ping operations per connection. \nWhen negative the number is unlimited." )
+    private int concurrentPings;
+
+    /**
      * Number of concurrent reads per connection.
      */
     @Parameter
@@ -84,6 +92,22 @@ public class ConcurrencyParams
     public void setConcurrentIo( int concurrentIo )
     {
         this.concurrentIo= concurrentIo;
+    }
+
+    /**
+     * @return the concurrentPings
+     */
+    public int getConcurrentPings()
+    {
+        return concurrentPings;
+    }
+
+    /**
+     * @param concurrentPings the concurrentPings to set
+     */
+    public void setConcurrentPings( int concurrentPings )
+    {
+        this.concurrentPings= concurrentPings;
     }
 
     /**

@@ -44,6 +44,9 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 			</reconnection>
 		</os:connection>
 	</os:config>
+	<os:object-store name="ping-responses"
+		doc:name="Object store" config-ref="ObjectStore_Config"
+		persistent="false" />
 	<os:object-store name="read-responses"
 		doc:name="Object store" config-ref="ObjectStore_Config"
 		persistent="false" />
@@ -63,14 +66,43 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 	<plc:event-handler name="Event_handler" />
 
 	<flow name="concurrent-ping">
-		<!-- parallel-foreach collection="#[[ 1, 2, 3, 4 ]]" -->
-		<plc:ping doc:name="Ping" config-ref="PLC_Config_Concurrent" />
-		<!--/parallel-foreach -->
-		<logger level="INFO" doc:name="Logger" message="#[payload]"
-			category="nl.teslanet.mule.connectors.plc.test" />
+		<foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
+			<async doc:name="Async">
+				<flow-ref doc:name="ping"
+					doc:id="efa4e4d2-9baa-4f59-9dd1-ff49d046b1dc"
+					name="concurrent-ping-single" />
+				<logger level="INFO" doc:name="Logger" message="STORE ping" category="nl.teslanet.mule.connectors.plc.test" />
+				<logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test" />
+				<os:store doc:name="Store" key="#[vars.counter]" objectStore="ping-responses">
+					<os:value ><![CDATA[#[payload]]]></os:value>
+				</os:store>
+				<logger level="INFO" doc:name="Logger" message="STORED ping" category="nl.teslanet.mule.connectors.plc.test" />
+				<logger level="INFO" doc:name="Logger" message="#[payload]" category="nl.teslanet.mule.connectors.plc.test" />
+			</async>
+		</foreach>
+	</flow>
+	
+	<flow name="concurrent-ping-single">
+		<plc:ping doc:name="Ping" config-ref="PLC_Config_Concurrent" >
+		    <reconnect count="5" frequency="500" />
+		</plc:ping>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On unsupported Error Continue" type="PLC:UNSUPPORTED">
+				<set-payload value="UNSUPPORTED ERROR" doc:name="UNSUPPORTED ERROR" />
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On any Error Continue" type="PLC:CONNECTIVITY, PLC:RETRY_EXHAUSTED, EXPRESSION, STREAM_MAXIMUM_SIZE_EXCEEDED">
+				<set-payload value="ANY ERROR" doc:name="ANY ERROR" />
+			</on-error-continue>
+		</error-handler>
 	</flow>
 
-
+ 	<flow name="concurrent-ping-retrieve" >
+		<os:retrieve-all doc:name="Retrieve all" objectStore="ping-responses" />
+		<logger level="INFO" doc:name="Logger" message="RETRIEVED ping" category="nl.teslanet.mule.connectors.plc.test" />
+		<logger level="INFO" doc:name="Logger" message="#[sizeOf( payload )]" category="nl.teslanet.mule.connectors.plc.test" />
+		<logger level="INFO" doc:name="Logger" category="nl.teslanet.mule.connectors.plc.test" />
+	</flow>   
+	
 	<flow name="concurrent-read">
 		<foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
 			<async doc:name="Async">

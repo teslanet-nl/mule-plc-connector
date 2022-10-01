@@ -71,9 +71,11 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
             new Object [] []
             {
                 { "testapps/concurrent-io.xml" },
+                { "testapps/concurrent-io-ping.xml" },
                 { "testapps/concurrent-io-read.xml" },
                 { "testapps/concurrent-io-write.xml" },
                 { "testapps/concurrent-io-subscribe.xml" },
+                { "testapps/concurrent-ping.xml" },
                 { "testapps/concurrent-read.xml" },
                 { "testapps/concurrent-write.xml" },
                 { "testapps/concurrent-subscribe.xml" },
@@ -124,8 +126,24 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     @Test
     public void concurrentPingOperation() throws Exception
     {
-        Message message= flowRunner( "concurrent-ping" ).run().getMessage();
-        assertEquals( "wrong ping result expected of responses", "false", getPayloadAsString( message ) );
+        Message message= flowRunner( "concurrent-ping" ).keepStreamsOpen().run().getMessage();
+        //let handler do its asynchronous work, if any
+        await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+            Message retieved= flowRunner( "concurrent-ping-retrieve" ).keepStreamsOpen().run().getMessage();
+            @SuppressWarnings( "unchecked" )
+            Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
+            return responses.size() >= 4;
+        } );
+
+        message= flowRunner( "concurrent-ping-retrieve" ).keepStreamsOpen().run().getMessage();
+        @SuppressWarnings( "unchecked" )
+        Map< String, Object > responses= (Map< String, Object >) message.getPayload().getValue();
+        assertEquals( "wrong number of responses", 4, responses.size() );
+        for ( Entry< ? , ? > response : responses.entrySet() )
+        {
+            String payloadValue= response.getValue().toString();
+            assertEquals( "response has wrong value", "UNSUPPORTED ERROR", payloadValue);
+        }
     }
 
     /**
