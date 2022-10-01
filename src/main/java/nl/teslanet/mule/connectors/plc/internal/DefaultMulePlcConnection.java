@@ -45,7 +45,6 @@ import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.lock.LockFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,12 +84,17 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     protected final PlcConnection plcConnection;
 
     /**
-     * The read lock pool to control concurrent reads.
+     * The ping operations are allowed by user.
+     */
+    protected final boolean pingAllowed;
+
+    /**
+     * The read operations are allowed by user.
      */
     protected final boolean readAllowed;
 
     /**
-     * The read lock pool to control concurrent writes.
+     * The write operations are allowed by user.
      */
     protected final boolean writeAllowed;
 
@@ -105,12 +109,17 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     protected final LockPool ioLocks;
 
     /**
+     * The ping lock pool to control concurrent ping.
+     */
+    protected final LockPool pingLocks;
+
+    /**
      * The read lock pool to control concurrent reads.
      */
     protected final LockPool readLocks;
 
     /**
-     * The read lock pool to control concurrent writes.
+     * The write lock pool to control concurrent writes.
      */
     protected final LockPool writeLocks;
 
@@ -131,6 +140,8 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         this.plcConnection= plcConnection;
 
         ioLocks= ( concurrencyParams.getConcurrentIo() >= 0 ? new LockPool( lockFactory, this.toString() + "-io-", concurrencyParams.getConcurrentIo() ) : null );
+        pingAllowed= ( concurrencyParams.getConcurrentPings() != 0 );
+        pingLocks= ( concurrencyParams.getConcurrentPings() > 0 ? new LockPool( lockFactory, this.toString() + "-ping-", concurrencyParams.getConcurrentPings() ) : null );
         readAllowed= ( concurrencyParams.getConcurrentReads() != 0 );
         readLocks= ( concurrencyParams.getConcurrentReads() > 0 ? new LockPool( lockFactory, this.toString() + "-read-", concurrencyParams.getConcurrentReads() ) : null );
         writeAllowed= ( concurrencyParams.getConcurrentWrites() != 0 );
@@ -171,6 +182,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         }
     }
 
+    /**
+     * Connect to PLC
+     */
     @Override
     public synchronized void connect() throws InternalConnectionException
     {
@@ -193,10 +207,12 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         }
     }
 
+    /**
+     * Return true when the connection is valid.
+     */
     @Override
     public boolean isConnected()
     {
-        ClassLoader actualClassLoader= plcConnection.getClass().getClassLoader();
         //in case connection lost, try to reconnect first
         //TODO remove connect attempt
         try
@@ -210,18 +226,22 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         return plcConnection.isConnected();
     }
 
-    //TODO concurrency
     /**
-     * Ping operation
+     * Ping IO locked.
+     * @throws InternalUnsupportedException 
      */
     @Override
-    public synchronized Boolean ping() throws InterruptedException, InternalUnsupportedException
+    public Boolean pingIoLocked( long timeout, TimeUnit timeoutUnit ) throws InterruptedException, InternalConcurrencyException, InternalUnsupportedException
     {
+        if ( !pingAllowed ) throw new InternalConcurrencyException( "No ping allowed on this connection." );
+        Lockable< Boolean > operation= () -> {
+            return pingLocked( timeout, timeoutUnit );
+        };
         try
         {
-            plcConnection.ping().get();
+            return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
         }
-        catch ( ExecutionException e )
+        catch ( TimeoutException | InternalConnectionException | ExecutionException e )
         {
             if ( e.getCause() instanceof PlcUnsupportedOperationException )
             {
@@ -229,7 +249,68 @@ public class DefaultMulePlcConnection implements MulePlcConnection
             }
             return Boolean.FALSE;
         }
-        return Boolean.TRUE;
+    }
+
+    /**
+     * Ping locked.
+     * @param timeout Operation timeout.
+     * @param timeoutUnit Unit of the timeout value.
+     * @return True when the PLC is reached, otherwise False
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws InternalConcurrencyException When operation is not allowed.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not established.
+     * @throws InternalUnsupportedException 
+     */
+    private Boolean pingLocked( long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+        TimeoutException,
+        InternalConcurrencyException,
+        ExecutionException,
+        InternalConnectionException,
+        InternalUnsupportedException
+    {
+        if ( pingLocks == null )
+        {
+            return ping( timeout, timeoutUnit );
+        }
+        else
+        {
+            Lockable< Boolean > operation= () -> {
+                return ping( timeout, timeoutUnit );
+            };
+            return operation.doLocked( pingLocks, operation, timeout, timeoutUnit );
+        }
+    }
+
+    /**
+     * Ping operation
+     * @param timeout Operation timeout.
+     * @param timeoutUnit Unit of the timeout value.
+     * @return True when the PLC is reached, otherwise False
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalUnsupportedException When ping operation is not supported by device.
+     */
+    public Boolean ping( long timeout, TimeUnit timeoutUnit ) throws InterruptedException, ExecutionException, InternalUnsupportedException
+    {
+        try
+        {
+            plcConnection.ping().get( timeout, timeoutUnit );
+            return Boolean.TRUE;
+        }
+        catch ( ExecutionException e )
+        {
+            if ( e.getCause() instanceof UnsupportedOperationException )
+            {
+                throw new InternalUnsupportedException( "Ping operation not support by device.", e );
+            }
+            throw e;
+        }
+        catch ( TimeoutException e )
+        {
+            return Boolean.FALSE;
+        }
     }
 
     @Override
@@ -240,55 +321,70 @@ public class DefaultMulePlcConnection implements MulePlcConnection
 
     /**
      * Read PLC fields.
+     * @throws InternalUnsupportedException 
      */
     @Override
-    public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcReadResponse readIoLocked( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException
+        InternalConcurrencyException,
+        InternalUnsupportedException
     {
         if ( !readAllowed ) throw new InternalConcurrencyException( "No read allowed on this connection." );
         Lockable< PlcReadResponse > operation= () -> {
-            return readIoLocked( fields, timeout, timeoutUnit );
+            return readLocked( fields, timeout, timeoutUnit );
         };
         return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
     }
 
     /**
-     * Read PLC fields.
+     * Read PLC fields locked.
+     * @param fields The PLC fields to read.
+     * @param timeout Operation timeout.
+     * @param timeoutUnit Unit of the timeout value.
+     * @return The PLC fields read.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws InternalConcurrencyException When operation is not allowed.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not established.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
-    private PlcReadResponse readIoLocked( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    private PlcReadResponse readLocked( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException
+        InternalConcurrencyException,
+        InternalUnsupportedException
     {
         if ( readLocks == null )
         {
-            return readLocked( fields, timeout, timeoutUnit );
+            return read( fields, timeout, timeoutUnit );
         }
         else
         {
             Lockable< PlcReadResponse > operation= () -> {
-                return readLocked( fields, timeout, timeoutUnit );
+                return read( fields, timeout, timeoutUnit );
             };
             return operation.doLocked( readLocks, operation, timeout, timeoutUnit );
         }
     }
 
     /**
-     * @param fields
-     * @param timeout
-     * @param timeoutUnit
-     * @return
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws TimeoutException
-     * @throws InternalConnectionException
-     * @throws InternalConcurrencyException
+     * Read PLC fields.
+     * @param fields The PLC fields to read.
+     * @param timeout Operation timeout.
+     * @param timeoutUnit Unit of the timeout value.
+     * @return The PLC fields read.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
-    private PlcReadResponse readLocked( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    private PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
@@ -313,64 +409,70 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     /**
-     * Read PLC fields.
+     * Write PLC fields IO locked.
      */
     @Override
-    public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcWriteResponse writeIoLocked( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException
+        InternalConcurrencyException,
+        InternalUnsupportedException
     {
         if ( !writeAllowed ) throw new InternalConcurrencyException( "No write allowed on this connection." );
         Lockable< PlcWriteResponse > operation= () -> {
-            return writeIoLocked( fields, timeout, timeoutUnit );
+            return writeLocked( fields, timeout, timeoutUnit );
         };
         return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
     }
 
     /**
-     * @param fields
-     * @param timeout
-     * @param timeoutUnit
-     * @return
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws TimeoutException
-     * @throws InternalConnectionException
-     * @throws InternalConcurrencyException
-     */
-    private PlcWriteResponse writeIoLocked( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    * Write PLC fields locked.
+    * @param fields The PLC fields to write.
+    * @param timeout Operation timeout.
+    * @param timeoutUnit Unit of the timeout value.
+    * @return The PLC fields written.
+    * @throws InterruptedException When the operations is interrupted.
+    * @throws TimeoutException When operation duration exceeds timeout period.
+    * @throws ExecutionException When execution failed.
+    * @throws InternalConnectionException When connection to PLC is not establishe
+    * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+    * @throws InternalUnsupportedException When the operation is not supported by device.
+    */
+    private PlcWriteResponse writeLocked( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException
+        InternalConcurrencyException,
+        InternalUnsupportedException
     {
         if ( writeLocks == null )
         {
-            return writeLocked( fields, timeout, timeoutUnit );
+            return write( fields, timeout, timeoutUnit );
         }
         else
         {
             Lockable< PlcWriteResponse > operation= () -> {
-                return writeLocked( fields, timeout, timeoutUnit );
+                return write( fields, timeout, timeoutUnit );
             };
             return operation.doLocked( writeLocks, operation, timeout, timeoutUnit );
         }
     }
 
     /**
-     * @param fields
-     * @param timeout
-     * @param timeoutUnit
-     * @return
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws TimeoutException
-     * @throws InternalConnectionException
-     * @throws InternalConcurrencyException
+     * Write PLC fields.
+     * @param fields The PLC fields to write.
+     * @param timeout Operation timeout.
+     * @param timeoutUnit Unit of the timeout value.
+     * @return The PLC fields written.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
-    private PlcWriteResponse writeLocked( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    private PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
@@ -386,7 +488,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     /**
-     *
+     * Establish that the connection supports subscription.
      */
     @Override
     public boolean canSubscribe()
@@ -394,61 +496,71 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         return( subscribeAllowed && plcConnection.getMetadata().canSubscribe() );
     }
 
+    /**
+     * Subscribe to PLC fields.
+     */
     @Override
-    public PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcSubscriptionResponse subscribeIoLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException
+        InternalConcurrencyException,
+        InternalUnsupportedException
     {
         if ( !subscribeAllowed ) throw new InternalConcurrencyException( "No subscribe allowed on this connection." );
         Lockable< PlcSubscriptionResponse > operation= () -> {
-            return subscribeIoLocked( fields, timeout, timeoutUnit );
+            return subscribeLocked( fields, timeout, timeoutUnit );
         };
         return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
     }
 
     /**
-     * @param fields
-     * @param timeout
-     * @param timeoutUnit
-     * @return
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws TimeoutException
-     * @throws InternalConnectionException
-     * @throws InternalConcurrencyException 
+     * Subscribe to PLC fields locked.
+     * @param fields The PLC fields to write.
+     * @param timeout Operation timeout.
+     * @param timeoutUnit Unit of the timeout value.
+     * @return The PLC fields subscribed to.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
-    public PlcSubscriptionResponse subscribeIoLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcSubscriptionResponse subscribeLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException
+        InternalConcurrencyException,
+        InternalUnsupportedException
     {
         if ( subscribeLocks == null )
         {
-            return subscribeLocked( fields, timeout, timeoutUnit );
+            return subscribe( fields, timeout, timeoutUnit );
         }
         else
         {
             Lockable< PlcSubscriptionResponse > operation= () -> {
-                return subscribeLocked( fields, timeout, timeoutUnit );
+                return subscribe( fields, timeout, timeoutUnit );
             };
             return operation.doLocked( subscribeLocks, operation, timeout, timeoutUnit );
         }
     }
 
     /**
-     * @param fields
-     * @param timeout
-     * @param timeoutUnit
-     * @return
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws TimeoutException
-     * @throws InternalConnectionException
+     * Subscribe to PLC fields.
+     * @param fields The PLC fields to write.
+     * @param timeout Operation timeout.
+     * @param timeoutUnit Unit of the timeout value.
+     * @return The PLC fields subscribed to.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
-    public PlcSubscriptionResponse subscribeLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException
@@ -471,63 +583,71 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     /**
-     *
+     * Unsubscribe to PLC fields IO locked.
+     * @throws InternalUnsupportedException 
      */
     @Override
-    public PlcUnsubscriptionResponse unSubscribe( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcUnsubscriptionResponse unSubscribeIoLocked( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException
+        InternalConcurrencyException,
+        InternalUnsupportedException
     {
         if ( !subscribeAllowed ) throw new InternalConcurrencyException( "No subscribe allowed on this connection." );
         Lockable< PlcUnsubscriptionResponse > operation= () -> {
-            return unSubscribeIoLocked( fields, timeout, timeoutUnit );
+            return unsubscribeLocked( fields, timeout, timeoutUnit );
         };
         return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
     }
 
     /**
-     * @param fields
-     * @param timeout
-     * @param timeoutUnit
-     * @return
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws TimeoutException
-     * @throws InternalConnectionException
-     * @throws InternalConcurrencyException
+     * Unsubscribe to PLC fields locked.
+     * @param fields The PLC fields to write.
+     * @param timeout Operation timeout.
+     * @param timeoutUnit Unit of the timeout value.
+     * @return The PLC fields unsubscribed to.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
-    public PlcUnsubscriptionResponse unSubscribeIoLocked( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcUnsubscriptionResponse unsubscribeLocked( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException
+        InternalConcurrencyException,
+        InternalUnsupportedException
     {
         if ( subscribeLocks == null )
         {
-            return unSubscribeLocked( fields, timeout, timeoutUnit );
+            return unsubscribe( fields, timeout, timeoutUnit );
         }
         else
         {
             Lockable< PlcUnsubscriptionResponse > operation= () -> {
-                return unSubscribeLocked( fields, timeout, timeoutUnit );
+                return unsubscribe( fields, timeout, timeoutUnit );
             };
             return operation.doLocked( subscribeLocks, operation, timeout, timeoutUnit );
         }
     }
 
     /**
-     * @param fields
-     * @param timeout
-     * @param timeoutUnit
-     * @return
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws TimeoutException
-     * @throws InternalConnectionException
+     * Unsubscribe to PLC fields.
+     * @param fields The PLC fields to write.
+     * @param timeout Operation timeout.
+     * @param timeoutUnit Unit of the timeout value.
+     * @return The PLC fields unsubscribed to.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
-    public PlcUnsubscriptionResponse unSubscribeLocked( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcUnsubscriptionResponse unsubscribe( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException
@@ -551,30 +671,42 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     }
 
     /**
-     * Interface for IO lockable operations.
-     *
+     * Interface for lockable operations.
      */
     @FunctionalInterface
     private interface Lockable< R >
     {
-        R run() throws InterruptedException, ExecutionException, TimeoutException, InternalConnectionException, InternalConcurrencyException;
+        /**
+         * Execute the operation
+         * @return The result.
+         * @throws InterruptedException When the operations is interrupted.
+         * @throws TimeoutException When operation duration exceeds timeout period.
+         * @throws ExecutionException When execution failed.
+         * @throws InternalConnectionException When connection to PLC is not establishe
+         * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+         * @throws InternalUnsupportedException When the operation is not supported by device.
+         */
+        R run() throws InterruptedException, ExecutionException, TimeoutException, InternalUnsupportedException, InternalConnectionException, InternalConcurrencyException;
 
         /**
-         * @param fields
-         * @param timeout
-         * @param timeoutUnit
-         * @return
-         * @throws InterruptedException
-         * @throws ExecutionException
-         * @throws TimeoutException
-         * @throws InternalConnectionException
-         * @throws InternalConcurrencyException
+         * @param pool The pool with locks. When null no locking is done.
+         * @param operation The operation to execute locked.
+         * @param timeout Operation timeout.
+         * @param timeoutUnit Unit of the timeout value.
+         * @return The result.
+         * @throws InterruptedException When the operations is interrupted.
+         * @throws TimeoutException When operation duration exceeds timeout period.
+         * @throws ExecutionException When execution failed.
+         * @throws InternalConnectionException When connection to PLC is not establishe
+         * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+         * @throws InternalUnsupportedException When the operation is not supported by device.
          */
         default R doLocked( LockPool pool, Lockable< R > operation, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
             ExecutionException,
             TimeoutException,
             InternalConnectionException,
-            InternalConcurrencyException
+            InternalConcurrencyException,
+            InternalUnsupportedException
         {
             if ( pool == null )
             {
