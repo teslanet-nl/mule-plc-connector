@@ -133,7 +133,7 @@ public class EventProcessor implements Consumer< PlcSubscriptionEvent >
 
     /**
      * Register this as handler for the subscription.
-     * @param subscriptionName the name of the subscription.
+     * @param subscriptionResponse The subscription response containing the handles.
      */
     public synchronized void register( PlcSubscriptionResponse subscriptionResponse )
     {

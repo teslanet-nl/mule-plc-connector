@@ -66,11 +66,14 @@ public interface MulePlcConnection
 
     /**
      * Ping the PLC using this connection.
+     * @param timeout Read response must be received within the timout.
+     * @param timeUnit Unit of the timeout parameter.
      * @return {@code true} when the PLC is reachable, otherwise {@code false}
      * @throws InterruptedException When the operation was interrupted.
-     * @throws InternalUnsupportedException When the operation is not supported by protocol used.
+     * @throws InternalConcurrencyException When a read operation is not allowed.
+     * @throws InternalUnsupportedException When ping is not supported by driver.
      */
-    public Boolean ping() throws InterruptedException, InternalUnsupportedException;
+    public Boolean pingIoLocked( long timeout, TimeUnit timeUnit ) throws InterruptedException, InternalConcurrencyException, InternalUnsupportedException;
 
     /**
      * @return {@code true} when the connection can be used to read, otherwise {@code false}.
@@ -78,22 +81,24 @@ public interface MulePlcConnection
     public boolean canRead();
 
     /**
-    * Read fields from PLC using this connection.
-    * @param fields to read.
-    * @param timeout Read response must be received within the timout.
-    * @param timeUnit Unit of the timeout parameter.
-    * @return The read response
-    * @throws TimeoutException when timeOut occurs before the response is received.
-    * @throws ExecutionException When the read could not be executed.
-    * @throws InterruptedException When the read operation is interrupted.
-    * @throws InternalConnectionException when connection failed.
+     * Read fields from PLC using this connection.
+     * @param fields to read.
+     * @param timeout Read response must be received within the timout.
+     * @param timeUnit Unit of the timeout parameter.
+     * @return The read response
+     * @throws TimeoutException when timeOut occurs before the response is received.
+     * @throws ExecutionException When the read could not be executed.
+     * @throws InterruptedException When the read operation is interrupted.
+     * @throws InternalConnectionException when connection failed.
      * @throws InternalConcurrencyException When a read operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
-    public PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeUnit ) throws InterruptedException,
+    public PlcReadResponse readIoLocked( List< ReadField > fields, long timeout, TimeUnit timeUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException;
+        InternalConcurrencyException,
+        InternalUnsupportedException;
 
     /**
      * @return {@code true} when the connection can be used to write, otherwise {@code false}.
@@ -102,21 +107,24 @@ public interface MulePlcConnection
 
     /**
     * Write fields from PLC using this connection.
-    * @param fields to write.
-    * @param timeout Write response must be received within the timeout.
-    * @param timeoutUnit Unit of the timeout parameter.
-    * @return The write response.
-    * @throws TimeoutException when timeOut occurs before the response is received.
-    * @throws ExecutionException When the write could not be executed.
-    * @throws InterruptedException When the write operation is interrupted.
-    * @throws InternalConnectionException when connection failed.
-    * @throws InternalConcurrencyException  When the number of concurrent write operation is not allowed.
+     * @param fields to write.
+     * @param timeout Write response must be received within the timeout.
+     * @param timeoutUnit Unit of the timeout parameter.
+     * @return The write response.
+     * @throws TimeoutException when timeOut occurs before the response is received.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
     */
-    public PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+    public PlcWriteResponse writeIoLocked( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException;
+        InternalConcurrencyException,
+        InternalUnsupportedException;
 
     /**
      * @return {@code true} when the connection can be used to subscribe, otherwise {@code false}.
@@ -124,40 +132,44 @@ public interface MulePlcConnection
     boolean canSubscribe();
 
     /**
-    * Subscribe to fields from PLC using this connection.
-    * @param fields to subscribe to.
-    * @param timeout Subscribe response must be received within the timeout.
-    * @param timeoutUnit Unit of the timeout parameter.
-    * @return The subscription response.
-    * @throws TimeoutException when timeOut occurs before the response is received.
-    * @throws ExecutionException When the subscribe request could not be executed.
-    * @throws InterruptedException When the subscribe request is interrupted.
-    * @throws InternalConnectionException when connection failed.
-    * @throws InternalConcurrencyException When the number of concurrent subscribe operation is not allowed.
+     * Subscribe to fields from PLC using this connection.
+     * @param fields to subscribe to.
+     * @param timeout Subscribe response must be received within the timeout.
+     * @param timeoutUnit Unit of the timeout parameter.
+     * @return The subscription response.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not established.
+     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
     */
-    public PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeOutUnit ) throws InterruptedException,
+    public PlcSubscriptionResponse subscribeIoLocked( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException;
+        InternalConcurrencyException,
+        InternalUnsupportedException;
 
     /**
-    * Unsubscribe to fields from PLC using this connection.
-    * @param fields to unsubscribe to.
-    * @param timeout Subscribe response must be received within the timeout.
-    * @param timeoutUnit Unit of the timeout parameter.
-    * @return The unSubscribe response containing the results of the operation.
-    * @throws TimeoutException when timeOut occurs before the response is received.
-    * @throws ExecutionException When the subscribe request could not be executed.
-    * @throws InterruptedException When the subscribe request is interrupted.
-    * @throws InternalConnectionException when connection failed.
-    * @throws InternalConcurrencyException When the number of concurrent subscribe operation is not allowed.
-    */
-    public PlcUnsubscriptionResponse unSubscribe( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
+     * Unsubscribe to fields from PLC using this connection. 
+     * @param fields to unsubscribe to.
+     * @param timeout Subscribe response must be received within the timeout.
+     * @param timeoutUnit Unit of the timeout parameter.
+     * @return The unSubscribe response containing the results of the operation.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws ExecutionException When execution failed.
+     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
+     */
+    public PlcUnsubscriptionResponse unSubscribeIoLocked( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
         InternalConnectionException,
-        InternalConcurrencyException;
+        InternalConcurrencyException,
+        InternalUnsupportedException;
 
     /**
      * @return the connection string

@@ -95,11 +95,15 @@ public class MulePlcOperations
     {
         try
         {
-            return connection.ping();
+            return connection.pingIoLocked( configuration.getTimeout(), configuration.getTimeoutUnits() );
+        }
+        catch ( InternalConcurrencyException e )
+        {
+            throw new ConcurrencyException( "Concurrency Error on ping.", e );
         }
         catch ( InternalUnsupportedException e )
         {
-            throw new UnsupportedException( "Protocol does not support ping." );
+            throw new UnsupportedException( "Protocol does not support ping.", e );
         }
     }
 
@@ -138,7 +142,7 @@ public class MulePlcOperations
         PlcReadResponse response= null;
         try
         {
-            response= connection.read( requestBuilder.getReadFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
+            response= connection.readIoLocked( requestBuilder.getReadFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
         }
         catch ( ExecutionException e )
         {
@@ -151,6 +155,10 @@ public class MulePlcOperations
         catch ( InternalConcurrencyException e )
         {
             throw new ConcurrencyException( "Concurrency Error on read.", e );
+        }
+        catch ( InternalUnsupportedException e )
+        {
+            throw new UnsupportedException( "Operation does not support read." );
         }
         if ( response == null )
         {
@@ -195,7 +203,7 @@ public class MulePlcOperations
         PlcWriteResponse response= null;
         try
         {
-            response= connection.write( requestBuilder.getWriteFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
+            response= connection.writeIoLocked( requestBuilder.getWriteFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
         }
         catch ( ExecutionException e )
         {
@@ -208,6 +216,10 @@ public class MulePlcOperations
         catch ( InternalConcurrencyException e )
         {
             throw new ConcurrencyException( "Concurrency Error on read.", e );
+        }
+        catch ( InternalUnsupportedException e )
+        {
+            throw new UnsupportedException( "Operation does not support write." );
         }
         if ( response == null )
         {
@@ -262,7 +274,7 @@ public class MulePlcOperations
         PlcSubscriptionResponse response= null;
         try
         {
-            response= connection.subscribe( subscription.getSubscribeFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
+            response= connection.subscribeIoLocked( subscription.getSubscribeFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
         }
         catch ( ExecutionException e )
         {
@@ -275,6 +287,10 @@ public class MulePlcOperations
         catch ( InternalConcurrencyException e )
         {
             throw new ConcurrencyException( "Concurrency Error on subscribe.", e );
+        }
+        catch ( InternalUnsupportedException e )
+        {
+            throw new UnsupportedException( "Operation does not support subscribing." );
         }
         if ( response == null )
         {
@@ -315,12 +331,12 @@ public class MulePlcOperations
         // Check if this connection supports subscribing.
         if ( !connection.canSubscribe() )
         {
-            throw new UnsupportedException( "Protocol does not support subscribing." );
+            throw new UnsupportedException( "Protocol does not support unsubscribing." );
         }
         PlcUnsubscriptionResponse response= null;
         try
         {
-            response= connection.unSubscribe( unsubscription.getUnsubscribeFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
+            response= connection.unSubscribeIoLocked( unsubscription.getUnsubscribeFields(), configuration.getTimeout(), configuration.getTimeoutUnits() );
         }
         catch ( ExecutionException e )
         {
@@ -333,6 +349,10 @@ public class MulePlcOperations
         catch ( InternalConcurrencyException e )
         {
             throw new ConcurrencyException( "Concurrency Error on unsubscribe.", e );
+        }
+        catch ( InternalUnsupportedException e )
+        {
+            throw new UnsupportedException( "Operation does not support unsubscribing." );
         }
         if ( response == null )
         {
