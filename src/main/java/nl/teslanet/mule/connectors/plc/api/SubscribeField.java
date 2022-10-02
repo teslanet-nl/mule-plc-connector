@@ -45,7 +45,7 @@ public class SubscribeField
     private String alias;
 
     /**
-     * The PLC address to be read.
+     * The PLC address to subscribe to.
      */
     @Parameter
     @Expression( ExpressionSupport.SUPPORTED )

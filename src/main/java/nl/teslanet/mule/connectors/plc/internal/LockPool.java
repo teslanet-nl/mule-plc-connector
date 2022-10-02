@@ -48,7 +48,7 @@ public class LockPool
      */
     public LockPool( LockFactory lockFactory, String lockPrefix, int poolSize )
     {
-        locks= new ArrayDeque< Lock >();
+        locks= new ArrayDeque<>();
         for ( int i= 0; i < poolSize; i++ )
         {
             locks.add( lockFactory.createLock( lockPrefix + i ) );

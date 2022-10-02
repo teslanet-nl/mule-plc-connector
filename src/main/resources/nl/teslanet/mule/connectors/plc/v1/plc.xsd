@@ -33,6 +33,7 @@
   <xs:element name="plcEvent">
     <xs:complexType>
       <xs:group minOccurs="0" maxOccurs="unbounded" ref="_valueField"/>
+      <xs:attribute name="ts" use="required" type="xs:dateTime"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="plcUnsubscribeRequest">
@@ -58,7 +59,7 @@
       <xs:element name="field">
         <xs:complexType>
           <xs:sequence>
-            <xs:element minOccurs="0" maxOccurs="unbounded" ref="value"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="value" type="xs:string"/>
           </xs:sequence>
           <xs:attribute name="alias" use="required" type="xs:token"/>
           <xs:attribute name="address" use="required"/>
@@ -66,7 +67,6 @@
       </xs:element>
     </xs:sequence>
   </xs:group>
-  <xs:element name="value" substitutionGroup="_values" type="xs:string"/>
   <xs:group name="_subscribeField">
     <xs:sequence>
       <xs:element name="field">
@@ -101,29 +101,40 @@
     <xs:sequence>
       <xs:element name="field">
         <xs:complexType>
-          <xs:complexContent>
-            <xs:extension base="_values">
-              <xs:attribute name="alias" use="required" type="xs:token"/>
-              <xs:attribute name="responseCode" use="required" type="_responseCodeContent"/>
-              <xs:attribute name="count" type="xs:unsignedInt"/>
-              <xs:attribute name="type" type="_typeContent"/>
-            </xs:extension>
-          </xs:complexContent>
+          <xs:sequence>
+            <xs:element ref="_values"/>
+          </xs:sequence>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="responseCode" use="required" type="_responseCodeContent"/>
+          <xs:attribute name="count" type="xs:unsignedInt"/>
+          <xs:attribute name="type" type="_typeContent"/>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
   </xs:group>
   <xs:element name="_values" abstract="true"/>
-  <xs:complexType name="_values">
-    <xs:sequence>
-      <xs:element ref="_values"/>
-    </xs:sequence>
-  </xs:complexType>
   <xs:element name="values" substitutionGroup="_values">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="value"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="_values"/>
       </xs:sequence>
+      <xs:attribute name="key" type="xs:token"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="_value" abstract="true" substitutionGroup="_values"/>
+  <xs:element name="value" substitutionGroup="_value">
+    <xs:complexType mixed="true">
+      <xs:attribute name="key" type="xs:token"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="nullValue" substitutionGroup="_value">
+    <xs:complexType>
+      <xs:attribute name="key" type="xs:token"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="unkownValue" substitutionGroup="_value">
+    <xs:complexType>
+      <xs:attribute name="key" type="xs:token"/>
     </xs:complexType>
   </xs:element>
   <xs:simpleType name="_responseCodeContent">

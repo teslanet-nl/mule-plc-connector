@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
@@ -190,7 +191,8 @@ public class XmlSerializer
 
         // root element
         Element rootElement= doc.createElement( "plcEvent" );
-        //TODO add timestamp
+        //add timestamp
+        rootElement.setAttribute( "ts", Instant.now().toString() );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, event, alias -> event.getPlcValue( alias ) );
@@ -276,9 +278,8 @@ public class XmlSerializer
 
     private static boolean seralizeFields( Document doc, Element parent, PlcUnsubscriptionResponse response )
     {
-        boolean allOk= true;
         //No field info available
-        return allOk;
+        return true;
     }
 
     private static Element xmlSeralize( Document doc, PlcValue plcValue )

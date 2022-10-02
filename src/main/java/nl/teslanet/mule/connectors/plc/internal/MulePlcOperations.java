@@ -288,9 +288,9 @@ public class MulePlcOperations
         }
         catch ( ParserConfigurationException e )
         {
-            throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
+            throw new ConnectorExecutionException( "Internal error on serializing subscribe response.", e );
         }
-        if ( subscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
+        if ( subscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully subscribed to." );
         //register subscription
         eventProcessor.register( response );
         return XmlSerializer.createMuleResult( responsePayload );
@@ -350,9 +350,9 @@ public class MulePlcOperations
         }
         catch ( ParserConfigurationException e )
         {
-            throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
+            throw new ConnectorExecutionException( "Internal error on serializing unsubscribe response.", e );
         }
-        if ( unsubscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
+        if ( unsubscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully unsubscribed to" );
         return XmlSerializer.createMuleResult( responsePayload );
     }
 }

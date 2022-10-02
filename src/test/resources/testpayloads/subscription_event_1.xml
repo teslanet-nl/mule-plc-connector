@@ -21,7 +21,7 @@
   limitations under the License.
   #L%
   -->
-<plcEvent >
+<plcEvent ts="2022-10-01T12:01:22.369Z">
   <field alias="coil1" responseCode="OK">
     <values>
       <value>true</value>

@@ -37,11 +37,11 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 public class UnsubscribeField
 {
     /**
-     * The alias of the field to subscribe to.
+     * The alias of the field to unsubscribe to.
      */
     @Parameter
     @Expression(ExpressionSupport.SUPPORTED)
-    @Summary("The alias of the field to subscribe to.")
+    @Summary("The alias of the field to unsubscribe to.")
     private String alias;
 
     /**

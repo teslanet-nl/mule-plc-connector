@@ -155,7 +155,8 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     @Test
     public void concurrentReadOperation() throws Exception
     {
-        Message message= flowRunner( "concurrent-read" ).keepStreamsOpen().run().getMessage();
+        Message message= flowRunner( "concurrent-write-single" ).keepStreamsOpen().run().getMessage();
+        message= flowRunner( "concurrent-read" ).keepStreamsOpen().run().getMessage();
         //let handler do its asynchronous work, if any
         await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
             Message retieved= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
@@ -172,8 +173,20 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         {
             String payloadValue= new String( (byte[]) response.getValue(), StandardCharsets.UTF_8 );
             TestUtils.validate( payloadValue );
-            assertThat( payloadValue, hasXPath( "/plcReadResponse/field[@alias = 'one' and @responseCode = 'OK']/values/value[text() = 'empty'] " ) );
-            assertThat( payloadValue, hasXPath( "/plcReadResponse/field[@alias = 'two' and @responseCode = 'OK']/values/value[text() = 'empty'] " ) );
+            assertThat(
+                payloadValue,
+                anyOf(
+                    hasXPath( "/plcReadResponse/field[@alias = 'one' and @responseCode = 'OK']/values/value[text() = 'true'] " ),
+                    hasXPath( "/plcReadResponse/field[@alias = 'one' and @responseCode = 'OK']/value[text() = 'true'] " )
+                )
+            );
+            assertThat(
+                payloadValue,
+                anyOf(
+                    hasXPath( "/plcReadResponse/field[@alias = 'two' and @responseCode = 'OK']/values/value[text() = 'true']" ),
+                    hasXPath( "/plcReadResponse/field[@alias = 'two' and @responseCode = 'OK']/value[text() = 'false'] " )
+                )
+            );
         }
     }
 
@@ -250,8 +263,8 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
             assertThat(
                 payloadValue,
                 anyOf(
-                    hasXPath( "/plcEvent/field[@alias = 'address_one:BOOL' and @responseCode = 'OK' and @type='BOOL']/values/value[@key='value' and text() = 'true'] " ),
-                    hasXPath( "/plcEvent/field[@alias = 'address_two:BOOL' and @responseCode = 'OK' and @type='BOOL']/values/value[@key='value' and text() = 'false'] " )
+                    hasXPath( "/plcEvent/field[@alias = 'STATE/address_one:BOOL' and @responseCode = 'OK' and @type='BOOL']/values/value[@key='value' and text() = 'true'] " ),
+                    hasXPath( "/plcEvent/field[@alias = 'STATE/address_two:BOOL' and @responseCode = 'OK' and @type='BOOL']/values/value[@key='value' and text() = 'false'] " )
                 )
             );
         }

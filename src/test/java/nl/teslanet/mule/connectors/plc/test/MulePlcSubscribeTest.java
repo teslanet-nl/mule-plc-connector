@@ -37,6 +37,8 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.ComparisonResult;
+import org.xmlunit.diff.ComparisonType;
 import org.xmlunit.diff.Diff;
 
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
@@ -120,10 +122,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         String payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+        Diff eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
 
         spyMessage= (Message) spy2.getEvents().get( 0 ).getContent();
         assertEquals(
@@ -135,10 +137,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+        eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
 
         //third write
         response= TestUtils.toString( flowRunner( "subscribe-write-2" ).run().getMessage().getPayload().getValue() );
@@ -166,10 +168,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+        eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
 
         spyMessage= (Message) spy2.getEvents().get( 1 ).getContent();
         assertEquals(
@@ -181,10 +183,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+        eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
     }
 
     /**
@@ -256,10 +258,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         String payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+        Diff eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
 
         //third write
         response= TestUtils.toString( flowRunner( "subscribe-write-2" ).run().getMessage().getPayload().getValue() );
@@ -287,10 +289,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+        eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
     }
 
     /**
@@ -354,10 +356,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         String payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+        Diff eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
 
         spyMessage= (Message) spy2.getEvents().get( 0 ).getContent();
         assertEquals(
@@ -369,10 +371,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+        eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
 
         //third write
         response= TestUtils.toString( flowRunner( "subscribe-write-2" ).run().getMessage().getPayload().getValue() );
@@ -400,10 +402,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+        eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
 
         spyMessage= (Message) spy2.getEvents().get( 1 ).getContent();
         assertEquals(
@@ -415,10 +417,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+        eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
 
         //unsubscribe
         response= TestUtils.toString( flowRunner( "subscribe-unsubscribe" ).run().getMessage().getPayload().getValue() );
@@ -498,10 +500,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         String payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
+        Diff eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_1.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
 
         //third write
         response= TestUtils.toString( flowRunner( "subscribe-write-2" ).run().getMessage().getPayload().getValue() );
@@ -526,10 +528,10 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+        eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
 
         //unsubscribe
         response= TestUtils.toString( flowRunner( "subscribe-unsubscribe-partial" ).run().getMessage().getPayload().getValue() );
@@ -575,9 +577,30 @@ public class MulePlcSubscribeTest extends AbstractPlcTestCase
         assertTrue( "wrong request code", attributes.isSuccess() );
         payloadValue= (String) spyMessage.getPayload().getValue();
         TestUtils.validate( payloadValue );
-        readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
+        eventDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/subscription_event_2.xml" ) ).withTest(
             payloadValue
         ).ignoreComments().ignoreWhitespace().build();
-        assertFalse( readDiff.toString(), readDiff.hasDifferences() );
+        assertEventHasTsDiffOnly( eventDiff );
     }
+
+    /**
+     * Assert that the only difference in an event is time stamp.
+     * @param difference The difference to assert.
+     */
+    private void assertEventHasTsDiffOnly( Diff difference )
+    {
+        assertTrue( difference.toString(), difference.hasDifferences() );
+        difference.getDifferences().forEach( diff -> {
+            if ( "/plcEvent[1]/@ts".equals( diff.getComparison().getControlDetails().getXPath() ) )
+            {
+                assertEquals( "no difference", ComparisonResult.DIFFERENT, diff.getResult() );
+                assertEquals( "wrong diff type", ComparisonType.ATTR_VALUE, diff.getComparison().getType() );
+            }
+            else
+            {
+                assertFalse( "unexpected difference", true );
+            }
+        } );
+    }
+
 }

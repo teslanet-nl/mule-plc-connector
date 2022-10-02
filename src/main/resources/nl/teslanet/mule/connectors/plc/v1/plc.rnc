@@ -12,7 +12,12 @@ start =
     |
     element plcSubscribeResponse { _subscribeResultField * }
     |
-    element plcEvent { _valueField * }
+    element plcEvent
+    { 
+        attribute ts { xsd:dateTime }
+        , 
+        _valueField * 
+    }
     |
     element plcUnsubscribeRequest { _unsubscribeField * }
     |
@@ -77,14 +82,20 @@ _valueField =
 
 _values=
 (
-	element values { _value * }
+	element values { attribute key { token } ?, _values * }
 	|
 	_value
 )
 
 _value= 
-	element value { text }
-    
+(
+	element value {  attribute key { token } ?, text }
+	|
+	element nullValue { attribute key { token } ? } 
+	|
+	element unkownValue { attribute key { token } ? } 
+)
+
 _responseCodeContent= 
     ( 
           "OK"
