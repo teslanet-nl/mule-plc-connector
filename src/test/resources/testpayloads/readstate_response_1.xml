@@ -21,7 +21,7 @@
   limitations under the License.
   #L%
   -->
-<plcReadResponse>
+<plcReadResponse >
 	<field alias="coil3" count="1" responseCode="OK"
 		type="BOOL">
 		<value>true</value>

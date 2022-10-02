@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
@@ -64,16 +65,16 @@ public class XmlSerializer
     /**
     * Xml transformer factory for processing responses.
     */
-    private static final TransformerFactory transformerFactory;
+    private static final TransformerFactory TRANSFORMER_FACTORY;
 
     /**
     * Create and configures transformerfactory instance.
     */
     static
     {
-        transformerFactory= javax.xml.transform.TransformerFactory.newInstance();
-        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_DTD, "" );
-        transformerFactory.setAttribute( XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "" );
+        TRANSFORMER_FACTORY= javax.xml.transform.TransformerFactory.newInstance();
+        TRANSFORMER_FACTORY.setAttribute( XMLConstants.ACCESS_EXTERNAL_DTD, "" );
+        TRANSFORMER_FACTORY.setAttribute( XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "" );
     }
 
     /**
@@ -190,7 +191,8 @@ public class XmlSerializer
 
         // root element
         Element rootElement= doc.createElement( "plcEvent" );
-        //TODO add timestamp
+        //add timestamp
+        rootElement.setAttribute( "ts", Instant.now().toString() );
         doc.appendChild( rootElement );
         //build content
         boolean allOk= seralizeFields( doc, rootElement, event, alias -> event.getPlcValue( alias ) );
@@ -207,7 +209,7 @@ public class XmlSerializer
         StringWriter writer= new StringWriter();
         try
         {
-            Transformer transformer= transformerFactory.newTransformer();
+            Transformer transformer= TRANSFORMER_FACTORY.newTransformer();
             transformer.setOutputProperty( OutputKeys.ENCODING, "ISO-8859-1" );
             transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
             transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "no" );
@@ -276,9 +278,8 @@ public class XmlSerializer
 
     private static boolean seralizeFields( Document doc, Element parent, PlcUnsubscriptionResponse response )
     {
-        boolean allOk= true;
         //No field info available
-        return allOk;
+        return true;
     }
 
     private static Element xmlSeralize( Document doc, PlcValue plcValue )

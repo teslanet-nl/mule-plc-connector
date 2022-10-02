@@ -21,7 +21,7 @@
   limitations under the License.
   #L%
   -->
-<plcReadResponse>
+<plcReadResponse >
 	<field alias="digital-input1" count="1" responseCode="OK"
 		type="BOOL">
 		<value>false</value>

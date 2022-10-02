@@ -21,7 +21,7 @@
   limitations under the License.
   #L%
   -->
-  <plcWriteResponse>
+<plcWriteResponse >
 	<field alias="reg1" count="2" responseCode="OK"
 		type="INT">
 		<values>

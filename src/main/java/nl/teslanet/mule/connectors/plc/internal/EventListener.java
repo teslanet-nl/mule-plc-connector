@@ -28,6 +28,7 @@ import java.io.InputStream;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -47,6 +48,7 @@ import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSeria
  * The received PLC messages are delivered to the listeners mule-flow.
  */
 @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
+@OutputXmlType(qname = "plcEvent", schema = "nl/teslanet/mule/connectors/plc/v1/plc.xsd")
 public class EventListener extends Source< InputStream, ReceivedResponseAttributes >
 {
     /**

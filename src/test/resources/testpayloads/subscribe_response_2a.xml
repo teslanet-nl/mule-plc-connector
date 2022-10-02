@@ -21,7 +21,7 @@
   limitations under the License.
   #L%
   -->
-<plcSubscribeResponse>
+<plcSubscribeResponse >
 	<field alias="coil1" responseCode="OK"/>
 </plcSubscribeResponse>
 

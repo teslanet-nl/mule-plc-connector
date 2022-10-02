@@ -30,12 +30,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.builder.DiffBuilder;
@@ -82,10 +79,10 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
     @Test
     public void executeReadOperation() throws Exception
     {
-
         String payloadValue= TestUtils.toString( flowRunner( "basic-read" ).run().getMessage().getPayload().getValue() );
         assertNotNull( payloadValue );
-        Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/read_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/read_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
         for ( Difference difference : diff.getDifferences() )
         {
             assertThat(
@@ -105,7 +102,10 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
     public void executeWriteOperation() throws Exception
     {
         String payloadValue= TestUtils.toString( flowRunner( "basic-write" ).run().getMessage().getPayload().getValue() );
-        Diff diff= DiffBuilder.compare( readResourceAsString( "testpayloads/write_response_1.xml" ) ).withTest( payloadValue ).ignoreComments().ignoreWhitespace().build();
+        TestUtils.validate( payloadValue );
+        Diff diff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/write_response_1.xml" ) ).withTest(
+            payloadValue
+        ).ignoreComments().ignoreWhitespace().build();
         assertFalse( diff.toString(), diff.hasDifferences() );
     }
 
@@ -117,28 +117,18 @@ public class MulePlcOperationsTest extends AbstractPlcTestCase
     public void executeWriteAndReadOperation() throws Exception
     {
         String payloadWriteValue= TestUtils.toString( flowRunner( "basic-writestate" ).run().getMessage().getPayload().getValue() );
-        Diff writeDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/writestate_response_1.xml" ) ).withTest(
+        TestUtils.validate( payloadWriteValue );
+        Diff writeDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/writestate_response_1.xml" ) ).withTest(
             payloadWriteValue
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( writeDiff.toString(), writeDiff.hasDifferences() );
 
         String payloadReadValue= (String) flowRunner( "basic-readstate" ).run().getMessage().getPayload().getValue();
+        TestUtils.validate( payloadReadValue );
         assertNotNull( payloadReadValue );
-        Diff readDiff= DiffBuilder.compare( readResourceAsString( "testpayloads/readstate_response_1.xml" ) ).withTest(
+        Diff readDiff= DiffBuilder.compare( TestUtils.readResourceAsString( "testpayloads/readstate_response_1.xml" ) ).withTest(
             payloadReadValue
         ).ignoreComments().ignoreWhitespace().build();
         assertFalse( readDiff.toString(), readDiff.hasDifferences() );
-    }
-
-    /**
-     * Read resource as string.
-     *
-     * @param resourcePath the resource path
-     * @return the string
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private String readResourceAsString( String resourcePath ) throws IOException
-    {
-        return IOUtils.getResourceAsString( resourcePath, this.getClass() );
     }
 }

@@ -261,5 +261,45 @@
                 </parameter>
             </parameters>
         </type>
+        <type name="plcEvent">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcEvent">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="plcReadResponse">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcReadResponse">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="plcSubscribeResponse">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcSubscribeResponse">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="plcUnsubscribeResponse">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcUnsubscribeResponse">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="plcWriteResponse">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="plcWriteResponse">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
     </types>
 </extension-documentation>

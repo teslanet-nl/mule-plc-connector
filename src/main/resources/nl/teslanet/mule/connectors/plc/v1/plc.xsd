@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="plcReadRequest">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="_readField"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcReadResponse">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="_valueField"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcWriteRequest">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="_writeField"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcWriteResponse">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="_valueField"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcSubscribeRequest">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="_subscribeField"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcSubscribeResponse">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="_subscribeResultField"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcEvent">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="_valueField"/>
+      <xs:attribute name="ts" use="required" type="xs:dateTime"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcUnsubscribeRequest">
+    <xs:complexType>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="_unsubscribeField"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plcUnsubscribeResponse">
+    <xs:complexType/>
+  </xs:element>
+  <xs:group name="_readField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="address" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="_writeField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="value" type="xs:string"/>
+          </xs:sequence>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="address" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="_subscribeField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="address" use="required"/>
+          <xs:attribute name="subscriptionType" use="required" type="_subscriptionTypeContent"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="_subscribeResultField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="responseCode" use="required" type="_responseCodeContent"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="_unsubscribeField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="_valueField">
+    <xs:sequence>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="_values"/>
+          </xs:sequence>
+          <xs:attribute name="alias" use="required" type="xs:token"/>
+          <xs:attribute name="responseCode" use="required" type="_responseCodeContent"/>
+          <xs:attribute name="count" type="xs:unsignedInt"/>
+          <xs:attribute name="type" type="_typeContent"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="_values" abstract="true"/>
+  <xs:element name="values" substitutionGroup="_values">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="_values"/>
+      </xs:sequence>
+      <xs:attribute name="key" type="xs:token"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="_value" abstract="true" substitutionGroup="_values"/>
+  <xs:element name="value" substitutionGroup="_value">
+    <xs:complexType mixed="true">
+      <xs:attribute name="key" type="xs:token"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="nullValue" substitutionGroup="_value">
+    <xs:complexType>
+      <xs:attribute name="key" type="xs:token"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="unkownValue" substitutionGroup="_value">
+    <xs:complexType>
+      <xs:attribute name="key" type="xs:token"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="_responseCodeContent">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="OK"/>
+      <xs:enumeration value="NOT_FOUND"/>
+      <xs:enumeration value="ACCESS_DENIED"/>
+      <xs:enumeration value="INVALID_ADDRESS"/>
+      <xs:enumeration value="INVALID_DATATYPE"/>
+      <xs:enumeration value="INVALID_DATA"/>
+      <xs:enumeration value="INTERNAL_ERROR"/>
+      <xs:enumeration value="REMOTE_BUSY"/>
+      <xs:enumeration value="REMOTE_ERROR"/>
+      <xs:enumeration value="UNSUPPORTED"/>
+      <xs:enumeration value="RESPONSE_PENDING"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="_typeContent">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="BOOLEAN"/>
+      <xs:enumeration value="BOOL"/>
+      <xs:enumeration value="BYTE"/>
+      <xs:enumeration value="SHORT"/>
+      <xs:enumeration value="INTEGER"/>
+      <xs:enumeration value="INT"/>
+      <xs:enumeration value="LONG"/>
+      <xs:enumeration value="FLOAT"/>
+      <xs:enumeration value="DOUBLE"/>
+      <xs:enumeration value="STRING"/>
+      <xs:enumeration value="TIME"/>
+      <xs:enumeration value="DATE"/>
+      <xs:enumeration value="DATE_TIME"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="_subscriptionTypeContent">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="CYCLIC"/>
+      <xs:enumeration value="CHANGE_OF_STATE"/>
+      <xs:enumeration value="EVENT"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

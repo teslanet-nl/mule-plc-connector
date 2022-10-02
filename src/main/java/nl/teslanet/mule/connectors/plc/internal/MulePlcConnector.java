@@ -24,6 +24,7 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 
 import org.mule.runtime.extension.api.annotation.Configurations;
+import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
@@ -41,6 +42,7 @@ import nl.teslanet.mule.connectors.plc.internal.error.Errors;
 @Configurations( { MulePlcConfig.class } )
 @Sources( { EventListener.class })
 @ErrorTypes( Errors.class )
+@Export(resources= {"nl/teslanet/mule/connectors/plc/v1/plc.rnc", "nl/teslanet/mule/connectors/plc/v1/plc.xsd"} )
 public class MulePlcConnector
 {
     //NOOP

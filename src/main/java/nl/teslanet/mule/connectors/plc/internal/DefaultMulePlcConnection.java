@@ -234,9 +234,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     public Boolean pingIoLocked( long timeout, TimeUnit timeoutUnit ) throws InterruptedException, InternalConcurrencyException, InternalUnsupportedException
     {
         if ( !pingAllowed ) throw new InternalConcurrencyException( "No ping allowed on this connection." );
-        Lockable< Boolean > operation= () -> {
-            return pingLocked( timeout, timeoutUnit );
-        };
+        Lockable< Boolean > operation= () -> pingLocked( timeout, timeoutUnit );
         try
         {
             return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
@@ -276,9 +274,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         }
         else
         {
-            Lockable< Boolean > operation= () -> {
-                return ping( timeout, timeoutUnit );
-            };
+            Lockable< Boolean > operation= () -> ping( timeout, timeoutUnit );
             return operation.doLocked( pingLocks, operation, timeout, timeoutUnit );
         }
     }
@@ -332,9 +328,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         InternalUnsupportedException
     {
         if ( !readAllowed ) throw new InternalConcurrencyException( "No read allowed on this connection." );
-        Lockable< PlcReadResponse > operation= () -> {
-            return readLocked( fields, timeout, timeoutUnit );
-        };
+        Lockable< PlcReadResponse > operation= () -> readLocked( fields, timeout, timeoutUnit );
         return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
     }
 
@@ -364,9 +358,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         }
         else
         {
-            Lockable< PlcReadResponse > operation= () -> {
-                return read( fields, timeout, timeoutUnit );
-            };
+            Lockable< PlcReadResponse > operation= () -> read( fields, timeout, timeoutUnit );
             return operation.doLocked( readLocks, operation, timeout, timeoutUnit );
         }
     }
@@ -420,9 +412,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         InternalUnsupportedException
     {
         if ( !writeAllowed ) throw new InternalConcurrencyException( "No write allowed on this connection." );
-        Lockable< PlcWriteResponse > operation= () -> {
-            return writeLocked( fields, timeout, timeoutUnit );
-        };
+        Lockable< PlcWriteResponse > operation= () -> writeLocked( fields, timeout, timeoutUnit );
         return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
     }
 
@@ -452,9 +442,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         }
         else
         {
-            Lockable< PlcWriteResponse > operation= () -> {
-                return write( fields, timeout, timeoutUnit );
-            };
+            Lockable< PlcWriteResponse > operation= () -> write( fields, timeout, timeoutUnit );
             return operation.doLocked( writeLocks, operation, timeout, timeoutUnit );
         }
     }
@@ -508,9 +496,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         InternalUnsupportedException
     {
         if ( !subscribeAllowed ) throw new InternalConcurrencyException( "No subscribe allowed on this connection." );
-        Lockable< PlcSubscriptionResponse > operation= () -> {
-            return subscribeLocked( fields, timeout, timeoutUnit );
-        };
+        Lockable< PlcSubscriptionResponse > operation= () -> subscribeLocked( fields, timeout, timeoutUnit );
         return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
     }
 
@@ -540,9 +526,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         }
         else
         {
-            Lockable< PlcSubscriptionResponse > operation= () -> {
-                return subscribe( fields, timeout, timeoutUnit );
-            };
+            Lockable< PlcSubscriptionResponse > operation= () -> subscribe( fields, timeout, timeoutUnit );
             return operation.doLocked( subscribeLocks, operation, timeout, timeoutUnit );
         }
     }
@@ -595,9 +579,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         InternalUnsupportedException
     {
         if ( !subscribeAllowed ) throw new InternalConcurrencyException( "No subscribe allowed on this connection." );
-        Lockable< PlcUnsubscriptionResponse > operation= () -> {
-            return unsubscribeLocked( fields, timeout, timeoutUnit );
-        };
+        Lockable< PlcUnsubscriptionResponse > operation= () -> unsubscribeLocked( fields, timeout, timeoutUnit );
         return operation.doLocked( ioLocks, operation, timeout, timeoutUnit );
     }
 
@@ -627,9 +609,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         }
         else
         {
-            Lockable< PlcUnsubscriptionResponse > operation= () -> {
-                return unsubscribe( fields, timeout, timeoutUnit );
-            };
+            Lockable< PlcUnsubscriptionResponse > operation= () -> unsubscribe( fields, timeout, timeoutUnit );
             return operation.doLocked( subscribeLocks, operation, timeout, timeoutUnit );
         }
     }
@@ -666,7 +646,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         PlcUnsubscriptionRequest.Builder builder= plcConnection.unsubscriptionRequestBuilder();
         builder.addHandles( toUnsubscribe );
         subscribeResponse= builder.build().execute().get( timeout, timeoutUnit );
-        fields.forEach( ( field ) -> handles.remove( field.getAlias() ) );
+        fields.forEach( field -> handles.remove( field.getAlias() ) );
         return subscribeResponse;
     }
 

@@ -35,8 +35,10 @@ import org.apache.plc4x.java.api.messages.PlcUnsubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -109,8 +111,9 @@ public class MulePlcOperations
     * @throws InterruptedException When the operation was interrupted.
      * @throws InternalConcurrencyException When the operation is not allowed.
     */
-    @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
+    @MediaType( value= MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
+    @OutputXmlType( qname= "plcReadResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
     public Result< InputStream, ReceivedResponseAttributes > read( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
@@ -171,6 +174,7 @@ public class MulePlcOperations
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
+    @OutputXmlType( qname= "plcWriteResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
     public Result< InputStream, ReceivedResponseAttributes > write( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
@@ -230,6 +234,7 @@ public class MulePlcOperations
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( SubscribeErrorProvider.class )
+    @OutputXmlType( qname= "plcSubscribeResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
     public Result< InputStream, ReceivedResponseAttributes > subscribe( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Event Handling" )
@@ -283,9 +288,9 @@ public class MulePlcOperations
         }
         catch ( ParserConfigurationException e )
         {
-            throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
+            throw new ConnectorExecutionException( "Internal error on serializing subscribe response.", e );
         }
-        if ( subscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
+        if ( subscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully subscribed to." );
         //register subscription
         eventProcessor.register( response );
         return XmlSerializer.createMuleResult( responsePayload );
@@ -302,6 +307,7 @@ public class MulePlcOperations
     */
     @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( SubscribeErrorProvider.class )
+    @OutputXmlType( qname= "plcUnsubscribeResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
     public Result< InputStream, ReceivedResponseAttributes > unsubscribe( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Subscription" )
@@ -344,9 +350,9 @@ public class MulePlcOperations
         }
         catch ( ParserConfigurationException e )
         {
-            throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
+            throw new ConnectorExecutionException( "Internal error on serializing unsubscribe response.", e );
         }
-        if ( unsubscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
+        if ( unsubscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully unsubscribed to" );
         return XmlSerializer.createMuleResult( responsePayload );
     }
 }

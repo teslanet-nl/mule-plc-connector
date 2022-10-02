@@ -1,0 +1,137 @@
+
+start =
+    element plcReadRequest { _readField * }
+    | 
+    element plcReadResponse { _valueField * }
+    | 
+    element plcWriteRequest { _writeField * }
+    |
+    element plcWriteResponse { _valueField * }
+    |
+    element plcSubscribeRequest { _subscribeField * }
+    |
+    element plcSubscribeResponse { _subscribeResultField * }
+    |
+    element plcEvent
+    { 
+        attribute ts { xsd:dateTime }
+        , 
+        _valueField * 
+    }
+    |
+    element plcUnsubscribeRequest { _unsubscribeField * }
+    |
+    element plcUnsubscribeResponse { empty }
+    
+_readField =
+    element field
+    {
+        attribute alias { token }
+        ,
+        attribute address { text }
+    }
+
+_writeField =
+    element field
+    {
+        attribute alias { token }
+        ,
+        attribute address { text }
+        ,
+        element value { text } *
+    }
+
+_subscribeField =
+    element field
+    {
+        attribute alias { token }
+        ,
+        attribute address { text }
+        ,
+        attribute subscriptionType { _subscriptionTypeContent }
+    }
+
+_subscribeResultField =
+    element field
+    {
+        attribute alias { token }
+        ,
+        attribute responseCode { _responseCodeContent }
+    }
+
+    
+_unsubscribeField =
+    element field
+    {
+        attribute alias { token }
+    }
+
+_valueField =
+    element field
+    {
+        attribute alias { token }
+        ,
+        attribute responseCode { _responseCodeContent }
+        ,
+        attribute count { xsd:unsignedInt } ?
+        ,
+        attribute type { _typeContent } ?
+        ,
+        _values
+    }
+
+_values=
+(
+	element values { attribute key { token } ?, _values * }
+	|
+	_value
+)
+
+_value= 
+(
+	element value {  attribute key { token } ?, text }
+	|
+	element nullValue { attribute key { token } ? } 
+	|
+	element unkownValue { attribute key { token } ? } 
+)
+
+_responseCodeContent= 
+    ( 
+          "OK"
+        | "NOT_FOUND"
+        | "ACCESS_DENIED"
+        | "INVALID_ADDRESS"
+        | "INVALID_DATATYPE"
+        | "INVALID_DATA"
+        | "INTERNAL_ERROR"
+        | "REMOTE_BUSY"
+        | "REMOTE_ERROR"
+        | "UNSUPPORTED"
+        | "RESPONSE_PENDING" 
+
+    )
+    
+_typeContent= 
+    ( 
+          "BOOLEAN"
+        | "BOOL"
+        | "BYTE"
+        | "SHORT"
+        | "INTEGER"
+        | "INT"
+        | "LONG"
+        | "FLOAT"
+        | "DOUBLE"
+        | "STRING"
+        | "TIME"
+        | "DATE"
+        | "DATE_TIME"
+    )
+
+_subscriptionTypeContent=
+    (
+          "CYCLIC"
+        | "CHANGE_OF_STATE"
+        | "EVENT"
+    )
