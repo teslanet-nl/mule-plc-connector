@@ -128,16 +128,16 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     @Test
     public void concurrentPingOperation() throws Exception
     {
-        Message message= flowRunner( "concurrent-ping" ).keepStreamsOpen().run().getMessage();
+        Message message= flowRunner( "concurrent-ping" ).run().getMessage();
         //let handler do its asynchronous work, if any
         await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
-            Message retieved= flowRunner( "concurrent-ping-retrieve" ).keepStreamsOpen().run().getMessage();
+            Message retieved= flowRunner( "concurrent-ping-retrieve" ).run().getMessage();
             @SuppressWarnings( "unchecked" )
             Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
             return responses.size() >= 4;
         } );
 
-        message= flowRunner( "concurrent-ping-retrieve" ).keepStreamsOpen().run().getMessage();
+        message= flowRunner( "concurrent-ping-retrieve" ).run().getMessage();
         @SuppressWarnings( "unchecked" )
         Map< String, Object > responses= (Map< String, Object >) message.getPayload().getValue();
         assertEquals( "wrong number of responses", 4, responses.size() );
@@ -155,17 +155,17 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     @Test
     public void concurrentReadOperation() throws Exception
     {
-        Message message= flowRunner( "concurrent-write-single" ).keepStreamsOpen().run().getMessage();
-        message= flowRunner( "concurrent-read" ).keepStreamsOpen().run().getMessage();
+        Message message= flowRunner( "concurrent-write-single" ).run().getMessage();
+        message= flowRunner( "concurrent-read" ).run().getMessage();
         //let handler do its asynchronous work, if any
         await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
-            Message retieved= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
+            Message retieved= flowRunner( "concurrent-read-retrieve" ).run().getMessage();
             @SuppressWarnings( "unchecked" )
             Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
             return responses.size() >= 4;
         } );
 
-        message= flowRunner( "concurrent-read-retrieve" ).keepStreamsOpen().run().getMessage();
+        message= flowRunner( "concurrent-read-retrieve" ).run().getMessage();
         @SuppressWarnings( "unchecked" )
         Map< String, Object > responses= (Map< String, Object >) message.getPayload().getValue();
         assertEquals( "wrong number of responses", 4, responses.size() );
@@ -183,7 +183,7 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
             assertThat(
                 payloadValue,
                 anyOf(
-                    hasXPath( "/plcReadResponse/field[@alias = 'two' and @responseCode = 'OK']/values/value[text() = 'true']" ),
+                    hasXPath( "/plcReadResponse/field[@alias = 'two' and @responseCode = 'OK']/values/value[text() = 'false']" ),
                     hasXPath( "/plcReadResponse/field[@alias = 'two' and @responseCode = 'OK']/value[text() = 'false'] " )
                 )
             );
@@ -197,16 +197,16 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     @Test
     public void concurrentWriteOperation() throws Exception
     {
-        Message message= flowRunner( "concurrent-write" ).keepStreamsOpen().run().getMessage();
+        Message message= flowRunner( "concurrent-write" ).run().getMessage();
         //let handler do its asynchronous work, if any
         await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
-            Message retieved= flowRunner( "concurrent-write-retrieve" ).keepStreamsOpen().run().getMessage();
+            Message retieved= flowRunner( "concurrent-write-retrieve" ).run().getMessage();
             @SuppressWarnings( "unchecked" )
             Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
             return responses.size() >= 4;
         } );
 
-        message= flowRunner( "concurrent-write-retrieve" ).keepStreamsOpen().run().getMessage();
+        message= flowRunner( "concurrent-write-retrieve" ).run().getMessage();
         @SuppressWarnings( "unchecked" )
         Map< String, Object > responses= (Map< String, Object >) message.getPayload().getValue();
         assertEquals( "wrong number of responses", 4, responses.size() );
@@ -227,15 +227,15 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     @Test
     public void concurrentSubscribeOperation() throws Exception
     {
-        Message message= flowRunner( "concurrent-subscribe" ).keepStreamsOpen().run().getMessage();
+        Message message= flowRunner( "concurrent-subscribe" ).run().getMessage();
         //let handler do its asynchronous work, if any
         await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
-            Message retieved= flowRunner( "concurrent-subscribe-retrieve" ).keepStreamsOpen().run().getMessage();
+            Message retieved= flowRunner( "concurrent-subscribe-retrieve" ).run().getMessage();
             Map< String, Object > responses= (Map< String, Object >) retieved.getPayload().getValue();
             return responses.size() >= 4;
         } );
 
-        message= flowRunner( "concurrent-subscribe-retrieve" ).keepStreamsOpen().run().getMessage();
+        message= flowRunner( "concurrent-subscribe-retrieve" ).run().getMessage();
         Map< String, Object > responses= (Map< String, Object >) message.getPayload().getValue();
         assertEquals( "wrong number of responses", 4, responses.size() );
         for ( Entry< ? , ? > response : responses.entrySet() )
@@ -246,14 +246,14 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
             assertThat( payloadValue, hasXPath( "/plcSubscribeResponse/field[@alias = 'two' and @responseCode = 'OK']" ) );
         }
 
-        message= flowRunner( "concurrent-write-single" ).keepStreamsOpen().run().getMessage();
+        message= flowRunner( "concurrent-write-single" ).run().getMessage();
 
         await( "retrieve events" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
-            Message retieved= flowRunner( "concurrent-event-retrieve" ).keepStreamsOpen().run().getMessage();
+            Message retieved= flowRunner( "concurrent-event-retrieve" ).run().getMessage();
             Map< String, Object > responses3= (Map< String, Object >) retieved.getPayload().getValue();
             return responses3.size() >= 2;
         } );
-        message= flowRunner( "concurrent-event-retrieve" ).keepStreamsOpen().run().getMessage();
+        message= flowRunner( "concurrent-event-retrieve" ).run().getMessage();
         responses= (Map< String, Object >) message.getPayload().getValue();
         assertEquals( "wrong number of responses", 2, responses.size() );
         for ( Entry< ? , ? > response : responses.entrySet() )

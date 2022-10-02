@@ -38,11 +38,6 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 
 	<os:config name="ObjectStore_Config"
 		doc:name="ObjectStore Config">
-		<os:connection>
-			<reconnection>
-				<reconnect-forever frequency="500" />
-			</reconnection>
-		</os:connection>
 	</os:config>
 	<os:object-store name="ping-responses"
 		doc:name="Object store" config-ref="ObjectStore_Config"
@@ -122,7 +117,6 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 	
 	<flow name="concurrent-read-single" doc:id="a2270657-93e9-4559-8ca2-ff5c01374026">
 		<plc:read doc:name="Read" config-ref="PLC_Config_Concurrent" throwExceptionOnIoError="false">
-					<repeatable-in-memory-stream />
 		            <reconnect count="5" frequency="500" />
 					<plc:read-fields>
 						<plc:read-field alias="one" address="STATE/address_one:BOOL" />
@@ -156,7 +150,6 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 
 	<flow name="concurrent-write-single">
 		<plc:write doc:name="Write" config-ref="PLC_Config_Concurrent" throwExceptionOnIoError="false">
-			<repeatable-in-memory-stream />
 		    <reconnect count="5" frequency="500" />
 		    <plc:write-fields>
 		    	<plc:write-field alias="one" address="STATE/address_one:BOOL" values="#[[ true ]]" />
