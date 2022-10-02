@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -77,7 +78,7 @@ public class TestPlc implements MockDevice
         TestPlcField field= fields.get( fieldQuery );
         if ( field == null )
         {
-            field= new TestPlcField(fieldQuery);
+            field= new TestPlcField( fieldQuery );
             field.setMember( "address", new PlcSTRING( fieldQuery ) );
             field.setMember( "value", new PlcSTRING( "empty" ) );
             fields.put( fieldQuery, field );
@@ -102,11 +103,11 @@ public class TestPlc implements MockDevice
         //TestPlcValue field= null;
         if ( field == null )
         {
-            field= new TestPlcField(fieldQuery);
+            field= new TestPlcField( fieldQuery );
             field.setMember( "address", new PlcSTRING( fieldQuery ) );
             fields.put( fieldQuery, field );
         }
-        field.setMember( "value", new PlcSTRING( ( (MockPlcValue) value ).getObject(0).toString()) );
+        field.setMember( "value", new PlcSTRING( ( (MockPlcValue) value ).getObject( 0 ).toString() ) );
         field.setMember( "write_begin_dt", plcNow() );
         try
         {
@@ -130,7 +131,7 @@ public class TestPlc implements MockDevice
         TestPlcField field= fields.get( fieldQuery );
         if ( field == null )
         {
-            field= new TestPlcField(fieldQuery);
+            field= new TestPlcField( fieldQuery );
             field.setMember( "address", new PlcSTRING( fieldQuery ) );
             field.setMember( "value", new PlcSTRING( "empty" ) );
             fields.put( fieldQuery, field );
@@ -151,7 +152,10 @@ public class TestPlc implements MockDevice
     @Override
     public void unsubscribe()
     {
-        // TODO Auto-generated method stub
+        for ( Entry< String, TestPlcField > fieldEntry : fields.entrySet() )
+        {
+            fieldEntry.getValue().unsubscribe();
+        }
     }
 
     @Override
@@ -177,7 +181,12 @@ public class TestPlc implements MockDevice
 
         public TestPlcField( String address )
         {
-            super(address, MockType.BOOL);
+            super( address, MockType.BOOL );
+        }
+
+        public void unsubscribe()
+        {
+            consumers.clear();
         }
 
         public PlcValue getMember( String key )
@@ -216,7 +225,7 @@ public class TestPlc implements MockDevice
             }
         }
     }
-   
+
     class TestPlcSubscriptionEvent implements PlcSubscriptionEvent
     {
         private final TestPlcField field;

@@ -279,7 +279,7 @@ Contributors:
 		<dependency>
 		  <groupId>org.apache.plc4x</groupId>
 		  <artifactId>plc4j-driver-mock</artifactId>
-		  <version>${plc4j.version}</version>
+		  <version>0.9.2-SNAPSHOT</version>
 		  <scope>test</scope>
 		</dependency>
         <dependency>
@@ -289,13 +289,6 @@ Contributors:
             <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-objectstore-connector</artifactId>
-			<version>1.2.1</version>
-			<classifier>mule-plugin</classifier>
-		    <scope>test</scope>
-		</dependency>
         
         <!--  explicit transients needed for ArtifactClassLoaderRunnerConfig -->
         
