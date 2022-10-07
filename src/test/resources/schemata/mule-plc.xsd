@@ -82,29 +82,29 @@
               <xs:documentation>The connection string of the plc.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentIo">
+          <xs:attribute type="mule:expressionInt" use="optional" default="1" name="concurrentIo">
             <xs:annotation>
-              <xs:documentation>The number of concurrent IO per connection. The total number of concurrent read, write and subscribe operations is limited to this number. When negative the number is unlimited.</xs:documentation>
+              <xs:documentation>The number of concurrent IO per connection. The total number of concurrent ping, read, write and (un)subscribe operations is limited to this number. Default is 1, resulting in serialization of all operations on a connection. When negative the number is unlimited.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentPings">
             <xs:annotation>
-              <xs:documentation>Number of concurrent ping operations per connection.</xs:documentation>
+              <xs:documentation>Number of concurrent ping operations per connection. When negative the number is unlimited.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentReads">
             <xs:annotation>
-              <xs:documentation>Number of concurrent reads per connection.</xs:documentation>
+              <xs:documentation>Number of concurrent reads per connection. When negative the number is unlimited.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentWrites">
             <xs:annotation>
-              <xs:documentation>Number of concurrent writes per connection.</xs:documentation>
+              <xs:documentation>Number of concurrent writes per connection. When negative the number is unlimited.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentSubscribes">
             <xs:annotation>
-              <xs:documentation>Number of concurrent subscribes per connection.</xs:documentation>
+              <xs:documentation>Number of concurrent subscribe and unsubscribe operations per connection. When negative the number is unlimited.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
         </xs:extension>
@@ -453,3 +453,4 @@
     </xs:union>
   </xs:simpleType>
 </xs:schema>
+
