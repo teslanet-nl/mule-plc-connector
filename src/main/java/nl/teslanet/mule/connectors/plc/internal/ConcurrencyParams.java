@@ -25,7 +25,6 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 
 /**
@@ -36,46 +35,44 @@ public class ConcurrencyParams
 {
     /**
      * The number of concurrent IO per connection.
-     * The total number of concurrent read, write and subscribe operations is limited to this number.
+     * The total number of concurrent ping, read, write and (un)subscribe operations is limited to this number.
+     * Default is 1, resulting in serialization of all operations on a connection.
      * When negative the number is unlimited.
      */
     @Parameter
-    @Optional( defaultValue= "-1" )
-    @Summary(
-        "The number of concurrent IO per connection. \nThe total number of concurrent read, write and subscribe operations is limited to this number.\nWhen negative the number is unlimited."
-    )
+    @Optional( defaultValue= "1" )
     private int concurrentIo;
 
     /**
      * Number of concurrent ping operations per connection.
+     * When negative the number is unlimited.
      */
     @Parameter
     @Optional( defaultValue= "-1" )
-    @Summary( "The number of concurrent ping operations per connection. \nWhen negative the number is unlimited." )
     private int concurrentPings;
 
     /**
      * Number of concurrent reads per connection.
+     * When negative the number is unlimited.
      */
     @Parameter
     @Optional( defaultValue= "-1" )
-    @Summary( "The number of concurrent reads per connection. \nWhen negative the number is unlimited." )
     private int concurrentReads;
 
     /**
      * Number of concurrent writes per connection.
+     * When negative the number is unlimited.
      */
     @Parameter
     @Optional( defaultValue= "-1" )
-    @Summary( "The number of concurrent writes per connection. \nWhen negative the number is unlimited." )
     private int concurrentWrites;
 
     /**
-     * Number of concurrent subscribes per connection.
+     * Number of concurrent subscribe and unsubscribe operations per connection.
+     * When negative the number is unlimited.
      */
     @Parameter
     @Optional( defaultValue= "-1" )
-    @Summary( "The number of concurrent subscribes per connection. \nWhen negative the number is unlimited." )
     private int concurrentSubscribes;
 
     /**

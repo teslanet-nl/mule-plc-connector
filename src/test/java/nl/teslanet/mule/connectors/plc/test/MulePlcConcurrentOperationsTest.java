@@ -39,6 +39,7 @@ import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.mock.connection.MockConnection;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -55,7 +56,7 @@ import nl.teslanet.mule.connectors.plc.test.utils.TestPlc;
 import nl.teslanet.mule.connectors.plc.test.utils.TestUtils;
 
 
-//@Ignore
+@Ignore
 @RunnerDelegateTo( Parameterized.class )
 public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
 {
@@ -72,21 +73,33 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         return Arrays.asList(
             new Object [] []
             {
-                { "testapps/concurrent-io.xml" },
-                { "testapps/concurrent-io-ping.xml" },
-                { "testapps/concurrent-io-read.xml" },
-                { "testapps/concurrent-io-write.xml" },
-                { "testapps/concurrent-io-subscribe.xml" },
-                { "testapps/concurrent-ping.xml" },
-                { "testapps/concurrent-read.xml" },
-                { "testapps/concurrent-write.xml" },
-                { "testapps/concurrent-subscribe.xml" },
-                { "testapps/concurrent-default.xml" } }
+                { "mock-default.xml" },
+                { "mock-io.xml" },
+                { "mock-io-ping.xml" },
+                { "mock-io-read.xml" },
+                { "mock-io-write.xml" },
+                { "mock-io-subscribe.xml" },
+                { "mock-nolock.xml" },
+                { "mock-ping.xml" },
+                { "mock-read.xml" },
+                { "mock-subscribe.xml" },
+                { "mock-write.xml" },
+                { "sim-default.xml" },
+                { "sim-io.xml" },
+                { "sim-io-ping.xml" },
+                { "sim-io-read.xml" },
+                { "sim-io-write.xml" },
+                { "sim-io-subscribe.xml" },
+                { "sim-nolock.xml" },
+                { "sim-ping.xml" },
+                { "sim-read.xml" },
+                { "sim-subscribe.xml" },
+                { "sim-write.xml" } }
         );
     }
 
     /**
-     * The mule flow to call.
+     * The mule configuration.
      */
     @Parameter( 0 )
     public String config;
@@ -98,7 +111,7 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
     @Override
     protected String[] getConfigFiles()
     {
-        String[] configs= { "testapps/concurrent.xml", config };
+        String[] configs= { "testapps/concurrent/concurrent.xml", "testapps/concurrent/" + config };
         return configs;
     }
 
@@ -225,8 +238,8 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
             return subscribeSpy.getEvents().size() >= 4;
         } );
-
-        assertEquals( "wrong number of responses", 4, subscribeSpy.getEvents().size() );
+        int subscribeCount= subscribeSpy.getEvents().size();
+        assertEquals( "wrong number of responses", 4, subscribeCount );
         for ( Event response : subscribeSpy.getEvents() )
         {
             String payloadValue= new String( (byte[]) ( (Message) response.getContent() ).getPayload().getValue(), StandardCharsets.UTF_8 );
@@ -241,7 +254,8 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         await( "retrieve events" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
             return eventSpy.getEvents().size() >= 2;
         } );
-        assertTrue( "wrong number of events", eventSpy.getEvents().size() >= 2 );
+        int eventCount1= eventSpy.getEvents().size();
+        assertTrue( "wrong number of events", eventCount1 >= 2 );
         for ( Event response : eventSpy.getEvents() )
         {
             String payloadValue= new String( (byte[]) ( (Message) response.getContent() ).getPayload().getValue(), StandardCharsets.UTF_8 );
@@ -262,8 +276,8 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         await( "retrieve responses" ).pollDelay( 1, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
             return unsubscribeSpy.getEvents().size() >= 4;
         } );
-
-        assertEquals( "wrong number of responses", 4, unsubscribeSpy.getEvents().size() );
+        int unsubscribeCount= unsubscribeSpy.getEvents().size();
+        assertEquals( "wrong number of responses", 4, unsubscribeCount );
         for ( Event response : unsubscribeSpy.getEvents() )
         {
             String payloadValue= new String( (byte[]) ( (Message) response.getContent() ).getPayload().getValue(), StandardCharsets.UTF_8 );
@@ -274,10 +288,11 @@ public class MulePlcConcurrentOperationsTest extends AbstractPlcTestCase
         eventSpy.clear();
         flowRunner( "concurrent-write-single" ).run().getMessage();
 
-        await( "retrieve events" ).pollDelay( 2, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
+        await( "retrieve events" ).pollDelay( 10, TimeUnit.SECONDS ).pollInterval( 1, TimeUnit.SECONDS ).atMost( 10, TimeUnit.MINUTES ).until( () -> {
             return eventSpy.getEvents().size() >= 0;
         } );
-        assertEquals( "wrong number of events", 0, eventSpy.getEvents().size() );
+        int eventCount2= eventSpy.getEvents().size();
+        assertEquals( "wrong number of events", 0, eventCount2 );
 
     }
 }

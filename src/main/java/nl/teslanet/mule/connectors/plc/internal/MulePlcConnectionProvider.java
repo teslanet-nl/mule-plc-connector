@@ -54,9 +54,7 @@ import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionExce
  * It implements {@link CachedConnectionProvider} which lazily creates and caches connections .
  */
 @Alias( "connection" )
-@ExternalLib(
-                name= "PLC4X Driver", type= ExternalLibraryType.DEPENDENCY, requiredClassName= "org.apache.plc4x.java.api.PlcDriver", coordinates= "org.apache.plc4x:plc4j-driver-simulated:jar::0.9.1"
-)
+@ExternalLib( name= "PLC4X Driver", type= ExternalLibraryType.DEPENDENCY, nameRegexpMatcher= "(.*)\\.jar",description= "The library containing the driver \nThis must contain an implementation of org.apache.plc4x.java.api.PlcDriver." )
 public class MulePlcConnectionProvider implements CachedConnectionProvider< MulePlcConnection >
 {
     /**

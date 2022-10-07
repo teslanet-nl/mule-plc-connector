@@ -37,8 +37,8 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 
 	<plc:config name="PLC_Config_Concurrent" timeout="20"
 		timeoutUnits="SECONDS">
-		<plc:connection connectionString="mock:test-plc"
-			concurrentWrites="1" />
+		<plc:connection connectionString="simulated:test-plc"
+			concurrentIo="1" concurrentWrites="1" />
 	</plc:config>
 	
 </mule>
