@@ -22,7 +22,7 @@ Several PLC protocols that are supported by the [Apache PLC4X project](https://p
 - Simulated
 
 ### Dependencies
-The Mule PLC Connector uses [Apache PLC4X](https://plc4x.apache.org/) version 0.9.1
+The Mule PLC Connector uses [Apache PLC4X](https://plc4x.apache.org/) version 0.10.0
 
 ### Supported Mule versions
 * Mule 4.1+
@@ -49,12 +49,12 @@ For example, to use Modbus and Simulated protocol add the dependencies to the po
 		<dependency>
 			<groupId>org.apache.plc4x</groupId>
 			<artifactId>plc4j-driver-simulated</artifactId>
-			<version>0.9.1</version>
+			<version>0.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.plc4x</groupId>
 			<artifactId>plc4j-driver-modbus</artifactId>
-			<version>0.9.1</version>
+			<version>0.10.0</version>
 		</dependency>
 
 ```
