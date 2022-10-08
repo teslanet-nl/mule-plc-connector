@@ -193,17 +193,12 @@ public class DefaultMulePlcConnection implements MulePlcConnection
             try
             {
                 plcConnection.connect();
-                logger.info( "(re)Connected connection { " + this + "::" + plcConnection + " }" );
+                logger.info( "(re)Connected PLC { " + this + "::" + plcConnection + " }" );
             }
             catch ( PlcConnectionException e )
             {
-                logger.error( "Failed reconnecting { " + this + "::" + plcConnection + " }" );
+                logger.error( "Failed (re)connecting PLC { " + this + "::" + plcConnection + " }" );
             }
-            //TODO
-            //            if ( !plcConnection.isConnected() )
-            //            {
-            //                throw new InternalConnectionException( "Error on connection { " + this + " }" );
-            //            }
         }
     }
 
@@ -213,16 +208,6 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public boolean isConnected()
     {
-        //in case connection lost, try to reconnect first
-        //TODO remove connect attempt
-        try
-        {
-            connect();
-        }
-        catch ( InternalConnectionException e1 )
-        {
-            //Ignore
-        }
         return plcConnection.isConnected();
     }
 
