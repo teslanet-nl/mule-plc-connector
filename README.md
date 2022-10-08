@@ -40,41 +40,52 @@ The connector is installed by adding its Maven dependency to your Mule 4 applica
 </dependency>
 ```
 
-When this dependency is added to your application in [AnypointStudio 7](https://en.wikipedia.org/wiki/MuleSoft), the connector will be installed from Maven Central. After that the Mule Palette in AnypointStudio will show the connectors operations, ready for use. 
+When the dependency is added to your application in [AnypointStudio 7](https://en.wikipedia.org/wiki/MuleSoft), the connector will be installed from [Maven Central](). After that the Mule Palette in AnypointStudio will show the connectors operations, ready for use. 
 
-For every PLC protocol needed in your application, the corresponding PLC4X module has to be added to the pom as well, as additional dependency of the Mule PLC connector. Find the PLC4X module dependency on the [PLC4X site](https://plc4x.apache.org/users/protocols/) and add this to the configuration of the Mule Maven Plugin. 
-
+For every PLC protocol needed in your application, the corresponding PLC4X Driver has to be added as dependency.
 For example, to use Modbus and Simulated protocol add the dependencies to the pom like this:
+ 
+```
+		<dependency>
+			<groupId>org.apache.plc4x</groupId>
+			<artifactId>plc4j-driver-simulated</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.plc4x</groupId>
+			<artifactId>plc4j-driver-modbus</artifactId>
+			<version>0.9.1</version>
+		</dependency>
 
 ```
-    <plugin>
-         <groupId>org.mule.tools.maven</groupId>
-         <artifactId>mule-maven-plugin</artifactId>
-         <version>${mule.maven.plugin.version}</version>
-         <extensions>true</extensions>
-         <configuration>
-             <additionalPluginDependencies>
-                 <!-- The connector for which the dependency is defined -->
-                 <plugin>
-                     <groupId>nl.teslanet.mule.connectors.plc</groupId>
-                     <artifactId>mule-plc-connector</artifactId>
-                     <!-- Dependencies definition for the connector -->
-                     <additionalDependencies>
-                         <dependency>
-                             <groupId>org.apache.plc4x</groupId>
-                             <artifactId>plc4j-driver-modbus</artifactId>
-                             <version>0.9.1</version>
-                         </dependency>
-                         <dependency>
-                             <groupId>org.apache.plc4x</groupId>
-                             <artifactId>plc4j-driver-simulated</artifactId>
-                             <version>0.9.1</version>
-                         </dependency>
-                     </additionalDependencies>
-                 </plugin>
-             </additionalPluginDependencies>
-         </configuration>
-     </plugin>
+
+See [PLC4X site](https://plc4x.apache.org/users/protocols/) for the the available drivers and their Maven coordinates.
+
+
+Needed PLC4X Drivers have to be added as shared library to the configuration of the Mule Maven Plugin. This way the drivers become 
+available on the classpath of the Mule PLC Connector. 
+
+For example, to use Modbus and Simulated protocol, add the shared library configuration to the pom like this:
+
+```
+	<plugin>
+		<groupId>org.mule.tools.maven</groupId>
+		<artifactId>mule-maven-plugin</artifactId>
+		<version>${mule.maven.plugin.version}</version>
+		<extensions>true</extensions>
+		<configuration>
+			<sharedLibraries>
+				<sharedLibrary>
+					<groupId>org.apache.plc4x</groupId>
+					<artifactId>plc4j-driver-simulated</artifactId>
+				</sharedLibrary>
+				<sharedLibrary>
+					<groupId>org.apache.plc4x</groupId>
+					<artifactId>plc4j-driver-modbus</artifactId>
+				</sharedLibrary>
+			</sharedLibraries>
+		</configuration>
+	</plugin>
 ```
 
 ## Usage
@@ -87,7 +98,12 @@ See [PLC4X documentation](https://plc4x.apache.org/users/protocols/).
 
 ### Configuration
 
-The Config element configures how to connect to a PLC instance. The configuration is referenced by every operation that accesses the PLC.
+The Config element configures how to connect to a PLC instance. The configuration is referenced by every operation that accesses the PLC. 
+Different parameters can be set to accommodate the PLC device capabilities.
+The concurrency parameters set limitations on the number of operations that will be executed simultaneously. 
+The _concurrentIo_ parameter limits total concurrency of all operation types, which has a default of 1. 
+As a result all operations are serialized by default. Set an appropriate value if concurrency is needed, where a negative value means unlimited concurrency.
+The timeout value will be used as maximum operation duration.  
 
 For example the configuration of a Modbus PLC:
 
@@ -96,9 +112,11 @@ For example the configuration of a Modbus PLC:
 Xml configuration:
 
 ```
-    <plc:config name="PLC_Config_Modbus">
+    <plc:config name="PLC_Config_Modbus" 
+    	timeout="2" timeoutUnits="SECONDS">
         <plc:connection
-            connectionString="modbus:tcp://plc.host.name:502" />
+            connectionString="modbus:tcp://plc.host.name:502" 
+            concurrentIo="1"/>
     </plc:config>
 ```
 
@@ -114,7 +132,7 @@ Ping example:
 Xml configuration:
 
 ```
-    <plc:ping doc:name="Ping" config-ref="PLC_Config" />
+    <plc:ping doc:name="Ping" config-ref="PLC_Config_Simulated" />
 ```
 
 ### Read operation
@@ -211,14 +229,12 @@ Subscribe example using the Simulated protocol:
 Xml configuration:
 
 ```
-    <flow name="plc-subscribe">
-        <plc:subscribe config-ref="PLC_Config_Simulated" eventHandler="handler1">
-            <plc:subscribe-fields >
-                <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
-                <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
-            </plc:subscribe-fields>
-        </plc:subscribe>
-    </flow>
+    <plc:subscribe config-ref="PLC_Config_Simulated" eventHandler="Event_handler">
+        <plc:subscribe-fields >
+            <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
+            <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
+        </plc:subscribe-fields>
+    </plc:subscribe>
 ```
 
 The result of the subscribe operation is a **plcSubscribeResponse** message describing which fields are successfully subscribed to.
@@ -245,14 +261,12 @@ Unsubscribe example using the Simulated protocol:
 Xml configuration:
 
 ```
-    <flow name="plc-unsubscribe">
-        <plc:unsubscribe config-ref="PLC_Config_Simulated">
-            <plc:unsubscribe-fields >
-                <plc:unsubscribe-field alias="coil1" />
-                <plc:unsubscribe-field alias="reg1" />
-            </plc:unsubscribe-fields>
-        </plc:unsubscribe>
-    </flow>
+    <plc:unsubscribe config-ref="PLC_Config_Simulated">
+        <plc:unsubscribe-fields >
+            <plc:unsubscribe-field alias="coil1" />
+            <plc:unsubscribe-field alias="reg1" />
+        </plc:unsubscribe-fields>
+    </plc:unsubscribe>
 ```
 
 The result of the unsubscribe operation is a **plcUnsubscribeResponse** message describing which subscription has been cancelled.
@@ -275,10 +289,7 @@ Event listener example:
 Xml configuration:
 
 ```
-    <flow name="plc-eventlistener">
-        <plc:event-listener doc:name="Event listener" config-ref="PLC_Config_Simulated" eventHandler="Event_handler"/>
-        <logger level="INFO" doc:name="Logger" message="#[payload]"/>
-    </flow>
+    <plc:event-listener doc:name="Event listener" eventHandler="Event_handler"/>
 ```
 
 The events are delivered using a **plcEvent** message containing actual value(s) of the field. The field alias in the event messages matches the alias given in the subscription.

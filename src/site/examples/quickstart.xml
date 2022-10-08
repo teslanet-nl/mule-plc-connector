@@ -27,19 +27,20 @@
     xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
     http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd">
 
-    <plc:config name="PLC_Config_Modbus">
+    <plc:config name="PLC_Config_Modbus" timeout="2" timeoutUnits="SECONDS">
         <plc:connection
-            connectionString="modbus:tcp://plc.host.name:502" />
+            connectionString="modbus:tcp://plc.host.name:502" concurrentIo="1"/>
     </plc:config>
 
     <plc:config name="PLC_Config_Simulated">
         <plc:connection
-            connectionString="simulated://test" />
+            connectionString="simulated://test" concurrentIo="-1"/>
     </plc:config>
 
-    <plc:event-handler name="Event_handler" doc:name="Event handler" description="asdasd" />
+    <plc:event-handler name="Event_handler" doc:name="Event handler"/>
+    
     <flow name="flow-ping">
-    <plc:ping doc:name="Ping" config-ref="PLC_Config" />
+    	<plc:ping doc:name="Ping" config-ref="PLC_Config_Simulated" />
         <logger level="INFO" doc:name="Logger" doc:id="054c7d10-23d7-4a98-8272-7dcd0684c0f8" />
     </flow>
 
@@ -68,7 +69,7 @@
     </flow>
 
     <flow name="plc-subscribe">
-        <plc:subscribe config-ref="PLC_Config_Simulated" subscriptionName="subscription1" eventHandler="Event_handler">
+        <plc:subscribe config-ref="PLC_Config_Simulated" eventHandler="Event_handler">
             <plc:subscribe-fields >
                 <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
                 <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
@@ -78,15 +79,16 @@
     </flow>
 
     <flow name="plc-unsubscribe">
-        <plc:unsubscribe config-ref="PLC_Config_Simulated" subscriptionName="subscription1" eventHandler="Event_handler">
-            <plc:unsubscribe-fields >
-                <plc:unsubscribe-field alias="asdasd" />
-            </plc:unsubscribe-fields>
-        </plc:unsubscribe>
-        <logger level="INFO" doc:name="Logger" doc:id="bb566e6b-fba3-4fbf-bd08-8f2138a25b7c" />
+		<plc:unsubscribe config-ref="PLC_Config_Simulated">
+			<plc:unsubscribe-fields >
+				<plc:unsubscribe-field alias="coil1" />
+				<plc:unsubscribe-field alias="reg1" />
+			</plc:unsubscribe-fields>
+		</plc:unsubscribe>
+		<logger level="INFO" doc:name="Logger" doc:id="bb566e6b-fba3-4fbf-bd08-8f2138a25b7c" />
     </flow>
     <flow name="plc-eventlistener">
-        <plc:event-listener doc:name="Event listener" config-ref="PLC_Config_Simulated" eventHandler="Event_handler"/>
+        <plc:event-listener doc:name="Event listener" eventHandler="Event_handler"/>
         <logger level="INFO" doc:name="Logger" message="#[payload]"/>
     </flow>
 </mule>
