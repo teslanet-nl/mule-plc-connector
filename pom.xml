@@ -64,7 +64,7 @@ L%
 	<properties>
 		<category>Community</category>
 		<licensePath>LICENSE.txt</licensePath>
-		<plc4j.version>0.9.1</plc4j.version>
+		<plc4j.version>0.10.0</plc4j.version>
         <slf4jVersion>1.7.36</slf4jVersion>
 		<xmlunit.version>2.9.0</xmlunit.version>
 	</properties>
@@ -269,12 +269,6 @@ Contributors:
 			<artifactId>plc4j-driver-simulated</artifactId>
 			<version>${plc4j.version}</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-		  <groupId>org.apache.plc4x</groupId>
-		  <artifactId>plc4j-transport-test</artifactId>
-		  <version>${plc4j.version}</version>
-		  <scope>test</scope>
 		</dependency>
 		<dependency>
 		  <groupId>org.apache.plc4x</groupId>

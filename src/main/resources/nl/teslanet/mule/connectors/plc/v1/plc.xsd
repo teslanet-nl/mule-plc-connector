@@ -154,19 +154,37 @@
   </xs:simpleType>
   <xs:simpleType name="_typeContent">
     <xs:restriction base="xs:token">
-      <xs:enumeration value="BOOLEAN"/>
+      <xs:enumeration value="NULL"/>
       <xs:enumeration value="BOOL"/>
       <xs:enumeration value="BYTE"/>
-      <xs:enumeration value="SHORT"/>
-      <xs:enumeration value="INTEGER"/>
+      <xs:enumeration value="WORD"/>
+      <xs:enumeration value="DWORD"/>
+      <xs:enumeration value="LWORD"/>
+      <xs:enumeration value="USINT"/>
+      <xs:enumeration value="UINT"/>
+      <xs:enumeration value="UDINT"/>
+      <xs:enumeration value="ULINT"/>
+      <xs:enumeration value="SINT"/>
       <xs:enumeration value="INT"/>
-      <xs:enumeration value="LONG"/>
-      <xs:enumeration value="FLOAT"/>
-      <xs:enumeration value="DOUBLE"/>
+      <xs:enumeration value="DINT"/>
+      <xs:enumeration value="LINT"/>
+      <xs:enumeration value="REAL"/>
+      <xs:enumeration value="LREAL"/>
+      <xs:enumeration value="CHAR"/>
+      <xs:enumeration value="WCHAR"/>
       <xs:enumeration value="STRING"/>
+      <xs:enumeration value="WSTRING"/>
       <xs:enumeration value="TIME"/>
+      <xs:enumeration value="LTIME"/>
       <xs:enumeration value="DATE"/>
-      <xs:enumeration value="DATE_TIME"/>
+      <xs:enumeration value="LDATE"/>
+      <xs:enumeration value="TIME_OF_DAY"/>
+      <xs:enumeration value="LTIME_OF_DAY"/>
+      <xs:enumeration value="DATE_AND_TIME"/>
+      <xs:enumeration value="LDATE_AND_TIME"/>
+      <xs:enumeration value="Struct"/>
+      <xs:enumeration value="List"/>
+      <xs:enumeration value="RAW_BYTE_ARRAY"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="_subscriptionTypeContent">
