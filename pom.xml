@@ -65,7 +65,7 @@ L%
 		<category>Community</category>
 		<licensePath>LICENSE.txt</licensePath>
 		<plc4j.version>0.10.0</plc4j.version>
-        <slf4jVersion>1.7.36</slf4jVersion>
+        <slf4jVersion>2.0.3</slf4jVersion>
 		<xmlunit.version>2.9.0</xmlunit.version>
 	</properties>
 
