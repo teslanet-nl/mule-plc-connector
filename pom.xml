@@ -3,7 +3,7 @@
 %L
   Mule PLC Connector
 %%
-  Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+  Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
   
   Contributors:
       (teslanet.nl) Rogier Cobben - initial creation
@@ -70,29 +70,18 @@ L%
 	</properties>
 
 	<scm>
-		<connection>scm:git:https://github.com/teslanet-nl/mule-plc-connector.git</connection>
-		<developerConnection>scm:git:https://github.com/teslanet-nl/mule-plc-connector.git</developerConnection>
-		<url>https://github.com/teslanet-nl/mule-plc-connector/tree/main</url>
+        <connection>${mule-plc-connector.connection}</connection>
+        <developerConnection>${mule-plc-connector.developerConnection}</developerConnection>
+        <url>${mule-plc-connector.url}</url>
 		<tag>HEAD</tag>
 	</scm>
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>2.0.0</version>
+                <version>2.5.0</version>
 				<configuration>
 					<projectName>Mule PLC Connector</projectName>
 					<licenseName>apache_v2</licenseName>
@@ -104,6 +93,10 @@ Contributors:
 					</copyrightOwners>
 					<verbose>false</verbose>
 					<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+					<extraExtensions>
+                        <xsd>xml</xsd>
+                        <psk>properties</psk>
+                    </extraExtensions>
 				</configuration>
 				<executions>
 					<execution>
@@ -122,7 +115,7 @@ Contributors:
 					<dependency>
 						<groupId>org.freemarker</groupId>
 						<artifactId>freemarker</artifactId>
-						<version>2.3.31</version>
+                        <version>2.3.34</version>
 					</dependency>
 				</dependencies>
 			</plugin>
@@ -159,7 +152,7 @@ Contributors:
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
-				<version>3.0.1</version>
+                <version>3.2.7</version>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
@@ -177,28 +170,28 @@ Contributors:
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.13</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>false</autoReleaseAfterClose>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
+                <version>3.1.1</version>
 				<configuration>
 					<username>${release.user}</username>
+                    <password>${release.password}</password>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<useReleaseProfile>false</useReleaseProfile>
 					<releaseProfiles>release</releaseProfiles>
 					<goals>deploy</goals>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <centralSnapshotsUrl>https://central.sonatype.com/repository/maven-snapshots/</centralSnapshotsUrl>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 
@@ -230,7 +223,7 @@ Contributors:
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.17.2</version>
+            <version>2.25.1</version>
             <scope>test</scope>
         </dependency>
 		<dependency>
@@ -243,7 +236,7 @@ Contributors:
 		<dependency>
 			<groupId>org.xmlunit</groupId>
 			<artifactId>xmlunit-core</artifactId>
-			<version>${xmlunit.version}</version>
+			<version>2.10.3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -261,7 +254,7 @@ Contributors:
 		<dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>4.2.0</version>
+            <version>4.3.0</version>
             <scope>test</scope>
         </dependency>
 		<dependency>
@@ -279,7 +272,7 @@ Contributors:
         <dependency>
             <groupId>org.mule.module</groupId>
             <artifactId>mule-java-module</artifactId>
-            <version>1.2.10</version>
+            <version>1.2.13</version>
             <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
@@ -289,7 +282,7 @@ Contributors:
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.12.0</version>
+			<version>3.18.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

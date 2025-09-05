@@ -3,7 +3,7 @@
 #%L
   Mule PLC Connector Test Utilities
 %%
-  Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+  Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
   
   Contributors:
       (teslanet.nl) Rogier Cobben - initial creation
@@ -453,4 +453,3 @@
     </xs:union>
   </xs:simpleType>
 </xs:schema>
-
