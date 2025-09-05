@@ -35,7 +35,7 @@ L%
 	
 	<groupId>nl.teslanet.mule.connectors.plc</groupId>
 	<artifactId>mule-plc-connector</artifactId>
-	<version>1.1.1-SNAPSHOT</version>
+	<version>1.1.1</version>
 	<packaging>mule-extension</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>Mule extension that enables Mule-applications to communicate with PLC systems.</description>
@@ -73,7 +73,7 @@ L%
         <connection>${mule-plc-connector.connection}</connection>
         <developerConnection>${mule-plc-connector.developerConnection}</developerConnection>
         <url>${mule-plc-connector.url}</url>
-		<tag>HEAD</tag>
+		<tag>mule-plc-connector-1.1.1</tag>
 	</scm>
 
 	<build>
