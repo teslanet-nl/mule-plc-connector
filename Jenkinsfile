@@ -2,8 +2,8 @@ pipeline
 {
     parameters
     {
-        booleanParam (  name: 'DEPLOY_SNAPSHOT',  defaultValue: false, description: 'when true snapshot is deployed' )
-        booleanParam (  name: 'BUILD_RELEASE',  defaultValue: false, description: 'when true  a release is built' )
+        booleanParam (  name: 'DEPLOY',  defaultValue: false, description: 'when true artifact is deployed' )
+        booleanParam (  name: 'RELEASE',  defaultValue: false, description: 'when true  a release is built' )
     }
     environment
     {
@@ -15,7 +15,7 @@ pipeline
         dockerfile
         {
             filename 'AgentDockerfile'
-            args '--network sonar_network --volume jenkins_keys:/var/lib/jenkins_keys --volume "jenkinsagent_m2repo:/home/jenkins/.m2/repository' }
+            args '--network sonar_network --volume jenkins_keys:/var/lib/jenkins_keys --volume jenkinsagent_m2repo:/home/jenkins/.m2/repository --add-host $REPO_ALIAS' }
     }
     options
     { 
@@ -27,22 +27,13 @@ pipeline
         {
             when
             {
-                expression { params.BUILD_RELEASE }
+                expression { params.RELEASE }
             }
             steps
             {
-               sh '''
-                git config user.email "jenkins@teslanet.nl"
-                git config user.name "jenkins"
-                mvn -B -s $MVN_SETTINGS release:clean
+                sh '''
+                    mvn --errors --batch-mode --settings $MVN_SETTINGS release:clean
                 '''
-            }
-        }
-        stage('build')
-        {
-            steps
-            {
-                sh 'mvn -B -s $MVN_SETTINGS clean package -DskipTests'
             }
         }
         stage('verify')
@@ -51,51 +42,51 @@ pipeline
             {
                 not
                 { 
-                	expression { params.DEPLOY_SNAPSHOT }
+                	expression { params.DEPLOY }
+                }
+                not
+                { 
+                	expression { params.RELEASE }
                 }
             }
             steps
             {
-                sh 'mvn -B -s $MVN_SETTINGS verify sonar:sonar -Psonar'
+                sh 'mvn --errors --batch-mode --settings $MVN_SETTINGS clean verify sonar:sonar -Psonar'
             }
         }
-        stage('verify and deploy')
+        stage('deploy')
         {
             when
             {
-                expression { params.DEPLOY_SNAPSHOT }
-            }
-             steps
-            {
-                sh 'mvn -B -s $MVN_SETTINGS deploy sonar:sonar -Psonar'
-            }
-        }
-        stage('release-prepare')
-        {
-            when
-            {
-                expression { params.BUILD_RELEASE }
+                expression { params.DEPLOY }
             }
             steps
             {
-               sh 'mvn -B -s $MVN_SETTINGS release:prepare'
+                sh 'mvn --errors --batch-mode --settings $MVN_SETTINGS clean deploy sonar:sonar -Psonar'
             }
         }
-        stage('release-perform')
+        stage('release')
         {
             when
             {
-                expression { params.BUILD_RELEASE }
+                expression { params.RELEASE }
             }
             steps
             {
-               sh 'mvn -B -s $MVN_SETTINGS release:perform'
+                sh 'mvn --errors --batch-mode --settings $MVN_SETTINGS clean release:prepare release:perform'
+            }
+            post
+            {
+                failure
+                {
+                    echo 'An unexpected error occurred. Rollbacking...'
+                    sh 'mvn --errors --batch-mode --settings $MVN_SETTINGS release:rollback'
+                }
             }
         }
     }
     post
     {
-        // Clean after build
         always
         {
             cleanWs( cleanWhenNotBuilt: false,
