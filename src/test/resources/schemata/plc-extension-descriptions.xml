@@ -212,10 +212,10 @@
         <type name="nl.teslanet.mule.connectors.plc.api.ReadField">
             <description><![CDATA[]]></description>
             <parameters>
-                <parameter name="alias">
+                <parameter name="address">
                     <description><![CDATA[]]></description>
                 </parameter>
-                <parameter name="address">
+                <parameter name="alias">
                     <description><![CDATA[]]></description>
                 </parameter>
             </parameters>
@@ -231,10 +231,10 @@
         <type name="nl.teslanet.mule.connectors.plc.api.SubscribeField">
             <description><![CDATA[]]></description>
             <parameters>
-                <parameter name="alias">
+                <parameter name="address">
                     <description><![CDATA[]]></description>
                 </parameter>
-                <parameter name="address">
+                <parameter name="alias">
                     <description><![CDATA[]]></description>
                 </parameter>
             </parameters>
@@ -250,13 +250,13 @@
         <type name="nl.teslanet.mule.connectors.plc.api.WriteField">
             <description><![CDATA[]]></description>
             <parameters>
-                <parameter name="alias">
+                <parameter name="values">
                     <description><![CDATA[]]></description>
                 </parameter>
                 <parameter name="address">
                     <description><![CDATA[]]></description>
                 </parameter>
-                <parameter name="values">
+                <parameter name="alias">
                     <description><![CDATA[]]></description>
                 </parameter>
             </parameters>

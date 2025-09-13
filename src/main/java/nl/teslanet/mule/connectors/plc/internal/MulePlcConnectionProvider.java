@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -32,9 +32,7 @@ import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.api.meta.ExternalLibraryType;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -54,7 +52,6 @@ import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionExce
  * It implements {@link CachedConnectionProvider} which lazily creates and caches connections .
  */
 @Alias( "connection" )
-@ExternalLib( name= "PLC4X Driver", type= ExternalLibraryType.DEPENDENCY, nameRegexpMatcher= "(.*)\\.jar",description= "The library containing the driver \nThis must contain an implementation of org.apache.plc4x.java.api.PlcDriver." )
 public class MulePlcConnectionProvider implements CachedConnectionProvider< MulePlcConnection >
 {
     /**

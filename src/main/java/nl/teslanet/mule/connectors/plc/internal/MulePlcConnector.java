@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -29,21 +29,34 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
+import org.mule.sdk.api.annotation.MinMuleVersion;
+import org.mule.sdk.api.meta.JavaVersion;
 
 import nl.teslanet.mule.connectors.plc.internal.error.Errors;
 
 
 /**
- * This is the main class of an extension, is the entry point from which configurations, connection providers, operations
- * and sources are going to be declared.
+ * This is the main class of an extension, is the entry point from which
+ * configurations, connection providers, operations and sources are going to be
+ * declared.
  */
 @Xml( prefix= "plc", namespace= "http://www.teslanet.nl/schema/mule/plc" )
 @Extension( name= "PLC", vendor= "Teslanet.nl" )
-@Configurations( { MulePlcConfig.class } )
-@Sources( { EventListener.class })
+@JavaVersionSupport(
+    { JavaVersion.JAVA_8, JavaVersion.JAVA_11, JavaVersion.JAVA_17 }
+)
+@MinMuleVersion( value= "4.1" )
+@Configurations(
+    { MulePlcConfig.class }
+)
+@Sources(
+    { EventListener.class }
+)
 @ErrorTypes( Errors.class )
-@Export(resources= {"nl/teslanet/mule/connectors/plc/v1/plc.rnc", "nl/teslanet/mule/connectors/plc/v1/plc.xsd"} )
+@Export( resources=
+{ "nl/teslanet/mule/connectors/plc/v1/plc.rnc", "nl/teslanet/mule/connectors/plc/v1/plc.xsd" } )
 public class MulePlcConnector
 {
-    //NOOP
+    // NOOP
 }

@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -48,7 +48,7 @@ import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSeria
  * The received PLC messages are delivered to the listeners mule-flow.
  */
 @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
-@OutputXmlType(qname = "plcEvent", schema = "nl/teslanet/mule/connectors/plc/v1/plc.xsd")
+@OutputXmlType( qname= "plcEvent", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
 public class EventListener extends Source< InputStream, ReceivedResponseAttributes >
 {
     /**
@@ -92,7 +92,7 @@ public class EventListener extends Source< InputStream, ReceivedResponseAttribut
         {
             throw new StartException( this + " listener has invalid handler { " + eventHandler.getHandlerName() + " }" );
         }
-        logger.info( this + " started." );
+        logger.info( "{} started.", this );
     }
 
     /**
@@ -109,10 +109,10 @@ public class EventListener extends Source< InputStream, ReceivedResponseAttribut
         }
         catch ( InternalInvalidHandlerNameException e )
         {
-            logger.error( this + " cannot remove handler { " + eventHandler.getHandlerName() + " }" );
+            logger.error( "{0} cannot remove handler { {1} }", this, eventHandler.getHandlerName() );
         }
         sourceCallback= null;
-        logger.info( this + " stopped." );
+        logger.info( "{} stopped.", this );
     }
 
     /**
