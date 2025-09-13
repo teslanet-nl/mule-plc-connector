@@ -149,7 +149,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         subscribeAllowed= ( concurrencyParams.getConcurrentSubscribes() != 0 );
         subscribeLocks= ( concurrencyParams.getConcurrentSubscribes() > 0
             ? new LockPool( lockFactory, this.toString() + "-subscribe-", concurrencyParams.getConcurrentSubscribes() ) : null );
-        logger.info( "connection created { {0} }", this );
+        logger.info( "connection created { {} }", this );
     }
 
     /**
@@ -167,17 +167,17 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public synchronized void close()
     {
-        logger.info( "Closing connection { {0} }", this );
+        logger.info( "Closing connection { {} }", this );
         if ( plcConnection.isConnected() )
         {
             try
             {
                 plcConnection.close();
-                logger.info( "Closed connection { {0} } ", this );
+                logger.info( "Closed connection { {} } ", this );
             }
             catch ( Exception e )
             {
-                logger.error( "Exception while closing connection { {0} } ", this, e );
+                logger.error( "Exception while closing connection { {} } ", this, e );
             }
         }
     }
@@ -193,11 +193,11 @@ public class DefaultMulePlcConnection implements MulePlcConnection
             try
             {
                 plcConnection.connect();
-                logger.info( "(re)Connected PLC { {0}::{1} } ", this, plcConnection );
+                logger.info( "(re)Connected PLC { {}::{} } ", this, plcConnection );
             }
             catch ( PlcConnectionException e )
             {
-                logger.error( "Failed (re)connecting PLC { " + this + "::" + plcConnection + " }" );
+                logger.error( "Failed (re)connecting PLC { {}::{} } ", this, plcConnection );
             }
         }
     }
