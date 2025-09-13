@@ -2,7 +2,7 @@
  * #%L
  * Mule CoAP Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -80,7 +81,7 @@ public class XmlSerializer
     /**
      * The Document Builer factory.
      */
-    private static final DocumentBuilderFactoryImpl dbFactory= (DocumentBuilderFactoryImpl) DocumentBuilderFactoryImpl.newInstance();
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY= DocumentBuilderFactoryImpl.newInstance();
 
     /**
      * Abstraction of the method to get PlcValues.
@@ -110,14 +111,13 @@ public class XmlSerializer
      */
     public static XmlSerializerResult xmlSerialize( PlcReadResponse response ) throws ParserConfigurationException
     {
-        DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
-        Document doc= dBuilder.newDocument();
+        Document doc= DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().getDOMImplementation().createDocument( null, null, null );
 
         // root element
         Element rootElement= doc.createElement( "plcReadResponse" );
         doc.appendChild( rootElement );
         //build content
-        boolean allOk= seralizeFields( doc, rootElement, response, alias -> response.getPlcValue( alias ) );
+        boolean allOk= seralizeFields( doc, rootElement, response, response::getPlcValue );
         return new XmlSerializerResult( allOk, doc );
     }
 
@@ -129,8 +129,7 @@ public class XmlSerializer
      */
     public static XmlSerializerResult xmlSerialize( PlcWriteResponse response ) throws ParserConfigurationException
     {
-        DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
-        Document doc= dBuilder.newDocument();
+        Document doc= DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().getDOMImplementation().createDocument( null, null, null );
 
         // root element
         Element rootElement= doc.createElement( "plcWriteResponse" );
@@ -148,8 +147,7 @@ public class XmlSerializer
      */
     public static XmlSerializerResult xmlSerialize( PlcSubscriptionResponse response ) throws ParserConfigurationException
     {
-        DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
-        Document doc= dBuilder.newDocument();
+        Document doc= DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().getDOMImplementation().createDocument( null, null, null );
 
         // root element
         Element rootElement= doc.createElement( "plcSubscribeResponse" );
@@ -167,15 +165,13 @@ public class XmlSerializer
      */
     public static XmlSerializerResult xmlSerialize( PlcUnsubscriptionResponse response ) throws ParserConfigurationException
     {
-        DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
-        Document doc= dBuilder.newDocument();
+        Document doc= DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().getDOMImplementation().createDocument( null, null, null );
 
         // root element
         Element rootElement= doc.createElement( "plcUnsubscribeResponse" );
         doc.appendChild( rootElement );
         //build content
-        boolean allOk= seralizeFields( doc, rootElement, response );
-        return new XmlSerializerResult( allOk, doc );
+        return new XmlSerializerResult( true, doc );
     }
 
     /**
@@ -186,8 +182,7 @@ public class XmlSerializer
      */
     public static XmlSerializerResult xmlSerialize( PlcSubscriptionEvent event ) throws ParserConfigurationException
     {
-        DocumentBuilder dBuilder= dbFactory.newDocumentBuilder();
-        Document doc= dBuilder.newDocument();
+        Document doc= DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().getDOMImplementation().createDocument( null, null, null );
 
         // root element
         Element rootElement= doc.createElement( "plcEvent" );
@@ -195,7 +190,7 @@ public class XmlSerializer
         rootElement.setAttribute( "ts", Instant.now().toString() );
         doc.appendChild( rootElement );
         //build content
-        boolean allOk= seralizeFields( doc, rootElement, event, alias -> event.getPlcValue( alias ) );
+        boolean allOk= seralizeFields( doc, rootElement, event, event::getPlcValue );
         return new XmlSerializerResult( allOk, doc );
     }
 
@@ -221,9 +216,12 @@ public class XmlSerializer
         }
         //small messages expected -> store payload in byte array
         ByteArrayInputStream inputStream= new ByteArrayInputStream( writer.toString().getBytes( StandardCharsets.ISO_8859_1 ) );
-        return Result.< InputStream, ReceivedResponseAttributes > builder().output( inputStream ).attributes(
-            new ReceivedResponseAttributes( responsePayload.isIndicatesSucces() )
-        ).mediaType( MediaType.APPLICATION_XML.withCharset( StandardCharsets.ISO_8859_1 ) ).build();
+        return Result
+            .< InputStream, ReceivedResponseAttributes > builder()
+            .output( inputStream )
+            .attributes( new ReceivedResponseAttributes( responsePayload.isIndicatesSucces() ) )
+            .mediaType( MediaType.APPLICATION_XML.withCharset( StandardCharsets.ISO_8859_1 ) )
+            .build();
     }
 
     /**
@@ -274,12 +272,6 @@ public class XmlSerializer
             parent.appendChild( fieldElement );
         }
         return allOk;
-    }
-
-    private static boolean seralizeFields( Document doc, Element parent, PlcUnsubscriptionResponse response )
-    {
-        //No field info available
-        return true;
     }
 
     private static Element xmlSeralize( Document doc, PlcValue plcValue )

@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -38,6 +38,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.apache.plc4x.java.api.messages.PlcReadRequest;
@@ -55,6 +56,8 @@ import org.apache.plc4x.java.spi.messages.utils.ResponseItem;
 import org.apache.plc4x.java.spi.values.PlcDATE_AND_TIME;
 import org.apache.plc4x.java.spi.values.PlcSTRING;
 import org.apache.plc4x.java.spi.values.PlcStruct;
+import org.awaitility.Awaitility;
+import org.junit.Assert;
 
 
 /**
@@ -84,14 +87,7 @@ public class TestPlc implements MockDevice
             fields.put( fieldQuery, field );
         }
         field.setMember( "read_begin_dt", plcNow() );
-        try
-        {
-            Thread.sleep( 2000 );
-        }
-        catch ( InterruptedException e )
-        {
-            return new ResponseItem< PlcValue >( PlcResponseCode.INTERNAL_ERROR, new PlcStruct( field.getMembers() ) );
-        }
+        Awaitility.await().pollDelay( 2, TimeUnit.SECONDS ).untilAsserted( () -> Assert.assertTrue( true ) );
         field.setMember( "read_end_dt", plcNow() );
         return new ResponseItem< PlcValue >( PlcResponseCode.OK, new PlcStruct( field.getMembers() ) );
     }
@@ -109,14 +105,7 @@ public class TestPlc implements MockDevice
         }
         field.setMember( "value", new PlcSTRING( ( (MockPlcValue) value ).getObject( 0 ).toString() ) );
         field.setMember( "write_begin_dt", plcNow() );
-        try
-        {
-            Thread.sleep( 2000 );
-        }
-        catch ( InterruptedException e )
-        {
-            return PlcResponseCode.REMOTE_BUSY;
-        }
+        Awaitility.await().pollDelay( 2, TimeUnit.SECONDS ).untilAsserted( () -> Assert.assertTrue( true ) );
         field.setMember( "write_end_dt", plcNow() );
         for ( Consumer< PlcSubscriptionEvent > client : field.consumers )
         {
@@ -137,14 +126,7 @@ public class TestPlc implements MockDevice
             fields.put( fieldQuery, field );
         }
         field.setMember( "subscribe_begin_dt", plcNow() );
-        try
-        {
-            Thread.sleep( 2000 );
-        }
-        catch ( InterruptedException e )
-        {
-            return new ResponseItem<>( PlcResponseCode.REMOTE_BUSY, field );
-        }
+        Awaitility.await().pollDelay( 2, TimeUnit.SECONDS ).untilAsserted( () -> Assert.assertTrue( true ) );
         field.setMember( "subscribe_end_dt", plcNow() );
         return new ResponseItem<>( PlcResponseCode.OK, field );
     }

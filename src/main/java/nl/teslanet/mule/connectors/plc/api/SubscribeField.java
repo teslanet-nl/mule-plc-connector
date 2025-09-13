@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -24,47 +24,11 @@
 package nl.teslanet.mule.connectors.plc.api;
 
 
-import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
-
-
 /**
  * Definition of an PLC field to subscribe to.
  *
  */
-public class SubscribeField
+public class SubscribeField extends FieldSpec
 {
-    /**
-     * The alias of the field to subscribe to.
-     */
-    @Parameter
-    @Expression( ExpressionSupport.SUPPORTED )
-    @Summary( "The alias of the field to subscribe to." )
-    private String alias;
-
-    /**
-     * The PLC address to subscribe to.
-     */
-    @Parameter
-    @Expression( ExpressionSupport.SUPPORTED )
-    @Summary( "The field address in protocol specific format." )
-    private String address;
-
-    /**
-     * @return the alias
-     */
-    public String getAlias()
-    {
-        return alias;
-    }
-
-    /**
-     * @return the address
-     */
-    public String getAddress()
-    {
-        return address;
-    }
+    //NOOP
 }

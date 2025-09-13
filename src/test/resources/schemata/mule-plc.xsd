@@ -21,6 +21,7 @@
   limitations under the License.
 #L%
 -->
+
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.teslanet.nl/schema/mule/plc" attributeFormDefault="unqualified" elementFormDefault="qualified">
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
   <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
@@ -193,8 +194,8 @@
   <xs:complexType name="nl.teslanet.mule.connectors.plc.api.ReadField">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionString" use="required" name="alias"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="alias"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -264,8 +265,8 @@
   <xs:complexType name="nl.teslanet.mule.connectors.plc.api.SubscribeField">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionString" use="required" name="alias"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="alias"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -395,9 +396,9 @@
   <xs:complexType name="nl.teslanet.mule.connectors.plc.api.WriteField">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionString" use="required" name="alias"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="values"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="alias"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

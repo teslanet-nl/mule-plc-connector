@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -329,7 +329,7 @@ public class MulePlcOperations
         }
         catch ( InternalConnectionException | TimeoutException e )
         {
-            throw new ConnectionException( "Connection Error on subscription.", e );
+            throw new ConnectionException( "Connection Error on unsubscription.", e );
         }
         catch ( InternalConcurrencyException e )
         {

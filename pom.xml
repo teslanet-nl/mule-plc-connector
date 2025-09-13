@@ -66,7 +66,7 @@ L%
 		<licensePath>LICENSE.txt</licensePath>
 		<plc4j.version>0.10.0</plc4j.version>
         <slf4jVersion>1.7.36</slf4jVersion>
-		<xmlunit.version>2.9.0</xmlunit.version>
+		<xmlunit.version>2.10.3</xmlunit.version>
 	</properties>
 
 	<scm>
@@ -236,7 +236,7 @@ Contributors:
 		<dependency>
 			<groupId>org.xmlunit</groupId>
 			<artifactId>xmlunit-core</artifactId>
-			<version>2.10.3</version>
+			<version>${xmlunit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -283,7 +283,6 @@ Contributors:
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.18.0</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 		    <groupId>com.github.jinahya</groupId>

@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -79,25 +79,31 @@ public class ExtensionModelTest extends AbstractGeneratedResourceFactoryTestCase
     public void generate() throws Exception
     {
         GeneratedResource resource= resourceFactory.generateResource( extensionModel ).get();
-        assertEquals( resource.getPath(), modelResourcePath );
+        assertEquals( modelResourcePath, resource.getPath() );
         String expected= IOUtils.toString( currentThread().getContextClassLoader().getResource( expectedResourcePath ).openStream() );
         String content= new String( resource.getContent() );
         Source expectedSource= Input.from( expected ).build();
         Source contentSource= Input.from( content ).build();
-        Diff diff= DiffBuilder.compare( expectedSource ).withTest( contentSource ).checkForSimilar()
-                        //.checkForIdentical() 
-                        .ignoreComments().ignoreWhitespace().normalizeWhitespace()
-                        //.withComparisonController(ComparisonController) 
-                        //.withComparisonFormatter(comparisonFormatter)
-                        //.withComparisonListeners(comparisonListeners) 
-                        //.withDifferenceEvaluator(differenceEvaluator) 
-                        //.withDifferenceListeners(comparisonListeners)
-                        //.withNodeMatcher(nodeMatcher) 
-                        //.withAttributeFilter(attributeFilter) 
-                        //.withNodeFilter(nodeFilter) 
-                        //.withNamespaceContext(map)
-                        //.withDocumentBuilerFactory(factory)
-                        .ignoreElementContentWhitespace().build();
+        Diff diff= DiffBuilder
+            .compare( expectedSource )
+            .withTest( contentSource )
+            .checkForSimilar()
+            //.checkForIdentical() 
+            .ignoreComments()
+            .ignoreWhitespace()
+            .normalizeWhitespace()
+            //.withComparisonController(ComparisonController) 
+            //.withComparisonFormatter(comparisonFormatter)
+            //.withComparisonListeners(comparisonListeners) 
+            //.withDifferenceEvaluator(differenceEvaluator) 
+            //.withDifferenceListeners(comparisonListeners)
+            //.withNodeMatcher(nodeMatcher) 
+            //.withAttributeFilter(attributeFilter) 
+            //.withNodeFilter(nodeFilter) 
+            //.withNamespaceContext(map)
+            //.withDocumentBuilerFactory(factory)
+            .ignoreElementContentWhitespace()
+            .build();
 
         if ( diff.hasDifferences() )
         {

@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -77,6 +77,6 @@ public class ResponseCodeValueProvider implements ValueProvider
     @Override
     public Set< Value > resolve() throws ValueResolvingException
     {
-        return ValueBuilder.getValuesFor( Stream.of( getKeys() ).map( e -> e.nextElement() ) );
+        return ValueBuilder.getValuesFor( Stream.of( getKeys() ).map( Enumeration< String >::nextElement ) );
     }
 }

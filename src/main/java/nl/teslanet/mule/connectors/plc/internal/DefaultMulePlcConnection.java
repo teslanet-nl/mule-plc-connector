@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -149,7 +149,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         subscribeAllowed= ( concurrencyParams.getConcurrentSubscribes() != 0 );
         subscribeLocks= ( concurrencyParams.getConcurrentSubscribes() > 0
             ? new LockPool( lockFactory, this.toString() + "-subscribe-", concurrencyParams.getConcurrentSubscribes() ) : null );
-        logger.info( "connection created { " + this + " }" );
+        logger.info( "connection created { {0} }", this );
     }
 
     /**
@@ -167,17 +167,17 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public synchronized void close()
     {
-        logger.info( "Closing connection { " + this + " }" );
+        logger.info( "Closing connection { {0} }", this );
         if ( plcConnection.isConnected() )
         {
             try
             {
                 plcConnection.close();
-                logger.info( "Closed connection { " + this + " }" );
+                logger.info( "Closed connection { {0} } ", this );
             }
             catch ( Exception e )
             {
-                logger.error( "Exception while closing connection { " + this + " }", e );
+                logger.error( "Exception while closing connection { {0} } ", this, e );
             }
         }
     }
@@ -193,7 +193,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
             try
             {
                 plcConnection.connect();
-                logger.info( "(re)Connected PLC { " + this + "::" + plcConnection + " }" );
+                logger.info( "(re)Connected PLC { {0}::{1} } ", this, plcConnection );
             }
             catch ( PlcConnectionException e )
             {
@@ -358,14 +358,11 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * @throws TimeoutException When operation duration exceeds timeout period.
      * @throws ExecutionException When execution failed.
      * @throws InternalConnectionException When connection to PLC is not establishe
-     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
-     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
     private PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException,
-        InternalConcurrencyException
+        InternalConnectionException
     {
         connect();
         PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
@@ -442,14 +439,11 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * @throws TimeoutException When operation duration exceeds timeout period.
      * @throws ExecutionException When execution failed.
      * @throws InternalConnectionException When connection to PLC is not establishe
-     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
-     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
     private PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
         TimeoutException,
-        InternalConnectionException,
-        InternalConcurrencyException
+        InternalConnectionException
     {
         connect();
         PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();
