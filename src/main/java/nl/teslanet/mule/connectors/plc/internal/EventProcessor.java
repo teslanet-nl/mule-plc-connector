@@ -156,7 +156,7 @@ public class EventProcessor implements Consumer< PlcSubscriptionEvent >
         }
         catch ( ParserConfigurationException e )
         {
-            logger.error( "EventHandler { " + handlerName + " } cannot process event.", e );
+            logger.error( "EventHandler {} cannot process event.", handlerName, e );
             return;
         }
         //hand over to listeners

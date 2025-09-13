@@ -97,7 +97,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     @Override
     public MulePlcConnection connect() throws ConnectionException
     {
-        logger.info( "Start connect { " + connectionString + " }" );
+        logger.info( "Start connect {}", connectionString );
         MulePlcConnection connection= null;
         try
         {
@@ -109,7 +109,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         {
             throw new ConnectionException( "Cannot connect { " + connection + "::" + connectionString + " }", e );
         }
-        logger.info( "Connected { " + connection + "::" + connectionString + " }" );
+        logger.info( "Connected { {}::{} }", connection, connectionString );
         return connection;
     }
 
@@ -119,9 +119,9 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     @Override
     public void disconnect( MulePlcConnection connection )
     {
-        logger.info( "Start disconnect { " + connection + "::" + connectionString + " }" );
+        logger.info( "Start disconnect { {}::{} }", connection, connectionString );
         connection.close();
-        logger.info( "Disconnected { " + connection + "::" + connectionString + " }" );
+        logger.info( "Disconnected { {}::{} }", connection, connectionString );
     }
 
     /**
@@ -130,15 +130,15 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     @Override
     public ConnectionValidationResult validate( MulePlcConnection connection )
     {
-        logger.info( "Start validation { " + connection + "::" + connectionString + " }" );
+        logger.info( "Start validation { {}::{} }", connection, connectionString );
         if ( connection == null || !connection.isConnected() )
         {
-            logger.warn( "No connection { " + connection + "::" + connectionString + " }" );
+            logger.warn( "No connection { {}::{} }", connection, connectionString );
             return ConnectionValidationResult.failure( "Not connected { " + connection + "::" + connectionString + " }", new Exception( "no connection" ) );
         }
         else
         {
-            logger.info( "Validation success { " + connection + "::" + connectionString + " }" );
+            logger.info( "Validation success { {}::{} }", connection, connectionString );
             return ConnectionValidationResult.success();
         }
     }

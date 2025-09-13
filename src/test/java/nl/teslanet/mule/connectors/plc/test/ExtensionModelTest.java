@@ -107,7 +107,7 @@ public class ExtensionModelTest extends AbstractGeneratedResourceFactoryTestCase
 
         if ( diff.hasDifferences() )
         {
-            logger.warn( "\n---\n" + content + "\n---" );
+            logger.warn( "\n---\n{}\n---", content );
         }
         assertFalse( diff.toString(), diff.hasDifferences() );
 

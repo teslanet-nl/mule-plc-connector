@@ -109,7 +109,7 @@ public class EventListener extends Source< InputStream, ReceivedResponseAttribut
         }
         catch ( InternalInvalidHandlerNameException e )
         {
-            logger.error( "{0} cannot remove handler { {1} }", this, eventHandler.getHandlerName() );
+            logger.error( "{} cannot remove handler { {} }", this, eventHandler.getHandlerName() );
         }
         sourceCallback= null;
         logger.info( "{} stopped.", this );

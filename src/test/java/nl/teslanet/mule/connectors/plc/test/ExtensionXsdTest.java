@@ -96,7 +96,7 @@ public class ExtensionXsdTest
 
         if ( diff.hasDifferences() )
         {
-            logger.warn( "\n---\n" + schema + "\n---" );
+            logger.warn( "\n---\n{}\n---", schema );
         }
         assertFalse( diff.toString(), diff.hasDifferences() );
 
