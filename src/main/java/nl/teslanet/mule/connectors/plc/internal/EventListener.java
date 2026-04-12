@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -23,33 +23,30 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import java.io.InputStream;
+import java.util.List;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.annotation.Expression;
+import org.mule.sdk.api.annotation.param.Parameter;
+import org.mule.sdk.api.meta.ExpressionSupport;
+import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.source.Source;
+import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.teslanet.mule.connectors.plc.api.EventHandler;
 import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
+import nl.teslanet.mule.connectors.plc.api.response.FieldValueResponse;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalInvalidHandlerNameException;
 import nl.teslanet.mule.connectors.plc.internal.exception.StartException;
-import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer;
-import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSerializerResult;
 
 
 /**
  * The EventListener message source receives PLC events.
  * The received PLC messages are delivered to the listeners mule-flow.
  */
-@org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
-@OutputXmlType( qname= "plcEvent", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
-public class EventListener extends Source< InputStream, ReceivedResponseAttributes >
+public class EventListener extends Source< List< FieldValueResponse >, ReceivedResponseAttributes >
 {
     /**
      * The logger of this class.
@@ -66,7 +63,7 @@ public class EventListener extends Source< InputStream, ReceivedResponseAttribut
     /**
      * Source callback to deliver messages to Mule.
      */
-    private SourceCallback< InputStream, ReceivedResponseAttributes > sourceCallback= null;
+    private SourceCallback< List< FieldValueResponse >, ReceivedResponseAttributes > sourceCallback= null;
 
     /**
     * Default constructor
@@ -80,7 +77,7 @@ public class EventListener extends Source< InputStream, ReceivedResponseAttribut
      * Start the listener
      */
     @Override
-    public void onStart( SourceCallback< InputStream, ReceivedResponseAttributes > sourceCallback ) throws MuleException
+    public void onStart( SourceCallback< List< FieldValueResponse >, ReceivedResponseAttributes > sourceCallback ) throws MuleException
     {
         this.sourceCallback= sourceCallback;
         try
@@ -118,9 +115,9 @@ public class EventListener extends Source< InputStream, ReceivedResponseAttribut
     /**
      * Accept serialized PLC event and hand over to the Mule flow.
      */
-    public void accept( XmlSerializerResult serializedContent )
+    public void accept( Result< List< FieldValueResponse >, ReceivedResponseAttributes > result )
     {
         //hand over to Mule
-        sourceCallback.handle( XmlSerializer.createMuleResult( serializedContent ) );
+        sourceCallback.handle( result );
     }
 }

@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -25,17 +25,19 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 import javax.inject.Inject;
 
-import org.apache.plc4x.java.PlcDriverManager;
+import org.apache.plc4x.java.DefaultPlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
+import org.apache.plc4x.java.api.PlcDriver;
+import org.apache.plc4x.java.api.PlcDriverManager;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
-import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.sdk.api.annotation.Alias;
+import org.mule.sdk.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.param.ParameterGroup;
+import org.mule.sdk.api.annotation.param.display.Summary;
+import org.mule.sdk.api.connectivity.CachedConnectionProvider;
+import org.mule.sdk.api.connectivity.ConnectionValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +83,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     /**
      * The PLC driver manager.
      */
-    private static final PlcDriverManager driverManager= new PlcDriverManager();
+    private static final PlcDriverManager driverManager= new DefaultPlcDriverManager();
 
     /**
      * @return the drivermanager
@@ -101,8 +103,9 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         MulePlcConnection connection= null;
         try
         {
-            PlcConnection plcConnnection= driverManager.getConnection( connectionString );
-            connection= new DefaultMulePlcConnection( connectionString, plcConnnection, lockFactory, concurrencyParams );
+            PlcDriver driver= driverManager.getDriverForUrl( connectionString );
+            PlcConnection plcConnnection= driver.getConnection( connectionString );
+            connection= new DefaultMulePlcConnection( plcConnnection, lockFactory, concurrencyParams );
             connection.connect();
         }
         catch ( InternalConnectionException | PlcConnectionException e )

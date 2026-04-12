@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -23,7 +23,7 @@
 package nl.teslanet.mule.connectors.plc.internal.error;
 
 
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 
 /**

@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -23,6 +23,8 @@
 package nl.teslanet.mule.connectors.plc.test.utils;
 
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -41,28 +43,32 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import org.apache.plc4x.java.api.PlcDriverManager;
+import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.api.messages.PlcReadRequest;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionEvent;
+import org.apache.plc4x.java.api.metadata.Metadata;
 import org.apache.plc4x.java.api.model.PlcConsumerRegistration;
-import org.apache.plc4x.java.api.model.PlcField;
 import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
+import org.apache.plc4x.java.api.model.PlcTag;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
+import org.apache.plc4x.java.api.types.PlcValueType;
 import org.apache.plc4x.java.api.value.PlcValue;
+import org.apache.plc4x.java.mock.connection.MockConnection;
 import org.apache.plc4x.java.mock.connection.MockDevice;
-import org.apache.plc4x.java.mock.field.MockField;
-import org.apache.plc4x.java.mock.field.MockPlcValue;
-import org.apache.plc4x.java.mock.field.MockType;
-import org.apache.plc4x.java.spi.messages.utils.ResponseItem;
+import org.apache.plc4x.java.mock.tag.MockTag;
+import org.apache.plc4x.java.spi.messages.utils.DefaultPlcResponseItem;
 import org.apache.plc4x.java.spi.values.PlcDATE_AND_TIME;
 import org.apache.plc4x.java.spi.values.PlcSTRING;
 import org.apache.plc4x.java.spi.values.PlcStruct;
 import org.awaitility.Awaitility;
-import org.junit.Assert;
+
+import nl.teslanet.mule.connectors.plc.internal.MulePlcConnectionProvider;
 
 
 /**
- * Plc device for testing. T
- * he response delays make the device suitable for concurency tests.
+ * Plc device for testing. 
+ * The response delays make the device suitable for concurrency tests.
  */
 public class TestPlc implements MockDevice
 {
@@ -73,10 +79,22 @@ public class TestPlc implements MockDevice
 
     public TestPlc()
     {
+        PlcDriverManager driverManager= MulePlcConnectionProvider.getDrivermanager();
+        MockConnection connection;
+        try
+        {
+            connection= (MockConnection) driverManager.getConnectionManager().getConnection( "mock:test-plc" );
+            connection.setDevice( this );
+        }
+        catch ( PlcConnectionException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public ResponseItem< PlcValue > read( String fieldQuery )
+    public DefaultPlcResponseItem< PlcValue > read( String fieldQuery )
     {
         TestPlcField field= fields.get( fieldQuery );
         if ( field == null )
@@ -87,9 +105,9 @@ public class TestPlc implements MockDevice
             fields.put( fieldQuery, field );
         }
         field.setMember( "read_begin_dt", plcNow() );
-        Awaitility.await().pollDelay( 2, TimeUnit.SECONDS ).untilAsserted( () -> Assert.assertTrue( true ) );
+        Awaitility.await().pollDelay( 2, TimeUnit.SECONDS ).untilAsserted( () -> assertTrue( true ) );
         field.setMember( "read_end_dt", plcNow() );
-        return new ResponseItem< PlcValue >( PlcResponseCode.OK, new PlcStruct( field.getMembers() ) );
+        return new DefaultPlcResponseItem< PlcValue >( PlcResponseCode.OK, new PlcStruct( field.getMembers() ) );
     }
 
     @Override
@@ -103,9 +121,10 @@ public class TestPlc implements MockDevice
             field.setMember( "address", new PlcSTRING( fieldQuery ) );
             fields.put( fieldQuery, field );
         }
-        field.setMember( "value", new PlcSTRING( ( (MockPlcValue) value ).getObject( 0 ).toString() ) );
+        //TODO v200 handle
+        field.setMember( "value", new PlcSTRING( ( (PlcValue) value ).getObject().toString() ) );
         field.setMember( "write_begin_dt", plcNow() );
-        Awaitility.await().pollDelay( 2, TimeUnit.SECONDS ).untilAsserted( () -> Assert.assertTrue( true ) );
+        Awaitility.await().pollDelay( 2, TimeUnit.SECONDS ).untilAsserted( () -> assertTrue( true ) );
         field.setMember( "write_end_dt", plcNow() );
         for ( Consumer< PlcSubscriptionEvent > client : field.consumers )
         {
@@ -115,7 +134,7 @@ public class TestPlc implements MockDevice
     }
 
     @Override
-    public ResponseItem< PlcSubscriptionHandle > subscribe( String fieldQuery )
+    public DefaultPlcResponseItem< PlcSubscriptionHandle > subscribe( String fieldQuery )
     {
         TestPlcField field= fields.get( fieldQuery );
         if ( field == null )
@@ -126,9 +145,9 @@ public class TestPlc implements MockDevice
             fields.put( fieldQuery, field );
         }
         field.setMember( "subscribe_begin_dt", plcNow() );
-        Awaitility.await().pollDelay( 2, TimeUnit.SECONDS ).untilAsserted( () -> Assert.assertTrue( true ) );
+        Awaitility.await().pollDelay( 2, TimeUnit.SECONDS ).untilAsserted( () -> assertTrue( true ) );
         field.setMember( "subscribe_end_dt", plcNow() );
-        return new ResponseItem<>( PlcResponseCode.OK, field );
+        return new DefaultPlcResponseItem<>( PlcResponseCode.OK, field );
     }
 
     @Override
@@ -155,7 +174,7 @@ public class TestPlc implements MockDevice
     /**
      *
      */
-    class TestPlcField extends MockField implements PlcSubscriptionHandle
+    class TestPlcField extends MockTag implements PlcSubscriptionHandle
     {
         private final ConcurrentHashMap< String, PlcValue > members= new ConcurrentHashMap<>();
 
@@ -163,7 +182,7 @@ public class TestPlc implements MockDevice
 
         public TestPlcField( String address )
         {
-            super( address, MockType.BOOL );
+            super( address, PlcValueType.BOOL );
         }
 
         public void unsubscribe()
@@ -720,7 +739,7 @@ public class TestPlc implements MockDevice
         }
 
         @Override
-        public Collection< String > getFieldNames()
+        public Collection< String > getTagNames()
         {
             ArrayList< String > list= new ArrayList<>();
             list.add( field.getMember( "address" ).getString() );
@@ -728,7 +747,7 @@ public class TestPlc implements MockDevice
         }
 
         @Override
-        public PlcField getField( String name )
+        public PlcTag getTag( String name )
         {
             return field;
         }
@@ -743,6 +762,12 @@ public class TestPlc implements MockDevice
         public Instant getTimestamp()
         {
             return ts;
+        }
+
+        @Override
+        public Metadata getTagMetadata( String name )
+        {
+            return Metadata.EMPTY;
         }
     }
 

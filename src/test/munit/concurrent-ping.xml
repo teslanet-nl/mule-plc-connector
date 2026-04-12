@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+#%L
+  Mule PLC Connector Test Utilities
+  %%
+  Copyright (C) 2026 (teslanet.nl) Rogier Cobben
+  
+  Contributors:
+      (teslanet.nl) Rogier Cobben - initial creation
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+-->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+    xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+    xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+    xmlns:plc="http://www.teslanet.nl/schema/mule/plc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
+    http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+    http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd 
+    http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd
+    http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
+    http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd    
+    http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
+>
+
+    <munit:config name="concurrent-ping-test">
+        <munit:parameterizations>
+            <munit:parameterization name="simulated">
+                <munit:parameters>
+                    <munit:parameter propertyName="connectorConfig"
+                        value="PLC_Config_Concurrent-ping-sim" />
+                </munit:parameters>
+            </munit:parameterization>
+            <munit:parameterization name="simulated-io">
+                <munit:parameters>
+                    <munit:parameter propertyName="connectorConfig"
+                        value="PLC_Config_Concurrent-ping-sim-io" />
+                </munit:parameters>
+            </munit:parameterization>
+        </munit:parameterizations>
+    </munit:config>
+
+    <!-- object doc:name="testPlc" doc:id="c72eba66-0ae0-409e-9986-5c8351568a52" name="testPlc" class="nl.teslanet.mule.connectors.plc.test.utils.TestPlc" 
+        / -->
+
+    <plc:config name="PLC_Config_Concurrent-ping-sim" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="simulated:test-plc" concurrentIo="-1" concurrentPings="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-ping-sim-io" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="simulated:test-plc" concurrentIo="1" concurrentPings="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-ping-mock" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="mock:test-plc" concurrentIo="-1" concurrentPings="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-ping-mock-io" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="mock:test-plc" concurrentIo="1" concurrentPings="1" />
+    </plc:config>
+
+    <munit:test name="concurrent-ping-testsuite">
+        <munit:execution>
+            <munit-tools:clear-stored-data doc:name="Clear stored data" />
+            <foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
+                <async doc:name="Async">
+                    <plc:ping doc:name="Ping" config-ref="${connectorConfig}">
+                        <reconnect count="5" frequency="500" />
+                    </plc:ping>
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="STORE ping" />
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="#[payload]" />
+                    <munit-tools:queue doc:name="concurrent-ping-q" queueName="concurrent-ping-q" />
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="STORED ping" />
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="#[payload]" />
+                </async>
+            </foreach>
+        </munit:execution>
+        <munit:validation>
+            <foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
+                <munit-tools:dequeue doc:name="concurrent-ping-q" queueName="concurrent-ping-q"
+                    timeout="#[100]" />
+                <logger level="INFO" doc:name="Logger" doc:id="3248c90f-6bd8-4e3a-b055-c52b356df30d"
+                    message="#[payload]" />
+                <munit-tools:assert-equals doc:name="payload == one"
+                    doc:id="fd9916da-985b-4755-bf73-fea2b3c00922" actual="#[payload]" expected="#[true]"
+                    message="wrong payload" />
+            </foreach>
+        </munit:validation>
+    </munit:test>
+
+</mule>

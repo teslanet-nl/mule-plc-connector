@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -25,13 +25,13 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 import java.util.concurrent.TimeUnit;
 
-import org.mule.runtime.extension.api.annotation.Configuration;
-import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.RefName;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.sdk.api.annotation.Configuration;
+import org.mule.sdk.api.annotation.Operations;
+import org.mule.sdk.api.annotation.connectivity.ConnectionProviders;
+import org.mule.sdk.api.annotation.param.Optional;
+import org.mule.sdk.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.param.RefName;
+import org.mule.sdk.api.annotation.param.display.Summary;
 
 
 /**

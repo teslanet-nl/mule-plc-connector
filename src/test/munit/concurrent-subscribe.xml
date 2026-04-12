@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+#%L
+  Mule PLC Connector Test Utilities
+  %%
+  Copyright (C) 2026 (teslanet.nl) Rogier Cobben
+  
+  Contributors:
+      (teslanet.nl) Rogier Cobben - initial creation
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+-->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+    xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+    xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+    xmlns:plc="http://www.teslanet.nl/schema/mule/plc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
+    http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+    http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd 
+    http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd
+    http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
+    http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd    
+    http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
+>
+
+    <munit:config name="concurrent-subscribe-testsuite">
+        <munit:parameterizations>
+            <munit:parameterization name="simulated">
+                <munit:parameters>
+                    <munit:parameter propertyName="connectorConfig"
+                        value="PLC_Config_Concurrent-subscribe-sim" />
+                </munit:parameters>
+            </munit:parameterization>
+            <munit:parameterization name="simulated-io">
+                <munit:parameters>
+                    <munit:parameter propertyName="connectorConfig"
+                        value="PLC_Config_Concurrent-subscribe-sim-io" />
+                </munit:parameters>
+            </munit:parameterization>
+        </munit:parameterizations>
+    </munit:config>
+
+    <!-- object doc:name="testPlc" doc:id="c7b0751c-635f-48c7-89dd-75ea0ef10db0" name="testPlc" class="nl.teslanet.mule.connectors.plc.test.utils.TestPlc" 
+        / -->
+
+    <plc:config name="PLC_Config_Concurrent-subscribe-sim" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="simulated:test-plc" concurrentIo="-1" concurrentSubscribes="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-subscribe-sim-io" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="simulated:test-plc" concurrentIo="1" concurrentSubscribes="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-subscribe-mock" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="mock:test-plc" concurrentIo="-1" concurrentSubscribes="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-subscribe-mock-io" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="mock:test-plc" concurrentIo="1" concurrentSubscribes="1" />
+    </plc:config>
+
+    <plc:event-handler name="Concurrent_Event_handler" doc:name="Concurrent_Event_handler" />
+
+    <flow name="concurrent-subscribe-event-listener">
+        <plc:event-listener doc:name="Event listener" eventHandler="Concurrent_Event_handler" />
+        <logger level="INFO" doc:name="Logger" message="#['EVENT']"
+            category="nl.teslanet.mule.connectors.plc.test" />
+        <logger level="INFO" doc:name="Logger" message="#[payload]"
+            category="nl.teslanet.mule.connectors.plc.test" />
+        <munit-tools:queue doc:name="concurrent-subscribe-q" queueName="concurrent-subscribe-q" />
+    </flow>
+
+    <munit:test name="concurrent-subscribe-test">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="concurrent-subscribe-event-listener" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:clear-stored-data doc:name="Clear stored data" />
+            <foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
+                <async doc:name="Async">
+                    <plc:subscribe doc:name="Subscribe" config-ref="${connectorConfig}"
+                        eventHandler="Concurrent_Event_handler" throwExceptionOnIoError="false"
+                    >
+                        <plc:subscribe-fields>
+                            <plc:subscribe-field alias="#['one' ++ payload as String]"
+                                address="#['STATE/address_one' ++ payload as String ++ ':BOOL']" />
+                            <plc:subscribe-field alias="#['two'  ++ payload as String]"
+                                address="#['STATE/address_two'  ++ payload as String ++ ':BOOL']" />
+                        </plc:subscribe-fields>
+                    </plc:subscribe>
+                </async>
+            </foreach>
+            <munit-tools:sleep time="100" doc:name="Sleep"
+                doc:id="e0e4edc1-689e-44b6-9e57-8ddafdb7b472" />
+            <foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
+                <set-variable value="#[payload as String]" doc:name="Set Variable"
+                    doc:id="262babf4-a0a8-491c-8de2-c234892c5465" variableName="nr" />
+                <plc:write doc:name="Write1" config-ref="${connectorConfig}" throwExceptionOnIoError="false">
+                    <plc:write-fields>
+                        <plc:write-field alias="#['one' ++ vars.nr]"
+                            address="#['STATE/address_one' ++ vars.nr ++ ':BOOL']" values="#[[ true ]]" />
+                    </plc:write-fields>
+                </plc:write>
+                <munit-tools:sleep time="100" doc:name="Sleep"
+                    doc:id="fed1006c-d5fb-4797-a096-11e487596298" />
+                <plc:write doc:name="Write1" config-ref="${connectorConfig}" throwExceptionOnIoError="false">
+                    <plc:write-fields>
+                        <plc:write-field values="#[[ false ]]"
+                            address="#['STATE/address_two' ++ vars.nr ++ ':BOOL']" alias="#['two' ++ vars.nr]" />
+                    </plc:write-fields>
+                </plc:write>
+                <munit-tools:sleep time="100" doc:name="Sleep1"
+                    doc:id="e59a76ca-cfb1-4e54-8fe2-5307b4260838" />
+            </foreach>
+            <foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
+                <async doc:name="Async">
+                    <plc:unsubscribe doc:name="unSubscribe" config-ref="${connectorConfig}"
+                        throwExceptionOnIoError="false"
+                    >
+                        <plc:unsubscribe-fields>
+                            <plc:unsubscribe-field alias="#['one' ++ payload as String]" />
+                            <plc:unsubscribe-field alias="#['two'  ++ payload as String]" />
+                        </plc:unsubscribe-fields>
+                    </plc:unsubscribe>
+                </async>
+            </foreach>
+            <munit-tools:sleep time="100" doc:name="Sleep"
+                doc:id="bf4c1ee9-2be2-4c27-b209-3b930d7f3408" />
+        </munit:execution>
+        <munit:validation>
+            <foreach collection="#[[ 'one1', 'two1', 'one2', 'two2', 'one3', 'two3','one4', 'two4', ]]"
+                doc:name="Four times"
+            >
+                <set-variable value="#[payload]" doc:name="Set Variable"
+                    doc:id="c6086c03-d44b-46a4-bfa6-76ce163dfd2f" variableName="alias" />
+                <munit-tools:dequeue doc:name="concurrent-subscribe-q"
+                    queueName="concurrent-subscribe-q" timeout="#[100]" />
+                <logger level="INFO" doc:name="Logger" doc:id="43e8b97e-fa83-43c6-b717-7fb85978399f"
+                    message="#[payload]" />
+                <munit-tools:assert-equals doc:name="alias "
+                    doc:id="721012e0-6e9f-48c5-993d-b80ad6403e79" actual="#[payload[0].alias]" expected="#[vars.alias]"
+                    message="wrong alias" />
+                <munit-tools:assert-equals doc:name="result == ok"
+                    doc:id="dacd1853-108c-4a42-8f46-5da35eaef9c7" actual="#[payload[0].result]" expected="OK"
+                    message="wrong result" />
+                <munit-tools:assert-equals doc:name="value is boolean"
+                    doc:id="cc191907-86f2-46dd-b142-7bf201424ae7" actual="#[payload[0].value.boolean]"
+                    expected="#[true]" message="wrong type" />
+            </foreach>
+        </munit:validation>
+    </munit:test>
+
+</mule>

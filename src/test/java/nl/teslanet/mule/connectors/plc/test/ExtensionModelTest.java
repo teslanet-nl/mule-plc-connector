@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -20,25 +20,23 @@
  * limitations under the License.
  * #L%
  */
+
 package nl.teslanet.mule.connectors.plc.test;
 
 
 import static java.lang.Thread.currentThread;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 
 import javax.xml.transform.Source;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.api.util.IOUtils;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.resources.AbstractGeneratedResourceFactoryTestCase;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
-import org.mule.tck.size.SmallTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.builder.DiffBuilder;
@@ -48,13 +46,15 @@ import org.xmlunit.diff.Diff;
 import nl.teslanet.mule.connectors.plc.internal.MulePlcConnector;
 
 
-@SmallTest
-public class ExtensionModelTest extends AbstractGeneratedResourceFactoryTestCase
+/**
+ * Test the Mule extension model.
+ */
+public class ExtensionModelTest
 {
 
     private static final Logger logger= LoggerFactory.getLogger( ExtensionModelTest.class.getCanonicalName() );
 
-    private static final String modelResourcePath= "plc-extension-descriptions.xml";
+    private static final String modelResourcePath= "META-INF/plc-extension-descriptions.xml";
 
     private static final String expectedResourcePath= "schemata/plc-extension-descriptions.xml";
 
@@ -62,17 +62,10 @@ public class ExtensionModelTest extends AbstractGeneratedResourceFactoryTestCase
 
     private ExtensionModel extensionModel;
 
-    @Before
+    @BeforeEach
     public void before()
     {
         extensionModel= loadExtension( MulePlcConnector.class );
-    }
-
-    @SuppressWarnings( "unchecked" )
-    @Override
-    protected Class< ? extends GeneratedResourceFactory >[] getResourceFactoryTypes()
-    {
-        return new Class []{ ExtensionDocumentationResourceGenerator.class };
     }
 
     @Test
@@ -80,7 +73,7 @@ public class ExtensionModelTest extends AbstractGeneratedResourceFactoryTestCase
     {
         GeneratedResource resource= resourceFactory.generateResource( extensionModel ).get();
         assertEquals( modelResourcePath, resource.getPath() );
-        String expected= IOUtils.toString( currentThread().getContextClassLoader().getResource( expectedResourcePath ).openStream() );
+        byte[] expected= IOUtils.toByteArray( currentThread().getContextClassLoader().getResource( expectedResourcePath ).openStream() );
         String content= new String( resource.getContent() );
         Source expectedSource= Input.from( expected ).build();
         Source contentSource= Input.from( content ).build();
@@ -109,7 +102,6 @@ public class ExtensionModelTest extends AbstractGeneratedResourceFactoryTestCase
         {
             logger.warn( "\n---\n{}\n---", content );
         }
-        assertFalse( diff.toString(), diff.hasDifferences() );
-
+        assertFalse( diff.hasDifferences(), diff.toString() );
     }
 }

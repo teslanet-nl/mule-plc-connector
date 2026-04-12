@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -23,14 +23,19 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.Export;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.apache.plc4x.java.api.PlcDriver;
+import org.apache.plc4x.java.api.messages.PlcWriteRequest;
+import org.apache.plc4x.java.api.metadata.PlcConnectionMetadata;
+import org.apache.plc4x.java.api.model.PlcTag;
+import org.apache.plc4x.java.api.types.PlcResponseCode;
+import org.apache.plc4x.java.api.value.PlcValue;
+import org.mule.sdk.api.annotation.Configurations;
+import org.mule.sdk.api.annotation.Export;
+import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.JavaVersionSupport;
-import org.mule.sdk.api.annotation.MinMuleVersion;
+import org.mule.sdk.api.annotation.Sources;
+import org.mule.sdk.api.annotation.dsl.xml.Xml;
+import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.sdk.api.meta.JavaVersion;
 
 import nl.teslanet.mule.connectors.plc.internal.error.Errors;
@@ -44,9 +49,8 @@ import nl.teslanet.mule.connectors.plc.internal.error.Errors;
 @Xml( prefix= "plc", namespace= "http://www.teslanet.nl/schema/mule/plc" )
 @Extension( name= "PLC", vendor= "Teslanet.nl" )
 @JavaVersionSupport(
-    { JavaVersion.JAVA_8, JavaVersion.JAVA_11, JavaVersion.JAVA_17 }
+    { JavaVersion.JAVA_17, JavaVersion.JAVA_21 }
 )
-@MinMuleVersion( value= "4.1" )
 @Configurations(
     { MulePlcConfig.class }
 )
@@ -54,8 +58,10 @@ import nl.teslanet.mule.connectors.plc.internal.error.Errors;
     { EventListener.class }
 )
 @ErrorTypes( Errors.class )
-@Export( resources=
-{ "nl/teslanet/mule/connectors/plc/v1/plc.rnc", "nl/teslanet/mule/connectors/plc/v1/plc.xsd" } )
+//TODO v2 remove export from libs
+@Export( classes=
+{ PlcDriver.class, PlcConnectionMetadata.class, PlcWriteRequest.class, PlcResponseCode.class, PlcTag.class, PlcValue.class }, resources= {
+    "nl/teslanet/mule/connectors/plc/v1/plc.rnc", "nl/teslanet/mule/connectors/plc/v1/plc.xsd" } )
 public class MulePlcConnector
 {
     // NOOP

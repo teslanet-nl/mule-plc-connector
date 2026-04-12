@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -23,24 +23,21 @@
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import java.io.InputStream;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcUnsubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
+import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
-import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.sdk.api.annotation.error.Throws;
+import org.mule.sdk.api.annotation.param.Config;
+import org.mule.sdk.api.annotation.param.Connection;
+import org.mule.sdk.api.annotation.param.ParameterGroup;
+import org.mule.sdk.api.runtime.operation.Result;
 
 import nl.teslanet.mule.connectors.plc.api.EventHandlingGroup;
 import nl.teslanet.mule.connectors.plc.api.ReadRequestBuilder;
@@ -48,6 +45,9 @@ import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
 import nl.teslanet.mule.connectors.plc.api.Subscription;
 import nl.teslanet.mule.connectors.plc.api.Unsubscription;
 import nl.teslanet.mule.connectors.plc.api.WriteRequestBuilder;
+import nl.teslanet.mule.connectors.plc.api.response.FieldResponse;
+import nl.teslanet.mule.connectors.plc.api.response.FieldValueResponse;
+import nl.teslanet.mule.connectors.plc.api.response.ResponseAttributes;
 import nl.teslanet.mule.connectors.plc.internal.error.ConcurrencyException;
 import nl.teslanet.mule.connectors.plc.internal.error.ConnectorExecutionException;
 import nl.teslanet.mule.connectors.plc.internal.error.InvalidHandlerNameException;
@@ -60,8 +60,7 @@ import nl.teslanet.mule.connectors.plc.internal.exception.InternalConcurrencyExc
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalConnectionException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalInvalidHandlerNameException;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalUnsupportedException;
-import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer;
-import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSerializerResult;
+import nl.teslanet.mule.connectors.plc.internal.utils.MessageUtils;
 
 
 /**
@@ -81,9 +80,8 @@ public class MulePlcOperations
      * Ping the PLC.
     * @throws InterruptedException When the operation was interrupted.
      */
-    @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.ANY, strict= false )
     @Throws( PingErrorProvider.class )
-    public Boolean ping( @Config
+    public boolean ping( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection ) throws InterruptedException
     {
@@ -106,18 +104,41 @@ public class MulePlcOperations
     * @param configuration The PLC connector configuration.
     * @param connection The connection instance
     * @param requestBuilder The builder containing request parameters.
-    * @return The readResponse as Result
-    * @throws ConnectionException 
+    * @return The read response as Result
+    * @throws ConnectionException When the connection is not healthy.
     * @throws InterruptedException When the operation was interrupted.
-     * @throws InternalConcurrencyException When the operation is not allowed.
     */
-    @MediaType( value= MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
-    @OutputXmlType( qname= "plcReadResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
-    public Result< InputStream, ReceivedResponseAttributes > read( @Config
+    public Result< List< FieldValueResponse >, ResponseAttributes > read( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
-    ReadRequestBuilder requestBuilder ) throws ConnectionException, InterruptedException
+    ReadRequestBuilder requestBuilder ) throws InterruptedException, ConnectionException
+    {
+        PlcReadResponse response= doRead( configuration, connection, requestBuilder );
+        boolean success= true;
+        for ( String tagName : response.getTagNames() )
+        {
+            if ( response.getResponseCode( tagName ) != PlcResponseCode.OK )
+            {
+                success= false;
+            }
+        }
+        if ( !success && requestBuilder.isThrowExceptionOnIoError() ) throw new IoErrorException( "One or more fields are not successfully read." );
+        ResponseAttributes responseAttributes= new ResponseAttributes( success );
+        List< FieldValueResponse > fieldResponses= MessageUtils.createFieldResponses( response );
+        return Result.< List< FieldValueResponse >, ResponseAttributes > builder().output( fieldResponses ).attributes( responseAttributes ).build();
+    }
+
+    /**
+    * Read PLC flields.
+    * @param configuration The PLC connector configuration.
+    * @param connection The connection instance
+    * @param requestBuilder The builder containing request parameters.
+    * @return The read response as Result
+    * @throws ConnectionException When the connection is not healthy.
+    * @throws InterruptedException When the operation was interrupted.
+    */
+    private PlcReadResponse doRead( MulePlcConfig configuration, MulePlcConnection connection, ReadRequestBuilder requestBuilder ) throws InterruptedException, ConnectionException
     {
         // Check if this connection support reading of data.
         if ( !connection.canRead() )
@@ -149,17 +170,7 @@ public class MulePlcOperations
         {
             throw new ConnectorExecutionException( "Null response on read." );
         }
-        XmlSerializerResult responsePayload;
-        try
-        {
-            responsePayload= XmlSerializer.xmlSerialize( response );
-        }
-        catch ( ParserConfigurationException e )
-        {
-            throw new ConnectorExecutionException( "Internal error on serializing read response.", e );
-        }
-        if ( requestBuilder.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully read" );
-        return XmlSerializer.createMuleResult( responsePayload );
+        return response;
     }
 
     /**
@@ -168,17 +179,41 @@ public class MulePlcOperations
     * @param connection The connection instance
     * @param requestBuilder The builder containing request parameters.
     * @return The writeResponse as Result.
-    * @throws ConnectionException When connection is lost.
+    * @throws ConnectionException When the connection is not healthy.
     * @throws InterruptedException When the operation was interrupted.
-     * @throws InternalConcurrencyException 
     */
-    @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( OperationErrorProvider.class )
-    @OutputXmlType( qname= "plcWriteResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
-    public Result< InputStream, ReceivedResponseAttributes > write( @Config
+    public Result< List< FieldResponse >, ReceivedResponseAttributes > write( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Request" )
-    WriteRequestBuilder requestBuilder ) throws ConnectionException, InterruptedException
+    WriteRequestBuilder requestBuilder ) throws InterruptedException, ConnectionException
+    {
+        PlcWriteResponse response= doWrite( configuration, connection, requestBuilder );
+        boolean success= true;
+        for ( String tagName : response.getTagNames() )
+        {
+            if ( response.getResponseCode( tagName ) != PlcResponseCode.OK )
+            {
+                success= false;
+            }
+        }
+        if ( !success && requestBuilder.isThrowExceptionOnIoError() ) throw new IoErrorException( "One or more fields are not successfully written." );
+        ReceivedResponseAttributes responseAttributes= new ReceivedResponseAttributes( success );
+        List< FieldResponse > fieldResponses= MessageUtils.createFieldResponses( response );
+        return Result.< List< FieldResponse >, ReceivedResponseAttributes > builder().output( fieldResponses ).attributes( responseAttributes ).build();
+    }
+
+    /**
+     * Execute write operation.
+     * @param configuration The PLC connector configuration.
+     * @param connection The connection instance
+     * @param requestBuilder The builder containing request parameters.
+     * @return The writeResponse as Result.
+     * @throws ConnectionException When connection is lost.
+     * @throws InterruptedException When the operation was interrupted.
+     */
+    private PlcWriteResponse doWrite( MulePlcConfig configuration, MulePlcConnection connection, WriteRequestBuilder requestBuilder ) throws InterruptedException,
+        ConnectionException
     {
         // Check if this connection support writing of data.
         if ( !connection.canWrite() )
@@ -210,36 +245,53 @@ public class MulePlcOperations
         {
             throw new ConnectorExecutionException( "Null response on write." );
         }
-        XmlSerializerResult responsePayload;
-        try
-        {
-            responsePayload= XmlSerializer.xmlSerialize( response );
-        }
-        catch ( ParserConfigurationException e )
-        {
-            throw new ConnectorExecutionException( "Internal error on serializing write response.", e );
-        }
-        if ( requestBuilder.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully written" );
-        return XmlSerializer.createMuleResult( responsePayload );
+        return response;
     }
 
     /**
-    * Subscribe PLC fields.
-    * @param configuration The PLC connector configuration.
-    * @param connection The connection instance
-    * @param subscription The subscription parameters.
-    * @return The readResponse as Result
-    * @throws ConnectionException 
-    * @throws InterruptedException When the operation was interrupted.
-    */
-    @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
+     * Subscribe PLC fields.
+     * @param configuration The PLC connector configuration.
+     * @param connection The connection instance
+     * @param subscription The subscription parameters.
+     * @return The readResponse as Result
+     * @throws ConnectionException 
+     * @throws InterruptedException When the operation was interrupted.
+     */
     @Throws( SubscribeErrorProvider.class )
-    @OutputXmlType( qname= "plcSubscribeResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
-    public Result< InputStream, ReceivedResponseAttributes > subscribe( @Config
+    public Result< List< FieldResponse >, ReceivedResponseAttributes > subscribe( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Event Handling" )
     EventHandlingGroup eventHandling, @ParameterGroup( name= "Subscription" )
     Subscription subscription ) throws ConnectionException, InterruptedException
+    {
+        PlcSubscriptionResponse response= doSubscribe( configuration, connection, subscription, eventHandling );
+        boolean success= true;
+        for ( String tagName : response.getTagNames() )
+        {
+            if ( response.getResponseCode( tagName ) != PlcResponseCode.OK )
+            {
+                success= false;
+            }
+        }
+        if ( !success && subscription.isThrowExceptionOnIoError() ) throw new IoErrorException( "One or more fields are not successfully subscribed to." );
+        ReceivedResponseAttributes responseAttributes= new ReceivedResponseAttributes( success );
+        List< FieldResponse > fieldResponses= MessageUtils.createFieldResponses( response );
+        return Result.< List< FieldResponse >, ReceivedResponseAttributes > builder().output( fieldResponses ).attributes( responseAttributes ).build();
+    }
+
+    /**
+     * Execute subscribe operation.
+     * @param configuration The PLC connector configuration.
+     * @param connection The connection instance
+     * @param subscription The builder containing request parameters.
+     * @param eventHandling The event handling parameters
+     * @return The writeResponse as Result.
+     * @throws ConnectionException When connection is lost.
+     * @throws InterruptedException When the operation was interrupted.
+    **/
+    private PlcSubscriptionResponse doSubscribe( MulePlcConfig configuration, MulePlcConnection connection, Subscription subscription, EventHandlingGroup eventHandling )
+        throws ConnectionException,
+        InterruptedException
     {
         // Check if this connection supports subscribing.
         if ( !connection.canSubscribe() )
@@ -281,19 +333,9 @@ public class MulePlcOperations
         {
             throw new ConnectorExecutionException( "Null response on subscription." );
         }
-        XmlSerializerResult responsePayload;
-        try
-        {
-            responsePayload= XmlSerializer.xmlSerialize( response );
-        }
-        catch ( ParserConfigurationException e )
-        {
-            throw new ConnectorExecutionException( "Internal error on serializing subscribe response.", e );
-        }
-        if ( subscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully subscribed to." );
         //register subscription
         eventProcessor.register( response );
-        return XmlSerializer.createMuleResult( responsePayload );
+        return response;
     }
 
     /**
@@ -301,17 +343,30 @@ public class MulePlcOperations
     * @param configuration The PLC connector configuration.
     * @param connection The connection instance
     * @param unsubscription The subscription parameters.
-    * @return The readResponse as Result
     * @throws ConnectionException 
     * @throws InterruptedException When the operation was interrupted.
     */
-    @org.mule.runtime.extension.api.annotation.param.MediaType( value= org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML, strict= true )
     @Throws( SubscribeErrorProvider.class )
-    @OutputXmlType( qname= "plcUnsubscribeResponse", schema= "nl/teslanet/mule/connectors/plc/v1/plc.xsd" )
-    public Result< InputStream, ReceivedResponseAttributes > unsubscribe( @Config
+    public void unsubscribe( @Config
     MulePlcConfig configuration, @Connection
     MulePlcConnection connection, @ParameterGroup( name= "Subscription" )
     Unsubscription unsubscription ) throws ConnectionException, InterruptedException
+    {
+        doUnSubscribe(configuration, connection, unsubscription);
+    }
+    
+    /**
+     * Execute un-subscribe operation.
+     * @param configuration The PLC connector configuration.
+     * @param connection The connection instance
+     * @param unsubscription The builder containing request parameters.
+     * @return The writeResponse as Result.
+     * @throws ConnectionException When connection is lost.
+     * @throws InterruptedException When the operation was interrupted.
+    **/
+    private PlcUnsubscriptionResponse doUnSubscribe( MulePlcConfig configuration, MulePlcConnection connection, Unsubscription unsubscription )
+        throws ConnectionException,
+        InterruptedException
     {
         // Check if this connection supports subscribing.
         if ( !connection.canSubscribe() )
@@ -343,16 +398,6 @@ public class MulePlcOperations
         {
             throw new ConnectorExecutionException( "Null response on unsubscription." );
         }
-        XmlSerializerResult responsePayload;
-        try
-        {
-            responsePayload= XmlSerializer.xmlSerialize( response );
-        }
-        catch ( ParserConfigurationException e )
-        {
-            throw new ConnectorExecutionException( "Internal error on serializing unsubscribe response.", e );
-        }
-        if ( unsubscription.isThrowExceptionOnIoError() && !responsePayload.isIndicatesSucces() ) throw new IoErrorException( "One or more fields are not successfully unsubscribed to" );
-        return XmlSerializer.createMuleResult( responsePayload );
+        return response;
     }
 }

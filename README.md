@@ -5,27 +5,37 @@
 
 Mule PLC Connector is a Mule extension that enables Mule 4 applications to communicate with PLC devices.
 
-Several PLC protocols that are supported by the [Apache PLC4X project](https://plc4x.apache.org/) can be used:
+All PLC protocols that are supported by the [Apache PLC4X project](https://plc4x.apache.org/) can be used:
 
 - AB-ETH
-- ADS/AMS
+- ADS (Automation Device Specification)
 - BACnet/IP
+- C-Bus
 - CANopen
+- CtlrX
 - DeltaV
 - DF1
 - EtherNet/IP
 - Firmata
+- Generic CAN
+- IEC-60870
 - KNXnet/IP
-- Modbus
+- Logix
+- Modbus (TCP/UDP/Serial)
 - OPC UA
+- Open-Protocol (Torque-Tools)
+- PLC4X (Proxy) (TCP)
+- Profinet (In Development)
 - S7 (Step7)
+- S7-Light (Step7)
 - Simulated
+- UMAS (Schneider Electric PLCs) 
 
 ### Dependencies
-The Mule PLC Connector uses [Apache PLC4X](https://plc4x.apache.org/) version 0.10.0
+The Mule PLC Connector uses [Apache PLC4X](https://plc4x.apache.org/) version 0.13.1
 
 ### Supported Mule versions
-* Mule 4.1+
+* Mule 4.9+
 
 ## Installation
 
@@ -35,7 +45,7 @@ The connector is installed by adding its Maven dependency to your Mule 4 applica
 <dependency>
     <groupId>nl.teslanet.mule.connectors.plc</groupId>
     <artifactId>mule-plc-connector</artifactId>
-    <version>1.1.2</version>
+    <version>2.0.0-M1</version>
     <classifier>mule-plugin</classifier>
 </dependency>
 ```
@@ -43,18 +53,18 @@ The connector is installed by adding its Maven dependency to your Mule 4 applica
 When the dependency is added to your application in [AnypointStudio 7](https://en.wikipedia.org/wiki/MuleSoft), the connector will be installed from [Maven Central](). After that the Mule Palette in AnypointStudio will show the connectors operations, ready for use. 
 
 For every PLC protocol needed in your application, the corresponding PLC4X Driver has to be added as dependency.
-For example, to use Modbus and Simulated protocol add the dependencies to the pom like this:
+For example, to use Modbus and Simulated protocol add the dependencies to the pom:
  
 ```
 		<dependency>
 			<groupId>org.apache.plc4x</groupId>
 			<artifactId>plc4j-driver-simulated</artifactId>
-			<version>0.10.0</version>
+			<version>0.13.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.plc4x</groupId>
 			<artifactId>plc4j-driver-modbus</artifactId>
-			<version>0.10.0</version>
+			<version>0.13.1</version>
 		</dependency>
 
 ```
@@ -65,7 +75,7 @@ See [PLC4X site](https://plc4x.apache.org/users/protocols/) for the the availabl
 Needed PLC4X Drivers have to be added as shared library to the configuration of the Mule Maven Plugin. This way the drivers become 
 available on the classpath of the Mule PLC Connector. 
 
-For example, to use Modbus and Simulated protocol, add the shared library configuration to the pom like this:
+For example, to use Modbus and Simulated protocol, add the shared library configuration to the pom:
 
 ```
 	<plugin>
@@ -155,25 +165,31 @@ Xml configuration:
     </plc:read>
 ```
 
-The result of the read operation is a **plcReadResponse** message describing the values that are read. It contains an entry for every field. Each entry gives the responseCode, alias and the values that are read.
-The response on the request above could be:
+The result of the read operation is a **FieldValueResponse** list describing the fields and the values read. It contains an entry for every field. Each entry gives the alias, result and the values of the field.
+Your application can use this response, for example using Dataweave:
 
 ```
-    <plcReadResponse>
-        <field alias="input1" count="1" responseCode="OK" type="BOOL">
-            <value>true</value>
-        </field>
-        <field alias="coil2" count="1" responseCode="OK" type="BOOL">
-            <value>false</value>
-        </field>
-        <field alias="register34array2" count="2" responseCode="OK" type="INT">
-            <values>
-                <value>31</value>
-                <value>45</value>
-            </values>
-        </field>
-    </plcReadResponse>
+%dw 2.0
+output application/java
 
+var input1= payload[?( $.alias == 'input1' )][0]
+var coil2= payload[?( $.alias == 'coil2' )][0]
+var register34array2= payload[?( $.alias == 'register34array2' )][0]
+---
+{
+    input1_success: input1.result == 'OK',
+    input1_type:    input1.fieldType,
+    input1_value:   input1.value.asBinary,
+    
+    coil2_success: coil2.result == 'OK',
+    coil2_type:    coil2.fieldType,
+    coil2_value:   coil2.value.asBoolean,
+    
+    register34array2_success: register34array2.result == 'OK',
+    register34array2_type:    register34array2.fieldType,
+    register34array2_values:  register34array2.value.asList 
+        map ( val ) -> val.asInteger
+}
 ```
 
 ### Write operation
@@ -197,23 +213,20 @@ Xml configuration:
     </plc:write>
 ```
 
-The result of the write operation is a **plcWriteResponse** message describing which values are successfully written. The written values are returned in the response for information. 
-
-The response on the request above could be:
+The result of the write operation is a **FieldResponse** list, describing which values are successfully written. 
+Your application can use this response, for example using Dataweave:
 
 ```
-    <plcWriteResponse>
-        <field alias="coil1" count="1" responseCode="OK" type="BOOL">
-            <value>true</value>
-        </field>
-        <field alias="register34array2" count="2" responseCode="OK"
-            type="INT">
-            <values>
-                <value>11</value>
-                <value>22</value>
-            </values>
-        </field>
-    </plcWriteResponse>
+%dw 2.0
+output application/java
+
+var coil2= payload[?( $.alias == 'coil2' )][0]
+var register34array2= payload[?( $.alias == 'register34array2' )][0]
+---
+{
+    coil2_success:            coil2.result == 'OK',
+    register34array2_success: register34array2.result == 'OK',
+}
 
 ```
 
@@ -237,16 +250,20 @@ Xml configuration:
     </plc:subscribe>
 ```
 
-The result of the subscribe operation is a **plcSubscribeResponse** message describing which fields are successfully subscribed to.
-
-The response on the request above could be:
+The result of the subscribe operation is a **FieldResponse** message describing which fields are successfully subscribed to.
+Your application can use this response, for example using Dataweave:
 
 ```
-    <plcSubscribeResponse>
-        <field alias="coil1" responseCode="OK"/>
-        <field alias="reg1" responseCode="OK"/>
-    </plcSubscribeResponse>
+%dw 2.0
+output application/java
 
+var coil2= payload[?( $.alias == 'coil2' )][0]
+var reg1= payload[?( $.alias == 'reg1' )][0]
+---
+{
+    coil2_success: coil2.result == 'OK',
+    reg1_success:  reg1.result == 'OK',
+}
 ```
 
 ### Unsubscribe operation
@@ -269,14 +286,7 @@ Xml configuration:
     </plc:unsubscribe>
 ```
 
-The result of the unsubscribe operation is a **plcUnsubscribeResponse** message describing which subscription has been cancelled.
-
-The response on the request above could be:
-
-```
-    <plcUnsubscribeResponse/>
-
-```
+The result of the unsubscribe operation is void.
 
 ### Event listener
 
@@ -292,21 +302,19 @@ Xml configuration:
     <plc:event-listener doc:name="Event listener" eventHandler="Event_handler"/>
 ```
 
-The events are delivered using a **plcEvent** message containing actual value(s) of the field. The field alias in the event messages matches the alias given in the subscription.
-
-An event message from the subscription above could be:
-
-```
-<plcEvent>
-  <field alias="coil1" responseCode="OK">
-    <values>
-      <value>true</value>
-      <value>false</value>
-    </values>
-  </field>
-</plcEvent>
+The events are delivered using a **FieldValueResponse** message per event, containing actual value(s) of the field. The field alias in the event messages matches the alias given in the subscription.
+Your application can use this response, for example using Dataweave:
 
 ```
+%dw 2.0
+output application/java
 
-    
-    
+var reg1= payload[?( $.alias == 'reg1' )][0]
+---
+{
+    reg1_success: reg1.result == 'OK',
+    reg1_type:    reg1.fieldType,
+    reg1_values:  reg1.value.asList 
+        map ( val ) -> val.asInteger
+}
+```
