@@ -2,7 +2,7 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
@@ -61,7 +61,7 @@ import nl.teslanet.mule.connectors.plc.internal.MulePlcConnector;
 /**
  * Test the Mule extension schema.
  */
-public class ExtensionXsdTest
+class ExtensionXsdTest
 {
     private static final Logger logger= LoggerFactory.getLogger( ExtensionXsdTest.class.getCanonicalName() );
 
@@ -74,7 +74,7 @@ public class ExtensionXsdTest
     private DslResolvingContext dslContext;
 
     @BeforeEach
-    public void before()
+    void before()
     {
         Map< String, Object > params= of(
             TYPE_PROPERTY_NAME,
@@ -97,7 +97,7 @@ public class ExtensionXsdTest
     }
 
     @Test
-    public void xsdTest() throws IOException
+    void xsdTest() throws IOException
     {
         DefaultExtensionSchemaGenerator generator= new DefaultExtensionSchemaGenerator();
         String schema= generator.generate( extensionModel, dslContext );

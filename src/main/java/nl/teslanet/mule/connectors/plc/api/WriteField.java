@@ -58,4 +58,12 @@ public class WriteField extends FieldSpec
     {
         return values;
     }
+
+    /**
+     * @param values the values to set
+     */
+    public void setValues( List< Object > values )
+    {
+        this.values= values;
+    }
 }

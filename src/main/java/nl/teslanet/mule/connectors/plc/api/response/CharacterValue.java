@@ -28,8 +28,7 @@ import java.math.BigInteger;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Character response value.
  */
 public record CharacterValue( char value ) implements Valuable
 {
@@ -37,18 +36,6 @@ public record CharacterValue( char value ) implements Valuable
     public boolean isSimple()
     {
         return true;
-    }
-
-    @Override
-    public boolean isNullable()
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isNull()
-    {
-        return false;
     }
 
     @Override
@@ -72,7 +59,7 @@ public record CharacterValue( char value ) implements Valuable
     @Override
     public byte getAsByte()
     {
-        if ( !isShort() ) return Valuable.super.getAsByte();
+        if ( !isByte() ) return Valuable.super.getAsByte();
         return (byte) value;
     }
 
@@ -122,7 +109,7 @@ public record CharacterValue( char value ) implements Valuable
     @Override
     public BigInteger getAsBigInteger()
     {
-        return BigInteger.valueOf( (long) value );
+        return BigInteger.valueOf( value );
     }
 
     @Override

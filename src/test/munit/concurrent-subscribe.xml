@@ -22,17 +22,14 @@
   #L%
 -->
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-    xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+    xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
     xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
     xmlns:plc="http://www.teslanet.nl/schema/mule/plc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
     http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
     http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd 
-    http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd
-    http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
-    http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd    
-    http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
+    http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd"
 >
 
     <munit:config name="concurrent-subscribe-testsuite">
@@ -51,9 +48,6 @@
             </munit:parameterization>
         </munit:parameterizations>
     </munit:config>
-
-    <!-- object doc:name="testPlc" doc:id="c7b0751c-635f-48c7-89dd-75ea0ef10db0" name="testPlc" class="nl.teslanet.mule.connectors.plc.test.utils.TestPlc" 
-        / -->
 
     <plc:config name="PLC_Config_Concurrent-subscribe-sim" timeout="20" timeoutUnits="SECONDS">
         <plc:connection connectionString="simulated:test-plc" concurrentIo="-1" concurrentSubscribes="1" />

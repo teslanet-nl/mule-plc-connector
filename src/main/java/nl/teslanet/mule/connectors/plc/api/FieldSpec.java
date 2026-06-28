@@ -53,4 +53,12 @@ public class FieldSpec extends FieldAlias
     {
         return address;
     }
+
+    /**
+     * @param address the address to set
+     */
+    public void setAddress( String address )
+    {
+        this.address= address;
+    }
 }

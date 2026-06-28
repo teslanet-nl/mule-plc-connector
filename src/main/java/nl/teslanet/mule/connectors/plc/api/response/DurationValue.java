@@ -28,8 +28,7 @@ import java.time.Duration;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Duration response value.
  */
 public record DurationValue( Duration value ) implements Valuable
 {

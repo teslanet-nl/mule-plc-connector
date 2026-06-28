@@ -49,4 +49,12 @@ public class Unsubscription extends IoRequestBuilder
     {
         return unsubscribeFields;
     }
+
+    /**
+     * @param unsubscribeFields the unsubscribeFields to set
+     */
+    public void setUnsubscribeFields( List< UnsubscribeField > unsubscribeFields )
+    {
+        this.unsubscribeFields= unsubscribeFields;
+    }
 }

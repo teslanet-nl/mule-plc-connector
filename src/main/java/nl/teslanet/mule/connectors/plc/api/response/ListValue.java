@@ -27,8 +27,7 @@ import java.util.List;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * List response value.
  */
 public record ListValue( List< ResponseValue > list ) implements Valuable
 {

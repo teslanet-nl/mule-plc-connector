@@ -28,8 +28,7 @@ import java.math.BigInteger;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Short response value.
  */
 public record ShortValue( short value ) implements Valuable
 {
@@ -55,13 +54,13 @@ public record ShortValue( short value ) implements Valuable
     @Override
     public boolean isByte()
     {
-        return (value <= Byte.MAX_VALUE) && (value >= Byte.MIN_VALUE);
+        return ( value <= Byte.MAX_VALUE ) && ( value >= Byte.MIN_VALUE );
     }
 
     @Override
     public byte getAsByte()
     {
-        if ( !isByte()) return Valuable.super.getAsByte();
+        if ( !isByte() ) return Valuable.super.getAsByte();
         return (byte) value;
     }
 
@@ -110,7 +109,7 @@ public record ShortValue( short value ) implements Valuable
     @Override
     public BigInteger getAsBigInteger()
     {
-        return BigInteger.valueOf(value);
+        return BigInteger.valueOf( value );
     }
 
     @Override
@@ -146,7 +145,7 @@ public record ShortValue( short value ) implements Valuable
     @Override
     public BigDecimal getAsBigDecimal()
     {
-        return BigDecimal.valueOf(value);
+        return BigDecimal.valueOf( value );
     }
 
     @Override

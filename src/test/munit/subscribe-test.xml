@@ -21,22 +21,20 @@
   limitations under the License.
   #L%
 -->
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
-    xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module"
-    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+<mule 
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
     xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
     xmlns:plc="http://www.teslanet.nl/schema/mule/plc"
     xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
-        http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
-        http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd
-        http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
-        http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
-        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
+      http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+      http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+      http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd"
 >
 
-    <munit:config name="plc-basic-testsuite" />
+    <munit:config name="plc-subscribe-testsuite" />
 
     <plc:config name="PLC_Config_Subscribe1">
         <plc:connection connectionString="simulated:plc1" />
@@ -54,8 +52,9 @@
         <plc:connection connectionString="simulated:plc4" />
     </plc:config>
 
-    <plc:event-handler name="Event_handler1" doc:name="Event handler" />
-    <plc:event-handler name="Event_handler2" doc:name="Event handler" />
+    <plc:event-handler name="Event_handler1" doc:name="Event handler 1" />
+    <plc:event-handler name="Event_handler2" doc:name="Event handler 2" />
+    <plc:event-handler name="Event_handler3" doc:name="Event handler 3" />
 
     <flow name="subscribe-eventhandler1a" doc:id="a8cafcc2-e87f-44e3-a239-073682f235c9">
         <plc:event-listener doc:name="Event listener" eventHandler="Event_handler1" />
@@ -77,25 +76,36 @@
             doc:id="b5cdf4f6-1533-4dc9-a477-6564c8568c26" queueName="subscribe-eventhandler1b-payload" />
     </flow>
 
-    <flow name="subscribe-eventhandler2" doc:id="351b7a24-7ad8-487e-8dfa-2795b99bfce4">
+    <flow name="subscribe-eventhandler2" doc:id="51a895a1-5cfc-4f4f-b851-a6abb84423d4">
         <plc:event-listener doc:name="Event listener" eventHandler="Event_handler2" />
         <logger level="INFO" doc:name="Logger" message="#['EVENT2']"
             category="nl.teslanet.mule.connectors.plc.test" />
         <logger level="INFO" doc:name="Logger" message="#[message]"
             category="nl.teslanet.mule.connectors.plc.test" />
         <munit-tools:queue doc:name="subscribe-eventhandler2-payload"
-            doc:id="5f184098-b4ce-4779-82eb-d8009af78856" queueName="subscribe-eventhandler2-payload" />
+            doc:id="266fad21-d716-4571-9634-0c03a31f7717" queueName="subscribe-eventhandler2-payload" />
     </flow>
 
-    <munit:test name="plc-subscribe-test">
+    <flow name="subscribe-eventhandler3" doc:id="23e9cf37-f6a2-4980-a071-6f583b17c2cf">
+        <plc:event-listener doc:name="Event listener" eventHandler="Event_handler3" />
+        <logger level="INFO" doc:name="Logger" message="#['EVENT3']"
+            category="nl.teslanet.mule.connectors.plc.test" />
+        <logger level="INFO" doc:name="Logger" message="#[message]"
+            category="nl.teslanet.mule.connectors.plc.test" />
+        <munit-tools:queue doc:name="subscribe-eventhandler3-payload"
+            doc:id="ca629e86-831c-4c8e-9412-ffd972c7005e" queueName="subscribe-eventhandler3-payload" />
+    </flow>
+
+    <munit:test name="plc-subscribe">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="subscribe-eventhandler1a" />
             <munit:enable-flow-source value="subscribe-eventhandler1b" />
             <munit:enable-flow-source value="subscribe-eventhandler2" />
+            <munit:enable-flow-source value="subscribe-eventhandler3" />
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:clear-stored-data doc:name="Clear stored data"
-                doc:id="2ad40d4a-1349-4069-a5dc-37eea2de9c5a" />
+                doc:id="8fcb6e9b-0b31-45cb-b13c-45378b1802ca" />
             <plc:write doc:name="Write1" config-ref="PLC_Config_Subscribe1">
                 <reconnect count="5" frequency="500" />
                 <plc:write-fields>
@@ -104,7 +114,7 @@
                 </plc:write-fields>
             </plc:write>
             <munit-tools:sleep time="100" doc:name="Sleep"
-                doc:id="d60c58d6-3d7b-416b-b894-ddd404caa6da" />
+                doc:id="1ab5fcfc-7f49-4d9e-8aa4-52da52678d90" />
             <plc:subscribe doc:name="Subscribe" config-ref="PLC_Config_Subscribe1"
                 eventHandler="Event_handler1"
             >
@@ -121,7 +131,7 @@
                 </plc:write-fields>
             </plc:write>
             <munit-tools:sleep time="100" doc:name="Sleep"
-                doc:id="f9ab84ce-ffc8-4e08-960d-fa11d7f62154" />
+                doc:id="f97f98b1-7236-48e5-818c-ab20cafcb228" />
             <plc:write doc:name="Write2" config-ref="PLC_Config_Subscribe1">
                 <reconnect count="5" frequency="500" />
                 <plc:write-fields>
@@ -130,51 +140,143 @@
                 </plc:write-fields>
             </plc:write>
             <munit-tools:sleep time="100" doc:name="Sleep"
-                doc:id="1ec6fd85-7968-4aa4-a2de-eebdd477d854" />
+                doc:id="6145bb9d-295d-420c-9ea6-cab70ca30773" />
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-equals actual="#[sizeOf( payload )]" expected="#[1]"
                 message="#['expected payload size == 1, but was: ' ++ sizeOf(payload ) as String]"
                 doc:name="payload size == 1" />
             <munit-tools:dequeue doc:name="subscribe-eventhandler1a-payload"
-                doc:id="c10f7898-83ee-46aa-b03e-41da561e4cc9" queueName="subscribe-eventhandler1a-payload"
+                doc:id="e73cca47-46b6-496b-8c13-3c06286c3a0f" queueName="subscribe-eventhandler1a-payload"
                 timeout="#[100]" />
-            <logger level="INFO" doc:name="Logger" doc:id="853f3089-8e83-44d5-98dd-be527978ddb4"
+            <logger level="INFO" doc:name="Logger" doc:id="60db88db-13ef-409a-9dbc-f34d345243cc"
                 message="#[payload]" />
             <munit-tools:assert-equals doc:name="alias == coil1"
-                doc:id="500c936e-2dca-4dc1-a25a-9539aca96ab1" actual="#[payload[0].alias]" expected="coil1"
+                doc:id="27cf1fc6-6949-4eb8-96a1-fa023077dbb9" actual="#[payload[0].alias]" expected="coil1"
                 message="wrong alias" />
             <munit-tools:assert-equals doc:name="result == ok"
-                doc:id="cc544a63-1ad6-400a-9b3b-2d830094a021" actual="#[payload[0].result]" expected="OK"
+                doc:id="5f964c34-c6fb-4c1e-98d9-2461ff5375fb" actual="#[payload[0].result]" expected="OK"
                 message="wrong result" />
             <munit-tools:assert-equals doc:name="value is list"
-                doc:id="21d8fb4a-9c74-4b4c-8678-12091d8956b3" actual="#[payload[0].value.list]" expected="#[true]"
+                doc:id="04081e70-9fc5-4c57-881a-0fb7a9f8e0f1" actual="#[payload[0].value.list]" expected="#[true]"
                 message="wrong value" />
             <munit-tools:assert-equals doc:name="value 0 as boolean"
-                doc:id="296405db-491e-4c24-9b3f-97b57abe9c68" actual="#[payload[0].value.asList[0].asBoolean]"
+                doc:id="d6fd01ef-55fb-40d7-b063-bcd205ca9e8d" actual="#[payload[0].value.asList[0].asBoolean]"
                 expected="#[false]" message="wrong value" />
             <munit-tools:assert-equals doc:name="value 1 as boolean"
-                doc:id="4d7b61ff-734a-43f3-a402-174ea0ece6f4" actual="#[payload[0].value.asList[1].asBoolean]"
+                doc:id="c56413ad-7766-4697-9235-59ded17bb74d" actual="#[payload[0].value.asList[1].asBoolean]"
                 expected="#[true]" message="wrong value" />
             <munit-tools:dequeue doc:name="subscribe-eventhandler1a-payload"
-                doc:id="1d1e7120-a662-48e4-b233-0de6f8b4bfc0" queueName="subscribe-eventhandler1a-payload"
+                doc:id="43d0566b-0941-4758-a526-9e9977193137" queueName="subscribe-eventhandler1a-payload"
                 timeout="#[100]" />
-            <logger level="INFO" doc:name="Logger" doc:id="345ceb89-13c8-48b6-ade3-63d01c8df206"
+            <logger level="INFO" doc:name="Logger" doc:id="c4e8bfd9-6db0-4eeb-8777-43574586bdff"
                 message="#[payload]" />
             <munit-tools:assert-equals doc:name="alias == reg1"
-                doc:id="8eff42df-8502-4ef3-b610-8039e4418d77" actual="#[payload[0].alias]" expected="reg1"
+                doc:id="b2592370-3043-4ec9-84db-60d4518bd2ac" actual="#[payload[0].alias]" expected="reg1"
                 message="wrong alias" />
             <munit-tools:assert-equals doc:name="result == ok"
-                doc:id="0ae92690-7093-4d53-88fc-0d2ad7de9d2c" actual="#[payload[0].result]" expected="OK"
+                doc:id="a52bd90e-70bb-4c1e-8602-76f839ff45a9" actual="#[payload[0].result]" expected="OK"
                 message="wrong result" />
             <munit-tools:assert-equals doc:name="value is list"
-                doc:id="6d7442fb-bb90-4f84-b6cd-9e4bf28e801a" actual="#[payload[0].value.list]" expected="#[true]"
+                doc:id="c63dfafe-ad6d-4825-bc75-3662b438dd3f" actual="#[payload[0].value.list]" expected="#[true]"
                 message="wrong value" />
             <munit-tools:assert-equals doc:name="value 0 as integer"
-                doc:id="9aad534a-ee91-4c34-afa5-2e0c77819bff" actual="#[payload[0].value.asList[0].asInteger]"
+                doc:id="40add353-ea56-4fa5-837e-2b5157bc071f" actual="#[payload[0].value.asList[0].asInteger]"
                 expected="#[111]" message="wrong value" />
             <munit-tools:assert-equals doc:name="value 1 as integer"
-                doc:id="8630d483-64d2-4238-be6d-d1001f308b85" actual="#[payload[0].value.asList[1].asInteger]"
+                doc:id="b1292605-6f62-4bf6-9748-595f59ee0401" actual="#[payload[0].value.asList[1].asInteger]"
+                expected="#[222]" message="wrong value" />
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="plc-subscribe-dynamic">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="subscribe-eventhandler1a" />
+            <munit:enable-flow-source value="subscribe-eventhandler1b" />
+            <munit:enable-flow-source value="subscribe-eventhandler2" />
+            <munit:enable-flow-source value="subscribe-eventhandler3" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:clear-stored-data doc:name="Clear stored data"
+                doc:id="f9971d37-f39d-4c38-a717-a9d7b877f30f" />
+            <plc:write doc:name="Write1" config-ref="PLC_Config_Subscribe1">
+                <reconnect count="5" frequency="500" />
+                <plc:write-fields>
+                    <plc:write-field alias="coil1" address="STATE/coil1:BOOL[2]"
+                        values="#[ [ true, false ] ]" />
+                </plc:write-fields>
+            </plc:write>
+            <munit-tools:sleep time="100" doc:name="Sleep"
+                doc:id="946503ef-411a-4b7e-8fcf-5252e21a1d96" />
+            <set-variable
+                value="#[%dw 2.6&#10;output application/java&#10;---&#10;[&#10;    {&#10;        alias: 'coil1',&#10;        address: 'STATE/coil1:BOOL[2]'&#10;    },&#10;    {&#10;        alias: 'reg1',&#10;        address: 'STATE/register1:INT[2]'&#10;    }&#10;]]"
+                doc:name="request" doc:id="3a15c0aa-fdbf-45b9-b3f2-c29e10fe9f05" variableName="request" />
+            <plc:subscribe doc:name="Subscribe" config-ref="PLC_Config_Subscribe1"
+                eventHandler="Event_handler3" subscribeFields="#[vars.request]"
+            >
+            </plc:subscribe>
+            <plc:write doc:name="Write1" config-ref="PLC_Config_Subscribe1">
+                <reconnect count="5" frequency="500" />
+                <plc:write-fields>
+                    <plc:write-field alias="coil1" address="STATE/coil1:BOOL[2]"
+                        values="#[[ false, true ]]" />
+                </plc:write-fields>
+            </plc:write>
+            <munit-tools:sleep time="100" doc:name="Sleep"
+                doc:id="66f057b3-8181-45b3-a470-2f2a12c26353" />
+            <plc:write doc:name="Write2" config-ref="PLC_Config_Subscribe1">
+                <reconnect count="5" frequency="500" />
+                <plc:write-fields>
+                    <plc:write-field alias="reg1" address="STATE/register1:INT[2]"
+                        values="#[[ '111', '222' ]]" />
+                </plc:write-fields>
+            </plc:write>
+            <munit-tools:sleep time="100" doc:name="Sleep"
+                doc:id="fdd729a9-5974-4a1f-b8b5-68447f798071" />
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[sizeOf( payload )]" expected="#[1]"
+                message="#['expected payload size == 1, but was: ' ++ sizeOf(payload ) as String]"
+                doc:name="payload size == 1" />
+            <munit-tools:dequeue doc:name="subscribe-eventhandler3-payload"
+                doc:id="c048defb-7819-438c-a2db-d606b2394597" queueName="subscribe-eventhandler3-payload"
+                timeout="#[100]" />
+            <logger level="INFO" doc:name="Logger" doc:id="8caeea0f-93b4-418d-966e-166d380bfa82"
+                message="#[payload]" />
+            <munit-tools:assert-equals doc:name="alias == coil1"
+                doc:id="200127be-965b-4f73-9372-aeabbdfe3d18" actual="#[payload[0].alias]" expected="coil1"
+                message="wrong alias" />
+            <munit-tools:assert-equals doc:name="result == ok"
+                doc:id="9797ee04-130d-4cb0-93f2-6ef13e8084ac" actual="#[payload[0].result]" expected="OK"
+                message="wrong result" />
+            <munit-tools:assert-equals doc:name="value is list"
+                doc:id="e8e2fdab-3a09-44b8-83e7-0b0cb4540c8f" actual="#[payload[0].value.list]" expected="#[true]"
+                message="wrong value" />
+            <munit-tools:assert-equals doc:name="value 0 as boolean"
+                doc:id="720207b7-d748-49e3-a86a-fdb74e81e035" actual="#[payload[0].value.asList[0].asBoolean]"
+                expected="#[false]" message="wrong value" />
+            <munit-tools:assert-equals doc:name="value 1 as boolean"
+                doc:id="c2b72291-d7e1-420f-973f-674b1b246d6c" actual="#[payload[0].value.asList[1].asBoolean]"
+                expected="#[true]" message="wrong value" />
+            <munit-tools:dequeue doc:name="subscribe-eventhandler3-payload"
+                doc:id="03e191ec-1258-4779-a6e8-4e3960788d86" queueName="subscribe-eventhandler3-payload"
+                timeout="#[100]" />
+            <logger level="INFO" doc:name="Logger" doc:id="5c93e674-bed8-4506-b4ee-eb990341c626"
+                message="#[payload]" />
+            <munit-tools:assert-equals doc:name="alias == reg1"
+                doc:id="aabf500b-e1d2-4ec6-847d-28b2da89d054" actual="#[payload[0].alias]" expected="reg1"
+                message="wrong alias" />
+            <munit-tools:assert-equals doc:name="result == ok"
+                doc:id="3e90f343-e59d-4206-a458-7a6c7e1c3ee7" actual="#[payload[0].result]" expected="OK"
+                message="wrong result" />
+            <munit-tools:assert-equals doc:name="value is list"
+                doc:id="fa1bfe9b-1337-4242-bb37-29a19fefda8f" actual="#[payload[0].value.list]" expected="#[true]"
+                message="wrong value" />
+            <munit-tools:assert-equals doc:name="value 0 as integer"
+                doc:id="0b734752-1675-45df-a6b0-4d126fc5aee0" actual="#[payload[0].value.asList[0].asInteger]"
+                expected="#[111]" message="wrong value" />
+            <munit-tools:assert-equals doc:name="value 1 as integer"
+                doc:id="9f4fe27e-eb20-461b-b9d1-81996795cfa7" actual="#[payload[0].value.asList[1].asInteger]"
                 expected="#[222]" message="wrong value" />
         </munit:validation>
     </munit:test>
@@ -184,6 +286,7 @@
             <munit:enable-flow-source value="subscribe-eventhandler1a" />
             <munit:enable-flow-source value="subscribe-eventhandler1b" />
             <munit:enable-flow-source value="subscribe-eventhandler2" />
+            <munit:enable-flow-source value="subscribe-eventhandler3" />
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:clear-stored-data doc:name="Clear stored data"
@@ -285,6 +388,7 @@
             <munit:enable-flow-source value="subscribe-eventhandler1a" />
             <munit:enable-flow-source value="subscribe-eventhandler1b" />
             <munit:enable-flow-source value="subscribe-eventhandler2" />
+            <munit:enable-flow-source value="subscribe-eventhandler3" />
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:clear-stored-data doc:name="Clear stored data"
@@ -387,6 +491,121 @@
                 doc:id="b3165ce9-f555-4bc4-8d82-edc674d73fb8" queueName="subscribe-eventhandler1a-payload"
                 timeout="#[100]" />
             <logger level="INFO" doc:name="Logger" doc:id="777cbb4d-450e-43ff-b03b-b6c99e83af17"
+                message="#[payload]" />
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="plc-subscribe-unsubscribe-dynamic"
+        expectedErrorDescription='Time out waiting for the queue "subscribe-eventhandler1a-payload" to return a result'
+        expectedErrorType="MUNIT-TOOLS:QUEUE_TIMEOUT"
+    >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="subscribe-eventhandler1a" />
+            <munit:enable-flow-source value="subscribe-eventhandler1b" />
+            <munit:enable-flow-source value="subscribe-eventhandler2" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:clear-stored-data doc:name="Clear stored data"
+                doc:id="6c8d3cdb-5624-43fb-8c88-0eb8ecd95c8d" />
+            <plc:write doc:name="Write1" config-ref="PLC_Config_Subscribe2">
+                <reconnect count="5" frequency="500" />
+                <plc:write-fields>
+                    <plc:write-field alias="coil1" address="STATE/coil1:BOOL[2]"
+                        values="#[ [ false, true ] ]" />
+                </plc:write-fields>
+            </plc:write>
+            <munit-tools:sleep time="100" doc:name="Sleep"
+                doc:id="803db4cb-f417-4466-9dba-0a923fdb7c28" />
+            <plc:subscribe doc:name="Subscribe" config-ref="PLC_Config_Subscribe2"
+                eventHandler="Event_handler3"
+            >
+                <plc:subscribe-fields>
+                    <plc:subscribe-field alias="coil1" address="STATE/coil1:BOOL[2]" />
+                    <plc:subscribe-field alias="reg1" address="STATE/register1:INT[2]" />
+                </plc:subscribe-fields>
+            </plc:subscribe>
+            <plc:write doc:name="Write1" config-ref="PLC_Config_Subscribe2">
+                <reconnect count="5" frequency="500" />
+                <plc:write-fields>
+                    <plc:write-field alias="coil1" address="STATE/coil1:BOOL[2]"
+                        values="#[[ true, false ]]" />
+                </plc:write-fields>
+            </plc:write>
+            <munit-tools:sleep time="100" doc:name="Sleep"
+                doc:id="c445ab46-34c8-483a-a531-de17e6ff4975" />
+            <plc:write doc:name="Write2" config-ref="PLC_Config_Subscribe2">
+                <reconnect count="5" frequency="500" />
+                <plc:write-fields>
+                    <plc:write-field alias="reg1" address="STATE/register1:INT[2]"
+                        values="#[[ '111', '222' ]]" />
+                </plc:write-fields>
+            </plc:write>
+            <munit-tools:sleep time="100" doc:name="Sleep"
+                doc:id="290ba23e-172f-4885-be7e-0df1d62bfc44" />
+            <set-variable
+                value="#[%dw 2.6&#10;output application/java&#10;---&#10;[&#10;    {&#10;        alias: 'coil1',&#10;    },&#10;    {&#10;        alias: 'reg1',&#10;    }&#10;]]"
+                doc:name="request" doc:id="30bfd448-de66-4840-85d5-311bcb3fecb2" variableName="request" />
+            <plc:unsubscribe doc:name="Unsubscribe" config-ref="PLC_Config_Subscribe2"
+                unsubscribeFields="#[vars.request]"
+            >
+            </plc:unsubscribe>
+            <plc:write doc:name="Write" config-ref="PLC_Config_Subscribe2">
+                <reconnect count="5" frequency="500" />
+                <plc:write-fields>
+                    <plc:write-field alias="coil1" address="STATE/coil1:BOOL[2]"
+                        values="#[ [ true, true ] ]" />
+                </plc:write-fields>
+            </plc:write>
+            <munit-tools:sleep time="0" doc:name="Sleep" doc:id="b0a1c804-1e65-46e2-adc2-365df8e85402" />
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[sizeOf( payload )]" expected="#[1]"
+                message="#['expected payload size == 1, but was: ' ++ sizeOf(payload ) as String]"
+                doc:name="payload size == 1" />
+            <munit-tools:dequeue doc:name="subscribe-eventhandler1a-payload"
+                doc:id="2e5a6528-33f0-4788-8da2-b5ff6740e4c5" queueName="subscribe-eventhandler1a-payload"
+                timeout="#[100]" />
+            <logger level="INFO" doc:name="Logger" doc:id="ff12aa3e-289f-4eb3-97d6-996954d55fec"
+                message="#[payload]" />
+            <munit-tools:assert-equals doc:name="alias == coil1"
+                doc:id="f37c183c-6a41-4c6d-b160-e7e804af68c1" actual="#[payload[0].alias]" expected="coil1"
+                message="wrong alias" />
+            <munit-tools:assert-equals doc:name="result == ok"
+                doc:id="04b83a00-adb7-4154-b926-be1fb6c93693" actual="#[payload[0].result]" expected="OK"
+                message="wrong result" />
+            <munit-tools:assert-equals doc:name="value is list"
+                doc:id="b9728374-a4cd-4ed3-a00b-868225056946" actual="#[payload[0].value.list]" expected="#[true]"
+                message="wrong value" />
+            <munit-tools:assert-equals doc:name="value 0 as boolean"
+                doc:id="4c0d8468-ba9c-44c0-af35-eb874f437709" actual="#[payload[0].value.asList[0].asBoolean]"
+                expected="#[true]" message="wrong value" />
+            <munit-tools:assert-equals doc:name="value 1 as boolean"
+                doc:id="7b97a334-9eb7-44c2-8317-ba8f69659719" actual="#[payload[0].value.asList[1].asBoolean]"
+                expected="#[false]" message="wrong value" />
+            <munit-tools:dequeue doc:name="subscribe-eventhandler1a-payload"
+                doc:id="cc3e87a0-2d9d-4e80-be5e-35abdc5e6596" queueName="subscribe-eventhandler1a-payload"
+                timeout="#[100]" />
+            <logger level="INFO" doc:name="Logger" doc:id="b28d9546-680a-4819-aec5-36f9fc41c446"
+                message="#[payload]" />
+            <munit-tools:assert-equals doc:name="alias == reg1"
+                doc:id="7e91c203-06d9-4806-b924-23641768ef67" actual="#[payload[0].alias]" expected="reg1"
+                message="wrong alias" />
+            <munit-tools:assert-equals doc:name="result == ok"
+                doc:id="82a92697-2c86-40c2-baf2-48c9b79a4b6d" actual="#[payload[0].result]" expected="OK"
+                message="wrong result" />
+            <munit-tools:assert-equals doc:name="value is list"
+                doc:id="a5f9dab0-67c8-47bc-b56b-afcae3cbf9b2" actual="#[payload[0].value.list]" expected="#[true]"
+                message="wrong value" />
+            <munit-tools:assert-equals doc:name="value 0 as integer"
+                doc:id="068f3ee5-0860-4814-9eda-ad239b091004" actual="#[payload[0].value.asList[0].asInteger]"
+                expected="#[111]" message="wrong value" />
+            <munit-tools:assert-equals doc:name="value 1 as integer"
+                doc:id="c01dd21e-f71d-4e86-bb7d-d7114b50c614" actual="#[payload[0].value.asList[1].asInteger]"
+                expected="#[222]" message="wrong value" />
+            <munit-tools:dequeue doc:name="subscribe-eventhandler1a-payload-timeout"
+                doc:id="c09a3c53-b7c8-465d-b648-77240e881666" queueName="subscribe-eventhandler1a-payload"
+                timeout="#[100]" />
+            <logger level="INFO" doc:name="Logger" doc:id="39a65c2f-76f4-4ead-8165-c96999f3f426"
                 message="#[payload]" />
         </munit:validation>
     </munit:test>

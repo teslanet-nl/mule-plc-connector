@@ -52,4 +52,12 @@ public class FieldAlias
     {
         return alias;
     }
+
+    /**
+     * @param alias the alias to set
+     */
+    public void setAlias( String alias )
+    {
+        this.alias= alias;
+    }
 }

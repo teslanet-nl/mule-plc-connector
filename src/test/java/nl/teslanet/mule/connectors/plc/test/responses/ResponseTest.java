@@ -119,7 +119,7 @@ import nl.teslanet.mule.connectors.plc.internal.utils.MessageUtils;
 /**
  * test response types.
  */
-public class ResponseTest
+class ResponseTest
 {
     private static final Logger LOGGER= LoggerFactory.getLogger( ResponseTest.class );
 
@@ -175,52 +175,134 @@ public class ResponseTest
         PlcValueType type,
         Object source,
         /* binary */
-        boolean isBinary,
         byte[] asBinary,
         /* boolean */
-        boolean isBoolean,
         Boolean asBoolean,
         /* byte */
-        boolean isByte,
-        Short asByte,
+        Byte asByte,
         /* short */
-        boolean isShort,
         Short asShort,
         /* integer */
-        boolean isInteger,
         Integer asInteger,
         /* long */
-        boolean isLong,
         Long asLong,
         /* big integer */
-        boolean isBigInteger,
         BigInteger asBigInteger,
         /* float */
-        boolean isFloat,
         Float asFloat,
         /* double */
-        boolean isDouble,
         Double asDouble,
         /* date */
-        boolean isDate,
         LocalDate asDate,
         /* dateTime */
-        boolean isDateTime,
         LocalDateTime asDateTime,
+        /* time */
+        LocalTime asTime,
         /* duration */
-        boolean isDuration,
         Duration asDuration,
         /* string */
-        boolean isString,
         String asString,
         /* list */
-        boolean isList,
         Integer getListLength,
         /* list */
-        boolean isStruct,
         List< String > getStructKeys
     )
     {
+        /* binary */
+        public boolean isBinary()
+        {
+            return null != asBinary();
+        }
+
+        /* boolean */
+        public boolean isBoolean()
+        {
+            return null != asBoolean();
+        }
+
+        /* byte */
+        public boolean isByte()
+        {
+            return null != asByte();
+        }
+
+        /* short */
+        public boolean isShort()
+        {
+            return null != asShort();
+        }
+
+        /* integer */
+        public boolean isInteger()
+        {
+            return null != asInteger();
+        }
+
+        /* long */
+        public boolean isLong()
+        {
+            return null != asLong();
+        }
+
+        /* big integer */
+        public boolean isBigInteger()
+        {
+            return null != asBigInteger();
+        }
+
+        /* float */
+        public boolean isFloat()
+        {
+            return null != asFloat();
+        }
+
+        /* double */
+        public boolean isDouble()
+        {
+            return null != asDouble();
+        }
+
+        /* date */
+        public boolean isDate()
+        {
+            return null != asDate();
+        }
+
+        /* dateTime */
+        public boolean isDateTime()
+        {
+            return null != asDateTime();
+        }
+
+        /* time */
+        public boolean isTime()
+        {
+            return null != asTime();
+        }
+
+        /* duration */
+        public boolean isDuration()
+        {
+            return null != asDuration();
+        }
+
+        /* string */
+        public boolean isString()
+        {
+            return null != asString();
+        }
+
+        /* list */
+        public boolean isList()
+        {
+            return null != getListLength();
+        }
+
+        /* list */
+        public boolean isStruct()
+        {
+            return null != getStructKeys();
+        }
     }
 
     /**
@@ -244,173 +326,173 @@ public class ResponseTest
     private TestData testData[]=
     {
         /* RAW_BYTE_ARRAY */
-        new TestData( PlcValueType.RAW_BYTE_ARRAY, new byte[] {}      , true, new byte[] {}      , false, false, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, true, "", false, null, false, null ),
-        new TestData( PlcValueType.RAW_BYTE_ARRAY, new byte[] {0x3e, 0x4f}, true, new byte[] {0x3e, 0x4f}, false, false, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, true, "3e4f", false, null, false, null ),
+        new TestData( PlcValueType.RAW_BYTE_ARRAY, new byte[] {}      , new byte[] {}              , null, null, null, null, null, null, null, null, null, null, null, null, ""    , null, null ),
+        new TestData( PlcValueType.RAW_BYTE_ARRAY, new byte[] {0x3e, 0x4f}, new byte[] {0x3e, 0x4f}, null, null, null, null, null, null, null, null, null, null, null, null, "3e4f", null, null ),
         /* BOOL */
-        new TestData( PlcValueType.BOOL, Boolean.TRUE , false, null, true, true , true, (short) 1, true, (short) 1, true, 1, true, 1L, true, BigInteger.ONE , true, 1.0f, true, 1.0, false, null, false, null, false, null, true, "true", false, null, false, null ),
-        new TestData( PlcValueType.BOOL, Boolean.FALSE, false, null, true, false, true, (short) 0, true, (short) 0, true, 0, true, 0L, true, BigInteger.ZERO, true, 0.0f, true, 0.0, false, null, false, null, false, null, true, "false", false, null, false, null ),
+        new TestData( PlcValueType.BOOL, Boolean.TRUE , null, true , (byte) 1, (short) 1, 1, 1L, BigInteger.ONE , 1.0f, 1.0, null, null, null, null, "true", null, null ),
+        new TestData( PlcValueType.BOOL, Boolean.FALSE, null, false, (byte) 0, (short) 0, 0, 0L, BigInteger.ZERO, 0.0f, 0.0, null, null, null, null, "false", null, null ),
         /* BYTE */                                                                                                                                                                                              
-        new TestData( PlcValueType.BYTE, Short.valueOf( (short)    0 ), false, null, true, false, true, (short)    0, true, (short)    0, true,    0, true,    0L, true, BigInteger.ZERO          , true,   0.0f, true,   0.0, false, null, false, null, false, null, true,   "0", false, null, false, null ),
-        new TestData( PlcValueType.BYTE, Short.valueOf( (short)    1 ), false, null, true, true , true, (short)    1, true, (short)    1, true,    1, true,    1L, true, BigInteger.ONE           , true,   1.0f, true,   1.0, false, null, false, null, false, null, true,   "1", false, null, false, null ),
-        new TestData( PlcValueType.BYTE, Short.valueOf( (short)  128 ), false, null, true, true , true, (short)  128, true, (short)  128, true,  128, true,  128L, true, BigInteger.valueOf(128L) , true, 128.0f, true, 128.0, false, null, false, null, false, null, true, "128", false, null, false, null ),
-        new TestData( PlcValueType.BYTE, Short.valueOf( (short) 0xFF ), false, null, true, true , true, (short) 0xFF, true, (short) 0xFF, true, 0xFF, true, 0xFFL, true, BigInteger.valueOf(0xFFL), true, 255.0f, true, 255.0, false, null, false, null, false, null, true, "255", false, null, false, null ),
+        new TestData( PlcValueType.BYTE, Short.valueOf( (short)    0 ), null, false, (byte)    0, (short)    0, 0, 0L, BigInteger.ZERO          , 0.0f, 0.0, null, null, null, null, "0", null, null ),
+        new TestData( PlcValueType.BYTE, Short.valueOf( (short)    1 ), null, true , (byte)    1, (short)    1, 1, 1L, BigInteger.ONE           , 1.0f, 1.0, null, null, null, null, "1", null, null ),
+        new TestData( PlcValueType.BYTE, Short.valueOf( (short)  128 ), null, true ,        null, (short)  128, 128, 128L, BigInteger.valueOf(128L) , 128.0f, 128.0, null, null, null, null, "128", null, null ),
+        new TestData( PlcValueType.BYTE, Short.valueOf( (short) 0xFF ), null, true ,        null, (short) 0xFF, 0xFF, 0xFFL, BigInteger.valueOf(0xFFL), 255.0f, 255.0, null, null, null, null, "255", null, null ),
         /* CHAR */
-        new TestData( PlcValueType.CHAR, Short.valueOf( (short)    0 ), false, null, true, false, true, (short)    0, true, (short)    0, true,    0, true,    0L, true, BigInteger.ZERO          ,  true,   0.0f, true,   0.0, false, null, false, null, false, null, true, "\u0000", false, null, false, null ),
-        new TestData( PlcValueType.CHAR, Short.valueOf( (short)    1 ), false, null, true, true , true, (short)    1, true, (short)    1, true,    1, true,    1L, true, BigInteger.ONE           ,  true,   1.0f, true,   1.0, false, null, false, null, false, null, true, "\u0001", false, null, false, null ),
-        new TestData( PlcValueType.CHAR, Short.valueOf( (short)   97 ), false, null, true, true , true, (short)   97, true, (short)   97, true,   97, true,   97L, true, BigInteger.valueOf(97L)  ,  true,  97.0f, true,  97.0, false, null, false, null, false, null, true,      "a", false, null, false, null ),
-        new TestData( PlcValueType.CHAR, Short.valueOf( (short) 0xFF ), false, null, true, true , true, (short) 0xFF, true, (short) 0xFF, true, 0xFF, true, 0xFFL, true, BigInteger.valueOf(0xFFL),  true, 255.0f, true, 255.0, false, null, false, null, false, null, true,      "ÿ", false, null, false, null ),
+        new TestData( PlcValueType.CHAR, Short.valueOf( (short)    0 ), null, false, (byte)    0, (short)    0, 0, 0L, BigInteger.ZERO          ,  0.0f, 0.0, null, null, null, null, "\u0000", null, null ),
+        new TestData( PlcValueType.CHAR, Short.valueOf( (short)    1 ), null, true , (byte)    1, (short)    1, 1, 1L, BigInteger.ONE           ,  1.0f, 1.0, null, null, null, null, "\u0001", null, null ),
+        new TestData( PlcValueType.CHAR, Short.valueOf( (short)   97 ), null, true , (byte)   97, (short)   97, 97, 97L, BigInteger.valueOf(97L)  ,  97.0f, 97.0, null, null, null, null, "a", null, null ),
+        new TestData( PlcValueType.CHAR, Short.valueOf( (short) 0xFF ), null, true ,        null, (short) 0xFF, 0xFF, 0xFFL, BigInteger.valueOf(0xFFL),  255.0f, 255.0, null, null, null, null, "ÿ", null, null ),
         /* DATE */
-        new TestData( PlcValueType.DATE, LocalDate.of( 0, 1, 1 )     , false, null, false, false, false, null, false, null, false, null, true, -62167219200L, true, BigInteger.valueOf(-62167219200L).multiply( NANOS ), false, null, false, null, true, LocalDate.of( 0, 1, 1 )     , true, LocalDateTime.of( 0, 1, 1, 0, 0 )     , false, null, true, "0000-01-01", false, null, false, null ),
-        new TestData( PlcValueType.DATE, LocalDate.of( 1972, 3, 2 )  , false, null, false, false, false, null, false, null, false, null, true,     68342400L, true, BigInteger.valueOf(68342400L).multiply( NANOS )    , false, null, false, null, true, LocalDate.of( 1972, 3, 2 )  , true, LocalDateTime.of( 1972, 3, 2, 0, 0 )  , false, null, true, "1972-03-02", false, null, false, null ),
-        new TestData( PlcValueType.DATE, LocalDate.of( 2026, 12, 30 ), false, null, false, false, false, null, false, null, false, null, true,   1798588800L, true, BigInteger.valueOf(1798588800L).multiply( NANOS )  , false, null, false, null, true, LocalDate.of( 2026, 12, 30 ), true, LocalDateTime.of( 2026, 12, 30, 0, 0 ), false, null, true, "2026-12-30", false, null, false, null ),
-        new TestData( PlcValueType.DATE, LocalDate.of( 3000, 5, 25 ) , false, null, false, false, false, null, false, null, false, null, true,  32516121600L, true, BigInteger.valueOf(32516121600L).multiply( NANOS ) , false, null, false, null, true, LocalDate.of( 3000, 5, 25 ) , true, LocalDateTime.of( 3000, 5, 25, 0, 0 ) , false, null, true, "3000-05-25", false, null, false, null ),
+        new TestData( PlcValueType.DATE, LocalDate.of( 0, 1, 1 )     , null, null, null, null, null, -62167219200L, BigInteger.valueOf(-62167219200L).multiply( NANOS ), null, null, LocalDate.of( 0, 1, 1 )     , LocalDateTime.of( 0, 1, 1, 0, 0 )     , null, null, "0000-01-01", null, null ),
+        new TestData( PlcValueType.DATE, LocalDate.of( 1972, 3, 2 )  , null, null, null, null, null, 68342400L, BigInteger.valueOf(68342400L).multiply( NANOS )    , null, null, LocalDate.of( 1972, 3, 2 )  , LocalDateTime.of( 1972, 3, 2, 0, 0 )  , null, null, "1972-03-02", null, null ),
+        new TestData( PlcValueType.DATE, LocalDate.of( 2026, 12, 30 ), null, null, null, null, null, 1798588800L, BigInteger.valueOf(1798588800L).multiply( NANOS )  , null, null, LocalDate.of( 2026, 12, 30 ), LocalDateTime.of( 2026, 12, 30, 0, 0 ), null, null, "2026-12-30", null, null ),
+        new TestData( PlcValueType.DATE, LocalDate.of( 3000, 5, 25 ) , null, null, null, null, null, 32516121600L, BigInteger.valueOf(32516121600L).multiply( NANOS ) , null, null, LocalDate.of( 3000, 5, 25 ) , LocalDateTime.of( 3000, 5, 25, 0, 0 ) , null, null, "3000-05-25", null, null ),
         /* DATE_AND_LTIME */
-        new TestData( PlcValueType.DATE_AND_LTIME, LocalDateTime.of( 0, 1, 1, 0, 0 )                  , false, null, false, false, false, null, false, null, false, null, true, -62167219200L, true, BigInteger.valueOf(-62167219200L).multiply( NANOS )                                , false, null, false, null, false, null, true, LocalDateTime.of( 0, 1, 1, 0, 0 )                , false, null, true, "0000-01-01T00:00"             , false, null, false, null ),
-        new TestData( PlcValueType.DATE_AND_LTIME, LocalDateTime.of( 1972, 3, 2, 11, 30 )             , false, null, false, false, false, null, false, null, false, null, true,     68383800L, true, BigInteger.valueOf(68383800L).multiply( NANOS )                                    , false, null, false, null, false, null, true, LocalDateTime.of( 1972, 3, 2, 11, 30 )           , false, null, true, "1972-03-02T11:30"             , false, null, false, null ),
-        new TestData( PlcValueType.DATE_AND_LTIME, LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )       , false, null, false, false, false, null, false, null, false, null, true,   1798592523L, true, BigInteger.valueOf(1798592523L).multiply( NANOS ).add( BigInteger.valueOf(4L) )    , false, null, false, null, false, null, true, LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )     , false, null, true, "2026-12-30T01:02:03.000000004", false, null, false, null ),
-        new TestData( PlcValueType.DATE_AND_LTIME, LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), false, null, false, false, false, null, false, null, false, null, true,  32516207999L, true, BigInteger.valueOf(32516207999L).multiply( NANOS ).add( BigInteger.valueOf(65523L) ), false, null, false, null, false, null, true, LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), false, null, true, "3000-05-25T23:59:59.000065523", false, null, false, null ),
+        new TestData( PlcValueType.DATE_AND_LTIME, LocalDateTime.of( 0, 1, 1, 0, 0 )                  , null, null, null, null, null, -62167219200L, BigInteger.valueOf(-62167219200L).multiply( NANOS )                                , null, null, LocalDate.of( 0, 1, 1 )     , LocalDateTime.of( 0, 1, 1, 0, 0 )                 , LocalTime.of( 0, 0 )             , null, "0000-01-01T00:00"             , null, null ),
+        new TestData( PlcValueType.DATE_AND_LTIME, LocalDateTime.of( 1972, 3, 2, 11, 30 )             , null, null, null, null, null, 68383800L, BigInteger.valueOf(68383800L).multiply( NANOS )                                    , null, null, LocalDate.of( 1972, 3, 2 )  , LocalDateTime.of( 1972, 3, 2, 11, 30 )            , LocalTime.of( 11, 30 )           , null, "1972-03-02T11:30"             , null, null ),
+        new TestData( PlcValueType.DATE_AND_LTIME, LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )       , null, null, null, null, null, 1798592523L, BigInteger.valueOf(1798592523L).multiply( NANOS ).add( BigInteger.valueOf(4L) )    , null, null, LocalDate.of( 2026, 12, 30 ), LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )      , LocalTime.of( 1, 2, 3, 4 )       , null, "2026-12-30T01:02:03.000000004", null, null ),
+        new TestData( PlcValueType.DATE_AND_LTIME, LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), null, null, null, null, null, 32516207999L, BigInteger.valueOf(32516207999L).multiply( NANOS ).add( BigInteger.valueOf(65523L) ), null, null, LocalDate.of( 3000, 5, 25 ) , LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), LocalTime.of( 23, 59, 59, 65523 ), null, "3000-05-25T23:59:59.000065523", null, null ),
         /* DATE_AND_TIME */
-        new TestData( PlcValueType.DATE_AND_TIME, LocalDateTime.of( 0, 1, 1, 0, 0 )                 , false, null, false, false, false, null, false, null, false, null, true, -62167219200L, true, BigInteger.valueOf(-62167219200L).multiply( NANOS )                                 , false, null, false, null, false, null, true, LocalDateTime.of( 0, 1, 1, 0, 0 )                 , false, null, true, "0000-01-01T00:00"             , false, null, false, null ),
-        new TestData( PlcValueType.DATE_AND_TIME, LocalDateTime.of( 1972, 3, 2, 11, 30 )            , false, null, false, false, false, null, false, null, false, null, true,     68383800L, true, BigInteger.valueOf(68383800L).multiply( NANOS )                                     , false, null, false, null, false, null, true, LocalDateTime.of( 1972, 3, 2, 11, 30 )            , false, null, true, "1972-03-02T11:30"             , false, null, false, null ),
-        new TestData( PlcValueType.DATE_AND_TIME, LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )      , false, null, false, false, false, null, false, null, false, null, true,   1798592523L, true, BigInteger.valueOf(1798592523L).multiply( NANOS ).add( BigInteger.valueOf(4L) )     , false, null, false, null, false, null, true, LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )      , false, null, true, "2026-12-30T01:02:03.000000004", false, null, false, null ),
-        new TestData( PlcValueType.DATE_AND_TIME, LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), false, null, false, false, false, null, false, null, false, null, true,  32516207999L, true, BigInteger.valueOf(32516207999L).multiply( NANOS ).add( BigInteger.valueOf(65523L) ), false, null, false, null, false, null, true, LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), false, null, true, "3000-05-25T23:59:59.000065523", false, null, false, null ),
+        new TestData( PlcValueType.DATE_AND_TIME, LocalDateTime.of( 0, 1, 1, 0, 0 )                 , null, null, null, null, null, -62167219200L, BigInteger.valueOf(-62167219200L).multiply( NANOS )                                 , null, null, LocalDate.of( 0, 1, 1 )     , LocalDateTime.of( 0, 1, 1, 0, 0 )                 , LocalTime.of( 0, 0 )             , null, "0000-01-01T00:00"             , null, null ),
+        new TestData( PlcValueType.DATE_AND_TIME, LocalDateTime.of( 1972, 3, 2, 11, 30 )            , null, null, null, null, null, 68383800L, BigInteger.valueOf(68383800L).multiply( NANOS )                                     , null, null, LocalDate.of( 1972, 3, 2 )  , LocalDateTime.of( 1972, 3, 2, 11, 30 )            , LocalTime.of( 11, 30 )           , null, "1972-03-02T11:30"             , null, null ),
+        new TestData( PlcValueType.DATE_AND_TIME, LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )      , null, null, null, null, null, 1798592523L, BigInteger.valueOf(1798592523L).multiply( NANOS ).add( BigInteger.valueOf(4L) )     , null, null, LocalDate.of( 2026, 12, 30 ), LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )      , LocalTime.of( 1, 2, 3, 4 )       , null, "2026-12-30T01:02:03.000000004", null, null ),
+        new TestData( PlcValueType.DATE_AND_TIME, LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), null, null, null, null, null, 32516207999L, BigInteger.valueOf(32516207999L).multiply( NANOS ).add( BigInteger.valueOf(65523L) ), null, null, LocalDate.of( 3000, 5, 25 ) , LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), LocalTime.of( 23, 59, 59, 65523 ), null, "3000-05-25T23:59:59.000065523", null, null ),
         /* DINT */
-        new TestData( PlcValueType.DINT, Integer.valueOf(      0 ), false, null, true, false, true , (short)     0, true , (short)     0, true,      0, true,      0L, true, BigInteger.ZERO            , true,     0.0f, true,     0.0, false, null, false, null, false, null, true,     "0", false, null, false, null ),
-        new TestData( PlcValueType.DINT, Integer.valueOf(      1 ), false, null, true, true , true , (short)     1, true , (short)     1, true,      1, true,      1L, true, BigInteger.ONE             , true,     1.0f, true,     1.0, false, null, false, null, false, null, true,     "1", false, null, false, null ),
-        new TestData( PlcValueType.DINT, Integer.valueOf(  32565 ), false, null, true, true , true , (short) 32565, true , (short) 32565, true,  32565, true,  32565L, true, BigInteger.valueOf(32565L) , true, 32565.0f, true, 32565.0, false, null, false, null, false, null, true, "32565", false, null, false, null ),
-        new TestData( PlcValueType.DINT, Integer.valueOf( 0xFFFF ), false, null, true, true , false,          null, false,          null, true, 0xFFFF, true, 0xFFFFL, true, BigInteger.valueOf(0xFFFFL), true, 65535.0f, true, 65535.0, false, null, false, null, false, null, true, "65535", false, null, false, null ),
+        new TestData( PlcValueType.DINT, Integer.valueOf(      0 ), null, false, (byte)     0, (short)     0,      0,      0L, BigInteger.ZERO            ,     0.0f,     0.0, null, null, null, null,     "0", null, null ),
+        new TestData( PlcValueType.DINT, Integer.valueOf(      1 ), null, true , (byte)     1, (short)     1,      1,      1L, BigInteger.ONE             ,     1.0f,     1.0, null, null, null, null,     "1", null, null ),
+        new TestData( PlcValueType.DINT, Integer.valueOf(  32565 ), null, true ,         null, (short) 32565,  32565,  32565L, BigInteger.valueOf(32565L) , 32565.0f, 32565.0, null, null, null, null, "32565", null, null ),
+        new TestData( PlcValueType.DINT, Integer.valueOf( 0xFFFF ), null, true ,         null,          null, 0xFFFF, 0xFFFFL, BigInteger.valueOf(0xFFFFL), 65535.0f, 65535.0, null, null, null, null, "65535", null, null ),
         /* DWORD */
-        new TestData( PlcValueType.DWORD, Long.valueOf(      0 ), false, null, true, false, true , (short)     0, true , (short)     0,  true,      0, true,      0L, true, BigInteger.ZERO            , true,           0.0f, true,             0.0, false, null, false, null, false, null, true,          "0", false, null, false, null ),
-        new TestData( PlcValueType.DWORD, Long.valueOf(      1 ), false, null, true, true , true , (short)     1, true , (short)     1,  true,      1, true,      1L, true, BigInteger.ONE             , true,           1.0f, true,             1.0, false, null, false, null, false, null, true,          "1", false, null, false, null ),
-        new TestData( PlcValueType.DWORD, Long.valueOf(  32565 ), false, null, true, true , true , (short) 32565, true , (short) 32565,  true,  32565, true,  32565L, true, BigInteger.valueOf(32565L) , true,       32565.0f, true,         32565.0, false, null, false, null, false, null, true,      "32565", false, null, false, null ),
-        new TestData( PlcValueType.DWORD, Long.valueOf( 0xFFFF ), false, null, true, true , false,          null, false,          null,  true, 0xFFFF, true, 0xFFFFL, true, BigInteger.valueOf(0xFFFFL), true,       65535.0f, true,         65535.0, false, null, false, null, false, null, true,      "65535", false, null, false, null ),
-        new TestData( PlcValueType.DWORD, Long.valueOf( XDWORD ), false, null, true, true , false,          null, false,          null, false,   null, true,  XDWORD, true, BigInteger.valueOf(XDWORD) , true, (float) XDWORD, true, (double) XDWORD, false, null, false, null, false, null, true, "4294967295", false, null, false, null ),
+        new TestData( PlcValueType.DWORD, Long.valueOf(      0 ), null, false, (byte)     0, (short)     0,  0, 0L, BigInteger.ZERO            , 0.0f, 0.0, null, null, null, null, "0", null, null ),
+        new TestData( PlcValueType.DWORD, Long.valueOf(      1 ), null, true , (byte)     1, (short)     1,  1, 1L, BigInteger.ONE             , 1.0f, 1.0, null, null, null, null, "1", null, null ),
+        new TestData( PlcValueType.DWORD, Long.valueOf(  32565 ), null, true ,         null, (short) 32565,  32565, 32565L, BigInteger.valueOf(32565L) , 32565.0f, 32565.0, null, null, null, null, "32565", null, null ),
+        new TestData( PlcValueType.DWORD, Long.valueOf( 0xFFFF ), null, true ,         null,          null,  0xFFFF, 0xFFFFL, BigInteger.valueOf(0xFFFFL), 65535.0f, 65535.0, null, null, null, null, "65535", null, null ),
+        new TestData( PlcValueType.DWORD, Long.valueOf( XDWORD ), null, true ,         null,          null, null, XDWORD, BigInteger.valueOf(XDWORD) , (float) XDWORD, (double) XDWORD, null, null, null, null, "4294967295", null, null ),
         /* INT */
-        new TestData( PlcValueType.INT, Short.valueOf( (short)       0 ), false, null, true, false, true , (short) 0, true, (short)       0, true,          0, true,          0L, true, BigInteger.ZERO            , true,         0.0f, true,           0.0, false, null, false, null, false, null, true,      "0", false, null, false, null ),
-        new TestData( PlcValueType.INT, Short.valueOf( (short)      -1 ), false, null, true, true , false,      null, true, (short)      -1, true,         -1, true,         -1L, true, BigInteger.ONE.negate()    , true,        -1.0f, true,          -1.0, false, null, false, null, false, null, true,     "-1", false, null, false, null ),
-        new TestData( PlcValueType.INT, Short.valueOf( (short)       1 ), false, null, true, true , true , (short) 1, true, (short)       1, true,          1, true,          1L, true, BigInteger.ONE             , true,         1.0f, true,           1.0, false, null, false, null, false, null, true,      "1", false, null, false, null ),
-        new TestData( PlcValueType.INT, Short.valueOf( (short)   32565 ), false, null, true, true , false,      null, true, (short)   32565, true,      32565, true,      32565L, true, BigInteger.valueOf(32565L) , true,     32565.0f, true,       32565.0, false, null, false, null, false, null, true,  "32565", false, null, false, null ),
-        new TestData( PlcValueType.INT, Short.valueOf( (short)  -31965 ), false, null, true, true , false,      null, true, (short)  -31965, true,     -31965, true,     -31965L, true, BigInteger.valueOf(-31965L), true,    -31965.0f, true,      -31965.0, false, null, false, null, false, null, true, "-31965", false, null, false, null ),
-        new TestData( PlcValueType.INT, Short.valueOf(            MINT ), false, null, true, true , false,      null, true,            MINT, true, (int) MINT, true, (long) MINT, true, BigInteger.valueOf(MINT)   , true, (float) MINT, true, (double) MINT, false, null, false, null, false, null, true, "-32768", false, null, false, null ),
-        new TestData( PlcValueType.INT, Short.valueOf(            XINT ), false, null, true, true , false,      null, true,            XINT, true, (int) XINT, true, (long) XINT, true, BigInteger.valueOf(XINT)   , true, (float) XINT, true, (double) XINT, false, null, false, null, false, null, true,  "32767", false, null, false, null ),
+        new TestData( PlcValueType.INT, Short.valueOf( (short)       0 ), null, false, (byte)  0, (short)       0, 0, 0L, BigInteger.ZERO            , 0.0f, 0.0, null, null, null, null, "0", null, null ),
+        new TestData( PlcValueType.INT, Short.valueOf( (short)      -1 ), null, true , (byte) -1, (short)      -1, -1, -1L, BigInteger.ONE.negate()    , -1.0f, -1.0, null, null, null, null, "-1", null, null ),
+        new TestData( PlcValueType.INT, Short.valueOf( (short)       1 ), null, true , (byte)  1, (short)       1, 1, 1L, BigInteger.ONE             , 1.0f, 1.0, null, null, null, null, "1", null, null ),
+        new TestData( PlcValueType.INT, Short.valueOf( (short)   32565 ), null, true ,      null, (short)   32565, 32565, 32565L, BigInteger.valueOf(32565L) , 32565.0f, 32565.0, null, null, null, null, "32565", null, null ),
+        new TestData( PlcValueType.INT, Short.valueOf( (short)  -31965 ), null, true ,      null, (short)  -31965, -31965, -31965L, BigInteger.valueOf(-31965L), -31965.0f, -31965.0, null, null, null, null, "-31965", null, null ),
+        new TestData( PlcValueType.INT, Short.valueOf(            MINT ), null, true ,      null, MINT, (int) MINT, (long) MINT, BigInteger.valueOf(MINT)   , (float) MINT, (double) MINT, null, null, null, null, "-32768", null, null ),
+        new TestData( PlcValueType.INT, Short.valueOf(            XINT ), null, true ,      null, XINT, (int) XINT, (long) XINT, BigInteger.valueOf(XINT)   , (float) XINT, (double) XINT, null, null, null, null, "32767", null, null ),
         /* LDATE */                                                                                                                                                                                                                   
-        new TestData( PlcValueType.LDATE, LocalDate.of( 0, 1, 1 )     , false, null, false, false, false, null, false, null, false, null, true, -62167219200L, true, BigInteger.valueOf(-62167219200L).multiply( NANOS ), false, null, false, null, true, LocalDate.of( 0, 1, 1 )     , true, LocalDateTime.of( 0, 1, 1, 0, 0 )     , false, null, true, "0000-01-01", false, null, false, null ),
-        new TestData( PlcValueType.LDATE, LocalDate.of( 1972, 3, 2 )  , false, null, false, false, false, null, false, null, false, null, true,     68342400L, true, BigInteger.valueOf(68342400L).multiply( NANOS )    , false, null, false, null, true, LocalDate.of( 1972, 3, 2 )  , true, LocalDateTime.of( 1972, 3, 2, 0, 0 )  , false, null, true, "1972-03-02", false, null, false, null ),
-        new TestData( PlcValueType.LDATE, LocalDate.of( 2026, 12, 30 ), false, null, false, false, false, null, false, null, false, null, true,   1798588800L, true, BigInteger.valueOf(1798588800L).multiply( NANOS )  , false, null, false, null, true, LocalDate.of( 2026, 12, 30 ), true, LocalDateTime.of( 2026, 12, 30, 0, 0 ), false, null, true, "2026-12-30", false, null, false, null ),
-        new TestData( PlcValueType.LDATE, LocalDate.of( 3000, 5, 25 ) , false, null, false, false, false, null, false, null, false, null, true,  32516121600L, true, BigInteger.valueOf(32516121600L).multiply( NANOS ) , false, null, false, null, true, LocalDate.of( 3000, 5, 25 ) , true, LocalDateTime.of( 3000, 5, 25, 0, 0 ) , false, null, true, "3000-05-25", false, null, false, null ),
+        new TestData( PlcValueType.LDATE, LocalDate.of( 0, 1, 1 )     , null, null, null, null, null, -62167219200L, BigInteger.valueOf(-62167219200L).multiply( NANOS ), null, null, LocalDate.of( 0, 1, 1 )     , LocalDateTime.of( 0, 1, 1, 0, 0 )     , null, null, "0000-01-01", null, null ),
+        new TestData( PlcValueType.LDATE, LocalDate.of( 1972, 3, 2 )  , null, null, null, null, null, 68342400L, BigInteger.valueOf(68342400L).multiply( NANOS )    , null, null, LocalDate.of( 1972, 3, 2 )  , LocalDateTime.of( 1972, 3, 2, 0, 0 )  , null, null, "1972-03-02", null, null ),
+        new TestData( PlcValueType.LDATE, LocalDate.of( 2026, 12, 30 ), null, null, null, null, null, 1798588800L, BigInteger.valueOf(1798588800L).multiply( NANOS )  , null, null, LocalDate.of( 2026, 12, 30 ), LocalDateTime.of( 2026, 12, 30, 0, 0 ), null, null, "2026-12-30", null, null ),
+        new TestData( PlcValueType.LDATE, LocalDate.of( 3000, 5, 25 ) , null, null, null, null, null, 32516121600L, BigInteger.valueOf(32516121600L).multiply( NANOS ) , null, null, LocalDate.of( 3000, 5, 25 ) , LocalDateTime.of( 3000, 5, 25, 0, 0 ) , null, null, "3000-05-25", null, null ),
         /* LDATE_AND_TIME */
-        new TestData( PlcValueType.LDATE_AND_TIME, LocalDateTime.of( 0, 1, 1, 0, 0 )                 , false, null, false, false, false, null, false, null, false, null, true, -62167219200L, true, BigInteger.valueOf(-62167219200L).multiply( NANOS )                                 , false, null, false, null, false, null, true, LocalDateTime.of( 0, 1, 1, 0, 0 )                 , false, null, true, "0000-01-01T00:00"             , false, null, false, null ),
-        new TestData( PlcValueType.LDATE_AND_TIME, LocalDateTime.of( 1972, 3, 2, 11, 30 )            , false, null, false, false, false, null, false, null, false, null, true,     68383800L, true, BigInteger.valueOf(68383800L).multiply( NANOS )                                     , false, null, false, null, false, null, true, LocalDateTime.of( 1972, 3, 2, 11, 30 )            , false, null, true, "1972-03-02T11:30"             , false, null, false, null ),
-        new TestData( PlcValueType.LDATE_AND_TIME, LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )      , false, null, false, false, false, null, false, null, false, null, true,   1798592523L, true, BigInteger.valueOf(1798592523L).multiply( NANOS ).add( BigInteger.valueOf(4L) )     , false, null, false, null, false, null, true, LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )      , false, null, true, "2026-12-30T01:02:03.000000004", false, null, false, null ),
-        new TestData( PlcValueType.LDATE_AND_TIME, LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), false, null, false, false, false, null, false, null, false, null, true,  32516207999L, true, BigInteger.valueOf(32516207999L).multiply( NANOS ).add( BigInteger.valueOf(65523L) ), false, null, false, null, false, null, true, LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), false, null, true, "3000-05-25T23:59:59.000065523", false, null, false, null ),
+        new TestData( PlcValueType.LDATE_AND_TIME, LocalDateTime.of( 0, 1, 1, 0, 0 )                 , null, null, null, null, null, -62167219200L, BigInteger.valueOf(-62167219200L).multiply( NANOS )                                 , null, null, LocalDate.of( 0, 1, 1 )     , LocalDateTime.of( 0, 1, 1, 0, 0 )                 , LocalTime.of( 0, 0 )             , null, "0000-01-01T00:00"             , null, null ),
+        new TestData( PlcValueType.LDATE_AND_TIME, LocalDateTime.of( 1972, 3, 2, 11, 30 )            , null, null, null, null, null, 68383800L, BigInteger.valueOf(68383800L).multiply( NANOS )                                     , null, null, LocalDate.of( 1972, 3, 2 )  , LocalDateTime.of( 1972, 3, 2, 11, 30 )            , LocalTime.of( 11, 30 )           , null, "1972-03-02T11:30"             , null, null ),
+        new TestData( PlcValueType.LDATE_AND_TIME, LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )      , null, null, null, null, null, 1798592523L, BigInteger.valueOf(1798592523L).multiply( NANOS ).add( BigInteger.valueOf(4L) )     , null, null, LocalDate.of( 2026, 12, 30 ), LocalDateTime.of( 2026, 12, 30, 1, 2, 3, 4 )      , LocalTime.of( 1, 2, 3, 4 )       , null, "2026-12-30T01:02:03.000000004", null, null ),
+        new TestData( PlcValueType.LDATE_AND_TIME, LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), null, null, null, null, null, 32516207999L, BigInteger.valueOf(32516207999L).multiply( NANOS ).add( BigInteger.valueOf(65523L) ), null, null, LocalDate.of( 3000, 5, 25 ) , LocalDateTime.of( 3000, 5, 25, 23, 59, 59, 65523 ), LocalTime.of( 23, 59, 59, 65523 ), null, "3000-05-25T23:59:59.000065523", null, null ),
         /* LINT */
-        new TestData( PlcValueType.LINT, Long.valueOf(      0 ), false, null, true, false, true , (short)     0, true , (short)     0, true,      0, true,             0L, true, BigInteger.ZERO                   , true,                   0.0f, true,                     0.0, false, null, false, null, false, null, true,                    "0", false, null, false, null ),
-        new TestData( PlcValueType.LINT, Long.valueOf(      1 ), false, null, true, true , true , (short)     1, true , (short)     1, true,      1, true,             1L, true, BigInteger.ONE                    , true,                   1.0f, true,                     1.0, false, null, false, null, false, null, true,                    "1", false, null, false, null ),
-        new TestData( PlcValueType.LINT, Long.valueOf(     -1 ), false, null, true, true , true , (short)    -1, true , (short)    -1, true,     -1, true,            -1L, true, BigInteger.ONE.negate()           , true,                  -1.0f, true,                    -1.0, false, null, false, null, false, null, true,                   "-1", false, null, false, null ),
-        new TestData( PlcValueType.LINT, Long.valueOf(  32565 ), false, null, true, true , true , (short) 32565, true , (short) 32565, true,  32565, true,         32565L, true, BigInteger.valueOf(32565L)        , true,               32565.0f, true,                 32565.0, false, null, false, null, false, null, true,                "32565", false, null, false, null ),
-        new TestData( PlcValueType.LINT, Long.MIN_VALUE        , false, null, true, true , false,          null, false,          null, false,  null, true, Long.MIN_VALUE, true, BigInteger.valueOf(Long.MIN_VALUE), true, (float) Long.MIN_VALUE, true, (double) Long.MIN_VALUE, false, null, false, null, false, null, true, "-9223372036854775808", false, null, false, null ),
-        new TestData( PlcValueType.LINT, Long.MAX_VALUE        , false, null, true, true , false,          null, false,          null, false,  null, true, Long.MAX_VALUE, true, BigInteger.valueOf(Long.MAX_VALUE), true, (float) Long.MAX_VALUE, true, (double) Long.MAX_VALUE, false, null, false, null, false, null, true,  "9223372036854775807", false, null, false, null ),
+        new TestData( PlcValueType.LINT, Long.valueOf(      0 ), null, false, (byte)     0, (short)     0,     0,             0L, BigInteger.ZERO                   , 0.0f, 0.0, null, null, null, null, "0", null, null ),
+        new TestData( PlcValueType.LINT, Long.valueOf(      1 ), null, true , (byte)     1, (short)     1,     1,             1L, BigInteger.ONE                    , 1.0f, 1.0, null, null, null, null, "1", null, null ),
+        new TestData( PlcValueType.LINT, Long.valueOf(     -1 ), null, true , (byte)    -1, (short)    -1,    -1,            -1L, BigInteger.ONE.negate()           , -1.0f, -1.0, null, null, null, null, "-1", null, null ),
+        new TestData( PlcValueType.LINT, Long.valueOf(  32565 ), null, true ,         null, (short) 32565, 32565,         32565L, BigInteger.valueOf(32565L)        , 32565.0f, 32565.0, null, null, null, null, "32565", null, null ),
+        new TestData( PlcValueType.LINT, Long.MIN_VALUE        , null, true ,         null,          null,  null, Long.MIN_VALUE, BigInteger.valueOf(Long.MIN_VALUE), (float) Long.MIN_VALUE, (double) Long.MIN_VALUE, null, null, null, null, "-9223372036854775808", null, null ),
+        new TestData( PlcValueType.LINT, Long.MAX_VALUE        , null, true ,         null,          null,  null, Long.MAX_VALUE, BigInteger.valueOf(Long.MAX_VALUE), (float) Long.MAX_VALUE, (double) Long.MAX_VALUE, null, null, null, null, "9223372036854775807", null, null ),
         /* LREAL */
-        new TestData( PlcValueType.LREAL, Double.valueOf(       0 ), false, null, false, null, false, null, false, null, false, null, false, null, false, null, true,            0.0f, true,              0.0, false, null, false, null, false, null, true,                    "0.0", false, null, false, null ),
-        new TestData( PlcValueType.LREAL, Double.valueOf(       1 ), false, null, false, null, false, null, false, null, false, null, false, null, false, null, true,            1.0f, true,              1.0, false, null, false, null, false, null, true,                    "1.0", false, null, false, null ),
-        new TestData( PlcValueType.LREAL, Double.valueOf(      -1 ), false, null, false, null, false, null, false, null, false, null, false, null, false, null, true,           -1.0f, true,             -1.0, false, null, false, null, false, null, true,                   "-1.0", false, null, false, null ),
-        new TestData( PlcValueType.LREAL, Double.valueOf( 65.3654 ), false, null, false, null, false, null, false, null, false, null, false, null, false, null, true,        65.3654f, true,          65.3654, false, null, false, null, false, null, true,                "65.3654", false, null, false, null ),
-        new TestData( PlcValueType.LREAL, Double.MIN_VALUE         , false, null, false, null, false, null, false, null, false, null, false, null, false, null, true, Float.MIN_VALUE, true, Double.MIN_VALUE, false, null, false, null, false, null, true,               "4.9E-324", false, null, false, null ),
-        new TestData( PlcValueType.LREAL, Double.MAX_VALUE         , false, null, false, null, false, null, false, null, false, null, false, null, false, null, true, Float.MAX_VALUE, true, Double.MAX_VALUE, false, null, false, null, false, null, true, "1.7976931348623157E308", false, null, false, null ),
+        new TestData( PlcValueType.LREAL, Double.valueOf(       0 ), null, null, null, null, null, null, null, null,              0.0, null, null, null, null,                    "0.0", null, null ),
+        new TestData( PlcValueType.LREAL, Double.valueOf(       1 ), null, null, null, null, null, null, null, null,              1.0, null, null, null, null,                    "1.0", null, null ),
+        new TestData( PlcValueType.LREAL, Double.valueOf(      -1 ), null, null, null, null, null, null, null, null,             -1.0, null, null, null, null,                   "-1.0", null, null ),
+        new TestData( PlcValueType.LREAL, Double.valueOf( 65.3654 ), null, null, null, null, null, null, null, null,          65.3654, null, null, null, null,                "65.3654", null, null ),
+        new TestData( PlcValueType.LREAL, Double.MIN_VALUE         , null, null, null, null, null, null, null, null, Double.MIN_VALUE, null, null, null, null,               "4.9E-324", null, null ),
+        new TestData( PlcValueType.LREAL, Double.MAX_VALUE         , null, null, null, null, null, null, null, null, Double.MAX_VALUE, null, null, null, null, "1.7976931348623157E308", null, null ),
         /* LTIME */
-        new TestData( PlcValueType.LTIME, Duration.ZERO           , false, null, false, false, false, null, false, null, false, null, true,        0L, true, BigInteger.ZERO                                , false, null, false, null, false, null, false, null, false, null, true,           "PT0S", false, null, false, null ),
-        new TestData( PlcValueType.LTIME, Duration.ofDays( 365 )  , false, null, false, false, false, null, false, null, false, null, true, 31536000L, true, BigInteger.valueOf(31536000L).multiply( NANOS ), false, null, false, null, false, null, false, null, false, null, true,        "PT8760H", false, null, false, null ),
-        new TestData( PlcValueType.LTIME, Duration.ofSeconds( 13 ), false, null, false, false, false, null, false, null, false, null, true,       13L, true, BigInteger.valueOf(13L).multiply( NANOS )      , false, null, false, null, false, null, false, null, false, null, true,          "PT13S", false, null, false, null ),
-        new TestData( PlcValueType.LTIME, Duration.ofNanos( 3023 ), false, null, false, false, false, null, false, null, false, null, true,        0L, true, BigInteger.valueOf(3023L)                      , false, null, false, null, false, null, false, null, false, null, true, "PT0.000003023S", false, null, false, null ),
+        new TestData( PlcValueType.LTIME, Duration.ZERO           , null, null, null, null, null,        0L, BigInteger.ZERO                                , null, null, null, null, null, Duration.ofSeconds(  0 ),           "PT0S", null, null ),
+        new TestData( PlcValueType.LTIME, Duration.ofDays( 365 )  , null, null, null, null, null, 31536000L, BigInteger.valueOf(31536000L).multiply( NANOS ), null, null, null, null, null, Duration.ofHours( 8760 ),        "PT8760H", null, null ),
+        new TestData( PlcValueType.LTIME, Duration.ofSeconds( 13 ), null, null, null, null, null,       13L, BigInteger.valueOf(13L).multiply( NANOS )      , null, null, null, null, null, Duration.ofSeconds( 13 ),          "PT13S", null, null ),
+        new TestData( PlcValueType.LTIME, Duration.ofNanos( 3023 ), null, null, null, null, null,        0L, BigInteger.valueOf(3023L)                      , null, null, null, null, null, Duration.ofNanos( 3023 ), "PT0.000003023S", null, null ),
         /* LTIME_OF_DAY */
-        new TestData( PlcValueType.LTIME_OF_DAY, LocalTime.of( 0, 0 )                   , false, null, false, false, false, null, false, null, true,     0, true,     0L, true, BigInteger.ZERO                                                                     , false, null, false, null, false, null, false, null, false, null, true,              "00:00", false, null, false, null ),
-        new TestData( PlcValueType.LTIME_OF_DAY, LocalTime.of( 3, 55 )                  , false, null, false, false, false, null, false, null, true, 14100, true, 14100L, true, BigInteger.valueOf(14100).multiply( NANOS )                                         , false, null, false, null, false, null, false, null, false, null, true,              "03:55", false, null, false, null ),
-        new TestData( PlcValueType.LTIME_OF_DAY, LocalTime.of( 23, 59, 59, 999_999_999 ), false, null, false, false, false, null, false, null, true, 86399, true, 86399L, true, BigInteger.valueOf(86399L).multiply( NANOS ).add( BigInteger.valueOf(999_999_999L) ), false, null, false, null, false, null, false, null, false, null, true, "23:59:59.999999999", false, null, false, null ),
-        new TestData( PlcValueType.LTIME_OF_DAY, LocalTime.of( 0, 0, 0, 32 )            , false, null, false, false, false, null, false, null, true,     0, true,     0L, true, BigInteger.valueOf(32L)                                                             , false, null, false, null, false, null, false, null, false, null, true, "00:00:00.000000032", false, null, false, null ),
+        new TestData( PlcValueType.LTIME_OF_DAY, LocalTime.of( 0, 0 )                   , null, null, null, null,     0,     0L, BigInteger.ZERO                                                                     , null, null, null, null, LocalTime.of( 0, 0 )                 , null,              "00:00", null, null ),
+        new TestData( PlcValueType.LTIME_OF_DAY, LocalTime.of( 3, 55 )                  , null, null, null, null, 14100, 14100L, BigInteger.valueOf(14100).multiply( NANOS )                                         , null, null, null, null, LocalTime.of( 3, 55 )                , null,              "03:55", null, null ),
+        new TestData( PlcValueType.LTIME_OF_DAY, LocalTime.of( 23, 59, 59, 999_999_999 ), null, null, null, null, 86399, 86399L, BigInteger.valueOf(86399L).multiply( NANOS ).add( BigInteger.valueOf(999_999_999L) ), null, null, null, null, LocalTime.of( 23, 59, 59, 999999999 ), null, "23:59:59.999999999", null, null ),
+        new TestData( PlcValueType.LTIME_OF_DAY, LocalTime.of( 0, 0, 0, 32 )            , null, null, null, null,     0,     0L, BigInteger.valueOf(32L)                                                             , null, null, null, null, LocalTime.of( 0, 0, 0, 32 )          , null, "00:00:00.000000032", null, null ),
         /* LWORD */
-        new TestData( PlcValueType.LWORD, BigInteger.valueOf(      0 ), false, null, true, false, true , (short)     0, true , (short)     0, true ,      0, true ,      0L, true, BigInteger.ZERO            , false, null, false, null, false, null, false, null, false, null, true,                    "0", false, null, false, null ),
-        new TestData( PlcValueType.LWORD, BigInteger.valueOf(      1 ), false, null, true, true , true , (short)     1, true , (short)     1, true ,      1, true ,      1L, true, BigInteger.ONE             , false, null, false, null, false, null, false, null, false, null, true,                    "1", false, null, false, null ),
-        new TestData( PlcValueType.LWORD, BigInteger.valueOf(  32565 ), false, null, true, true , true , (short) 32565, true , (short) 32565, true ,  32565, true ,  32565L, true, BigInteger.valueOf(32565L) , false, null, false, null, false, null, false, null, false, null, true,                "32565", false, null, false, null ),
-        new TestData( PlcValueType.LWORD, BigInteger.valueOf( 0xFFFF ), false, null, true, true , false,          null, false,          null, true , 0xFFFF, true , 0xFFFFL, true, BigInteger.valueOf(0xFFFFL), false, null, false, null, false, null, false, null, false, null, true,                "65535", false, null, false, null ),
-        new TestData( PlcValueType.LWORD, XLWORD                      , false, null, true, true , false,          null, false,          null, false,   null, false,    null, true, XLWORD                     , false, null, false, null, false, null, false, null, false, null, true, "18446744073709551615", false, null, false, null ),
+        new TestData( PlcValueType.LWORD, BigInteger.valueOf(      0 ), null, false, (byte)     0, (short)     0,     0,       0L, BigInteger.ZERO            , null, null, null, null, null, null,                    "0", null, null ),
+        new TestData( PlcValueType.LWORD, BigInteger.valueOf(      1 ), null, true , (byte)     1, (short)     1,     1,       1L, BigInteger.ONE             , null, null, null, null, null, null,                    "1", null, null ),
+        new TestData( PlcValueType.LWORD, BigInteger.valueOf(  32565 ), null, true ,         null, (short) 32565, 32565,   32565L, BigInteger.valueOf(32565L) , null, null, null, null, null, null,                "32565", null, null ),
+        new TestData( PlcValueType.LWORD, BigInteger.valueOf( 0xFFFF ), null, true ,         null,          null, 0xFFFF, 0xFFFFL, BigInteger.valueOf(0xFFFFL), null, null, null, null, null, null,                "65535", null, null ),
+        new TestData( PlcValueType.LWORD, XLWORD                      , null, true ,         null,          null,   null,    null, XLWORD                     , null, null, null, null, null, null, "18446744073709551615", null, null ),
         /* NULL */
-        new TestData( PlcValueType.NULL, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, true, "null", false, null, false, null ),
+        new TestData( PlcValueType.NULL, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "empty", null, null ),
         /* REAL */
-        new TestData( PlcValueType.REAL, Float.valueOf(        0 ), false, null, false, null, false, null, false, null, false, null, false, null, false, null, true,            0.0f, true,                      0.0, false, null, false, null, false, null, true, "0.0", false, null, false, null ),
-        new TestData( PlcValueType.REAL, Float.valueOf(        1 ), false, null, false, null, false, null, false, null, false, null, false, null, false, null, true,            1.0f, true,                      1.0, false, null, false, null, false, null, true, "1.0", false, null, false, null ),
-        new TestData( PlcValueType.REAL, Float.valueOf(       -1 ), false, null, false, null, false, null, false, null, false, null, false, null, false, null, true,           -1.0f, true,                     -1.0, false, null, false, null, false, null, true, "-1.0", false, null, false, null ),
-        new TestData( PlcValueType.REAL, Float.valueOf( 65.3654f ), false, null, false, null, false, null, false, null, false, null, false, null, false, null, true,        65.3654f, true, (double)        65.3654f, false, null, false, null, false, null, true, "65.3654", false, null, false, null ),
-        new TestData( PlcValueType.REAL, Float.MIN_VALUE          , false, null, false, null, false, null, false, null, false, null, false, null, false, null, true, Float.MIN_VALUE, true, (double) Float.MIN_VALUE, false, null, false, null, false, null, true, "1.4E-45", false, null, false, null ),
-        new TestData( PlcValueType.REAL, Float.MAX_VALUE          , false, null, false, null, false, null, false, null, false, null, false, null, false, null, true, Float.MAX_VALUE, true, (double) Float.MAX_VALUE, false, null, false, null, false, null, true, "3.4028235E38", false, null, false, null ),
+        new TestData( PlcValueType.REAL, Float.valueOf(        0 ), null, null, null, null, null, null, null,            0.0f,                      0.0, null, null, null, null,          "0.0", null, null ),
+        new TestData( PlcValueType.REAL, Float.valueOf(        1 ), null, null, null, null, null, null, null,            1.0f,                      1.0, null, null, null, null,          "1.0", null, null ),
+        new TestData( PlcValueType.REAL, Float.valueOf(       -1 ), null, null, null, null, null, null, null,           -1.0f,                     -1.0, null, null, null, null,         "-1.0", null, null ),
+        new TestData( PlcValueType.REAL, Float.valueOf( 65.3654f ), null, null, null, null, null, null, null,        65.3654f, (double)        65.3654f, null, null, null, null,      "65.3654", null, null ),
+        new TestData( PlcValueType.REAL, Float.MIN_VALUE          , null, null, null, null, null, null, null, Float.MIN_VALUE, (double) Float.MIN_VALUE, null, null, null, null,      "1.4E-45", null, null ),
+        new TestData( PlcValueType.REAL, Float.MAX_VALUE          , null, null, null, null, null, null, null, Float.MAX_VALUE, (double) Float.MAX_VALUE, null, null, null, null, "3.4028235E38", null, null ),
         /* SINT */                                                                                                                                                                                              
-        new TestData( PlcValueType.SINT, Byte.valueOf( (byte)   0 ), false, null, true, false, true, (short)    0, true, (short)    0, true,    0, true,    0L, true, BigInteger.ZERO          , true,    0.0f, true,    0.0, false, null, false, null, false, null, true,    "0", false, null, false, null ),
-        new TestData( PlcValueType.SINT, Byte.valueOf( (byte)   1 ), false, null, true, true , true, (short)    1, true, (short)    1, true,    1, true,    1L, true, BigInteger.ONE           , true,    1.0f, true,    1.0, false, null, false, null, false, null, true,    "1", false, null, false, null ),
-        new TestData( PlcValueType.SINT, Byte.valueOf( (byte)  -1 ), false, null, true, true , true, (short)   -1, true, (short)   -1, true,   -1, true,   -1L, true, BigInteger.ONE.negate()  , true,   -1.0f, true,   -1.0, false, null, false, null, false, null, true,   "-1", false, null, false, null ),
-        new TestData( PlcValueType.SINT, Byte.valueOf( (byte) 113 ), false, null, true, true , true, (short)  113, true, (short)  113, true,  113, true,  113L, true, BigInteger.valueOf(113L) , true,  113.0f, true,  113.0, false, null, false, null, false, null, true,  "113", false, null, false, null ),
-        new TestData( PlcValueType.SINT, Byte.MIN_VALUE            , false, null, true, true , true, (short) -128, true, (short) -128, true, -128, true, -128L, true, BigInteger.valueOf(-128L), true, -128.0f, true, -128.0, false, null, false, null, false, null, true, "-128", false, null, false, null ),
-        new TestData( PlcValueType.SINT, Byte.MAX_VALUE            , false, null, true, true , true, (short) 0x7F, true, (short) 0x7F, true, 0x7F, true, 0x7FL, true, BigInteger.valueOf(0x7FL), true,  127.0f, true,  127.0, false, null, false, null, false, null, true,  "127", false, null, false, null ),
+        new TestData( PlcValueType.SINT, Byte.valueOf( (byte)   0 ), null, false, (byte)    0, (short)    0,    0,    0L, BigInteger.ZERO          ,   0.0f,     0.0, null, null, null, null,    "0", null, null ),
+        new TestData( PlcValueType.SINT, Byte.valueOf( (byte)   1 ), null, true , (byte)    1, (short)    1,    1,    1L, BigInteger.ONE           ,   1.0f,     1.0, null, null, null, null,    "1", null, null ),
+        new TestData( PlcValueType.SINT, Byte.valueOf( (byte)  -1 ), null, true , (byte)   -1, (short)   -1,   -1,   -1L, BigInteger.ONE.negate()  ,   -1.0f,   -1.0, null, null, null, null,   "-1", null, null ),
+        new TestData( PlcValueType.SINT, Byte.valueOf( (byte) 113 ), null, true , (byte)  113, (short)  113,  113,  113L, BigInteger.valueOf(113L) ,  113.0f,  113.0, null, null, null, null,  "113", null, null ),
+        new TestData( PlcValueType.SINT, Byte.MIN_VALUE            , null, true , (byte) -128, (short) -128, -128, -128L, BigInteger.valueOf(-128L), -128.0f, -128.0, null, null, null, null, "-128", null, null ),
+        new TestData( PlcValueType.SINT, Byte.MAX_VALUE            , null, true , (byte) 0x7F, (short) 0x7F, 0x7F, 0x7FL, BigInteger.valueOf(0x7FL), 127.0f,   127.0, null, null, null, null,  "127", null, null ),
         /* STRING */                                                                                                                                                                                              
-        new TestData( PlcValueType.STRING,           "", false, null, true, false, false,        null, false, (short)    0, false, null, false, null, false,                     null, false, null, false,   null, false, null, false, null, false, null, true,           "", false, null, false, null ),
-        new TestData( PlcValueType.STRING,       "true", false, null, true, true , false,        null, false, (short)    1, false, null, false, null, false,                     null, false, null, false,   null, false, null, false, null, false, null, true,       "true", false, null, false, null ),
-        new TestData( PlcValueType.STRING,        "123", false, null, true, false, true , (short) 123, true , (short)  123, true ,  123, true , 123L, true , BigInteger.valueOf(123L), true , 123f, true ,  123.0, false, null, false, null, false, null, true,        "123", false, null, false, null ),
-        new TestData( PlcValueType.STRING, "Some text.", false, null, true, false, false,        null, false,         null, false, null, false, null, false,                     null, false, null, false,   null, false, null, false, null, false, null, true, "Some text.", false, null, false, null ),
+        new TestData( PlcValueType.STRING,           "", null, false,       null,         null, null, null, null                    , null,  null, null, null, null, null,           "", null, null ),
+        new TestData( PlcValueType.STRING,       "true", null, true ,       null,         null, null, null, null                    , null,  null, null, null, null, null,       "true", null, null ),
+        new TestData( PlcValueType.STRING,        "123", null, false, (byte) 123, (short)  123,  123, 123L, BigInteger.valueOf(123L), 123f, 123.0, null, null, null, null,        "123", null, null ),
+        new TestData( PlcValueType.STRING, "Some text.", null, false,       null,         null, null, null, null                    , null,  null, null, null, null, null, "Some text.", null, null ),
         /* TIME */
-        new TestData( PlcValueType.TIME, Duration.ZERO           , false, null, false, false, false, null, false, null, false, null, true,        0L, true, BigInteger.ZERO                                , false, null, false, null, false, null, false, null, false, null, true,           "PT0S", false, null, false, null ),
-        new TestData( PlcValueType.TIME, Duration.ofDays( 365 )  , false, null, false, false, false, null, false, null, false, null, true, 31536000L, true, BigInteger.valueOf(31536000L).multiply( NANOS ), false, null, false, null, false, null, false, null, false, null, true,        "PT8760H", false, null, false, null ),
-        new TestData( PlcValueType.TIME, Duration.ofSeconds( 13 ), false, null, false, false, false, null, false, null, false, null, true,       13L, true, BigInteger.valueOf(13L).multiply( NANOS )      , false, null, false, null, false, null, false, null, false, null, true,          "PT13S", false, null, false, null ),
-        new TestData( PlcValueType.TIME, Duration.ofNanos( 3023 ), false, null, false, false, false, null, false, null, false, null, true,        0L, true, BigInteger.valueOf(3023L)                      , false, null, false, null, false, null, false, null, false, null, true, "PT0.000003023S", false, null, false, null ),
+        new TestData( PlcValueType.TIME, Duration.ZERO           , null, null, null, null, null,        0L, BigInteger.ZERO                                , null, null, null, null, null, Duration.ofSeconds(  0 ),           "PT0S", null, null ),
+        new TestData( PlcValueType.TIME, Duration.ofDays( 365 )  , null, null, null, null, null, 31536000L, BigInteger.valueOf(31536000L).multiply( NANOS ), null, null, null, null, null, Duration.ofHours( 8760 ),        "PT8760H", null, null ),
+        new TestData( PlcValueType.TIME, Duration.ofSeconds( 13 ), null, null, null, null, null,       13L, BigInteger.valueOf(13L).multiply( NANOS )      , null, null, null, null, null, Duration.ofSeconds( 13 ),          "PT13S", null, null ),
+        new TestData( PlcValueType.TIME, Duration.ofNanos( 3023 ), null, null, null, null, null,        0L, BigInteger.valueOf(3023L)                      , null, null, null, null, null, Duration.ofNanos( 3023 ), "PT0.000003023S", null, null ),
         /* TIME_OF_DAY */
-        new TestData( PlcValueType.TIME_OF_DAY, LocalTime.of( 0, 0 )                   , false, null, false, false, false, null, false, null, true,     0, true,     0L, true, BigInteger.ZERO                                                                     , false, null, false, null, false, null, false, null, false, null, true,              "00:00", false, null, false, null ),
-        new TestData( PlcValueType.TIME_OF_DAY, LocalTime.of( 3, 55 )                  , false, null, false, false, false, null, false, null, true, 14100, true, 14100L, true, BigInteger.valueOf(14100).multiply( NANOS )                                         , false, null, false, null, false, null, false, null, false, null, true,              "03:55", false, null, false, null ),
-        new TestData( PlcValueType.TIME_OF_DAY, LocalTime.of( 23, 59, 59, 999_999_999 ), false, null, false, false, false, null, false, null, true, 86399, true, 86399L, true, BigInteger.valueOf(86399L).multiply( NANOS ).add( BigInteger.valueOf(999_999_999L) ), false, null, false, null, false, null, false, null, false, null, true, "23:59:59.999999999", false, null, false, null ),
-        new TestData( PlcValueType.TIME_OF_DAY, LocalTime.of( 0, 0, 0, 32 )            , false, null, false, false, false, null, false, null, true,     0, true,     0L, true, BigInteger.valueOf(32L)                                                             , false, null, false, null, false, null, false, null, false, null, true, "00:00:00.000000032", false, null, false, null ),
+        new TestData( PlcValueType.TIME_OF_DAY, LocalTime.of( 0, 0 )                   , null, null, null, null, 0, 0L, BigInteger.ZERO                                                                             , null, null, null, null, LocalTime.of( 0, 0 )                 , null,              "00:00", null, null ),
+        new TestData( PlcValueType.TIME_OF_DAY, LocalTime.of( 3, 55 )                  , null, null, null, null, 14100, 14100L, BigInteger.valueOf(14100).multiply( NANOS )                                         , null, null, null, null, LocalTime.of( 3, 55 )                , null,              "03:55", null, null ),
+        new TestData( PlcValueType.TIME_OF_DAY, LocalTime.of( 23, 59, 59, 999_999_999 ), null, null, null, null, 86399, 86399L, BigInteger.valueOf(86399L).multiply( NANOS ).add( BigInteger.valueOf(999_999_999L) ), null, null, null, null, LocalTime.of( 23, 59, 59, 999999999 ), null, "23:59:59.999999999", null, null ),
+        new TestData( PlcValueType.TIME_OF_DAY, LocalTime.of( 0, 0, 0, 32 )            , null, null, null, null, 0, 0L, BigInteger.valueOf(32L)                                                                     , null, null, null, null, LocalTime.of( 0, 0, 0, 32 )          , null, "00:00:00.000000032", null, null ),
         /* UDINT */
-        new TestData( PlcValueType.UDINT, Long.valueOf(      0 ), false, null, true, false, true , (short)     0, true , (short)     0, true,      0, true,     0L, true, BigInteger.ZERO           , true,           0.0f, true,             0.0, false, null, false, null, false, null, true,          "0", false, null, false, null ),
-        new TestData( PlcValueType.UDINT, Long.valueOf(      1 ), false, null, true, true , true , (short)     1, true , (short)     1, true,      1, true,     1L, true, BigInteger.ONE            , true,           1.0f, true,             1.0, false, null, false, null, false, null, true,          "1", false, null, false, null ),
-        new TestData( PlcValueType.UDINT, Long.valueOf(  32565 ), false, null, true, true , true , (short) 32565, true , (short) 32565, true,  32565, true, 32565L, true, BigInteger.valueOf(32565L), true,       32565.0f, true,         32565.0, false, null, false, null, false, null, true,      "32565", false, null, false, null ),
-        new TestData( PlcValueType.UDINT, XUDINT                , false, null, true, true , false,          null, false,          null, false,  null, true, XUDINT, true, BigInteger.valueOf(XUDINT), true, (float) XUDINT, true, (double) XUDINT, false, null, false, null, false, null, true, "4294967295", false, null, false, null ),
+        new TestData( PlcValueType.UDINT, Long.valueOf(      0 ), null, false, (byte) 0, (short)     0,     0,     0L, BigInteger.ZERO           ,           0.0f,             0.0, null, null, null, null,          "0", null, null ),
+        new TestData( PlcValueType.UDINT, Long.valueOf(      1 ), null, true , (byte) 1, (short)     1,     1,     1L, BigInteger.ONE            ,           1.0f,             1.0, null, null, null, null,          "1", null, null ),
+        new TestData( PlcValueType.UDINT, Long.valueOf(  32565 ), null, true ,     null, (short) 32565, 32565, 32565L, BigInteger.valueOf(32565L),       32565.0f,         32565.0, null, null, null, null,      "32565", null, null ),
+        new TestData( PlcValueType.UDINT, XUDINT                , null, true ,     null,          null,  null, XUDINT, BigInteger.valueOf(XUDINT), (float) XUDINT, (double) XUDINT, null, null, null, null, "4294967295", null, null ),
         /* UINT */
-        new TestData( PlcValueType.UINT, Integer.valueOf(      0 ), false, null, true, false, true , (short)     0, true , (short)     0, true,     0, true,           0L, true, BigInteger.ZERO           , true,         0.0f, true,           0.0, false, null, false, null, false, null, true,     "0", false, null, false, null ),
-        new TestData( PlcValueType.UINT, Integer.valueOf(      1 ), false, null, true, true , true , (short)     1, true , (short)     1, true,     1, true,           1L, true, BigInteger.ONE            , true,         1.0f, true,           1.0, false, null, false, null, false, null, true,     "1", false, null, false, null ),
-        new TestData( PlcValueType.UINT, Integer.valueOf(  32565 ), false, null, true, true , true , (short) 32565, true , (short) 32565, true, 32565, true,       32565L, true, BigInteger.valueOf(32565L), true,     32565.0f, true,       32565.0, false, null, false, null, false, null, true, "32565", false, null, false, null ),
-        new TestData( PlcValueType.UINT, XUINT                    , false, null, true, true , false,          null, false,          null, true, XUINT, true, (long) XUINT, true, BigInteger.valueOf(XUINT) , true, (float)XUINT, true, (double)XUINT, false, null, false, null, false, null, true, "65535", false, null, false, null ),
+        new TestData( PlcValueType.UINT, Integer.valueOf(      0 ), null, false, (byte) 0, (short)     0,     0,           0L, BigInteger.ZERO           ,         0.0f,           0.0, null, null, null, null,     "0", null, null ),
+        new TestData( PlcValueType.UINT, Integer.valueOf(      1 ), null, true , (byte) 1, (short)     1,     1,           1L, BigInteger.ONE            ,         1.0f,           1.0, null, null, null, null,     "1", null, null ),
+        new TestData( PlcValueType.UINT, Integer.valueOf(  32565 ), null, true ,     null, (short) 32565, 32565,       32565L, BigInteger.valueOf(32565L),     32565.0f,       32565.0, null, null, null, null, "32565", null, null ),
+        new TestData( PlcValueType.UINT, XUINT                    , null, true ,     null,          null, XUINT, (long) XUINT, BigInteger.valueOf(XUINT) , (float)XUINT, (double)XUINT, null, null, null, null, "65535", null, null ),
         /* ULINT */
-        new TestData( PlcValueType.ULINT, BigInteger.valueOf(      0 ), false, null, true, false, true , (short)     0, true , (short)     0, true ,      0, true ,      0L, true, BigInteger.ZERO             , false, null, false, null, false, null, false, null, false, null, true,                    "0", false, null, false, null ),
-        new TestData( PlcValueType.ULINT, BigInteger.valueOf(      1 ), false, null, true, true , true , (short)     1, true , (short)     1, true ,      1, true ,      1L, true, BigInteger.ONE              , false, null, false, null, false, null, false, null, false, null, true,                    "1", false, null, false, null ),
-        new TestData( PlcValueType.ULINT, BigInteger.valueOf(  32565 ), false, null, true, true , true , (short) 32565, true , (short) 32565, true ,  32565, true ,  32565L, true, BigInteger.valueOf(32565L)  , false, null, false, null, false, null, false, null, false, null, true,                "32565", false, null, false, null ),
-        new TestData( PlcValueType.ULINT, BigInteger.valueOf( 0xFFFF ), false, null, true, true , false,          null, false,          null, true , 0xFFFF, true , 0xFFFFL, true, BigInteger.valueOf(0xFFFFL ), false, null, false, null, false, null, false, null, false, null, true,                "65535", false, null, false, null ),
-        new TestData( PlcValueType.ULINT, XULINT                      , false, null, true, true , false,          null, false,          null, false,   null, false,    null, true, XULINT                      , false, null, false, null, false, null, false, null, false, null, true, "18446744073709551615", false, null, false, null ),
+        new TestData( PlcValueType.ULINT, BigInteger.valueOf(      0 ), null, false, (byte) 0, (short)     0,      0,      0L, BigInteger.ZERO             , null, null, null, null, null, null,                    "0", null, null ),
+        new TestData( PlcValueType.ULINT, BigInteger.valueOf(      1 ), null, true , (byte) 1, (short)     1,      1,      1L, BigInteger.ONE              , null, null, null, null, null, null,                    "1", null, null ),
+        new TestData( PlcValueType.ULINT, BigInteger.valueOf(  32565 ), null, true ,     null, (short) 32565,  32565,  32565L, BigInteger.valueOf(32565L)  , null, null, null, null, null, null,                "32565", null, null ),
+        new TestData( PlcValueType.ULINT, BigInteger.valueOf( 0xFFFF ), null, true ,     null,          null, 0xFFFF, 0xFFFFL, BigInteger.valueOf(0xFFFFL ), null, null, null, null, null, null,                "65535", null, null ),
+        new TestData( PlcValueType.ULINT, XULINT                      , null, true ,     null,          null,   null,    null, XULINT                      , null, null, null, null, null, null, "18446744073709551615", null, null ),
         /* USINT */
-        new TestData( PlcValueType.USINT, Short.valueOf( (short)   0 ), false, null, true, false, true , (short) 0, true, (short)   0, true,            0, true,            0L, true, BigInteger.ZERO           , true,           0.0f, true,             0.0, false, null, false, null, false, null, true,   "0", false, null, false, null ),
-        new TestData( PlcValueType.USINT, Short.valueOf( (short)   1 ), false, null, true, true , true , (short) 1, true, (short)   1, true,            1, true,            1L, true, BigInteger.ONE            , true,           1.0f, true,             1.0, false, null, false, null, false, null, true,   "1", false, null, false, null ),
-        new TestData( PlcValueType.USINT, Short.valueOf( (short) 213 ), false, null, true, true , false,      null, true, (short) 213, true,          213, true,          213L, true, BigInteger.valueOf(213L)  , true,         213.0f, true,           213.0, false, null, false, null, false, null, true, "213", false, null, false, null ),
-        new TestData( PlcValueType.USINT, Short.valueOf(      XUSINT ), false, null, true, true , false,      null, true,      XUSINT, true, (int) XUSINT, true, (long) XUSINT, true, BigInteger.valueOf(XUSINT), true, (float) XUSINT, true, (double) XUSINT, false, null, false, null, false, null, true, "255", false, null, false, null ),
+        new TestData( PlcValueType.USINT, Short.valueOf( (short)   0 ), null, false, (byte) 0, (short)   0,            0,            0L, BigInteger.ZERO          ,            0.0f,             0.0, null, null, null, null,   "0", null, null ),
+        new TestData( PlcValueType.USINT, Short.valueOf( (short)   1 ), null, true , (byte) 1, (short)   1,            1,            1L, BigInteger.ONE           ,            1.0f,             1.0, null, null, null, null,   "1", null, null ),
+        new TestData( PlcValueType.USINT, Short.valueOf( (short) 213 ), null, true ,     null, (short) 213,          213,          213L, BigInteger.valueOf(213L) ,          213.0f,           213.0, null, null, null, null, "213", null, null ),
+        new TestData( PlcValueType.USINT, Short.valueOf(      XUSINT ), null, true ,     null,      XUSINT, (int) XUSINT, (long) XUSINT, BigInteger.valueOf(XUSINT), (float) XUSINT, (double) XUSINT, null, null, null, null, "255", null, null ),
         /* DINT */
-        new TestData( PlcValueType.DINT, Integer.valueOf(      0 ), false, null, true, false, true , (short)     0, true , (short)     0, true,      0, true,      0L, true, BigInteger.ZERO            , true,     0.0f, true,     0.0, false, null, false, null, false, null, true,     "0", false, null, false, null ),
-        new TestData( PlcValueType.DINT, Integer.valueOf(      1 ), false, null, true, true , true , (short)     1, true , (short)     1, true,      1, true,      1L, true, BigInteger.ONE             , true,     1.0f, true,     1.0, false, null, false, null, false, null, true,     "1", false, null, false, null ),
-        new TestData( PlcValueType.DINT, Integer.valueOf(  32565 ), false, null, true, true , true , (short) 32565, true , (short) 32565, true,  32565, true,  32565L, true, BigInteger.valueOf(32565L) , true, 32565.0f, true, 32565.0, false, null, false, null, false, null, true, "32565", false, null, false, null ),
-        new TestData( PlcValueType.DINT, Integer.valueOf( 0xFFFF ), false, null, true, true , false,          null, false,          null, true, 0xFFFF, true, 0xFFFFL, true, BigInteger.valueOf(0xFFFFL), true, 65535.0f, true, 65535.0, false, null, false, null, false, null, true, "65535", false, null, false, null ),
+        new TestData( PlcValueType.DINT, Integer.valueOf(      0 ), null, false, (byte) 0, (short)     0,      0,      0L, BigInteger.ZERO            ,     0.0f,     0.0, null, null, null, null,     "0", null, null ),
+        new TestData( PlcValueType.DINT, Integer.valueOf(      1 ), null, true , (byte) 1, (short)     1,      1,      1L, BigInteger.ONE             ,     1.0f,     1.0, null, null, null, null,     "1", null, null ),
+        new TestData( PlcValueType.DINT, Integer.valueOf(  32565 ), null, true ,     null, (short) 32565,  32565,  32565L, BigInteger.valueOf(32565L) , 32565.0f, 32565.0, null, null, null, null, "32565", null, null ),
+        new TestData( PlcValueType.DINT, Integer.valueOf( 0xFFFF ), null, true ,     null,          null, 0xFFFF, 0xFFFFL, BigInteger.valueOf(0xFFFFL), 65535.0f, 65535.0, null, null, null, null, "65535", null, null ),
         /* WCHAR */
-        new TestData( PlcValueType.WCHAR, Integer.valueOf(      0 ), false, null, true, false, true , (short)     0, true , (short)     0, true,      0, true,      0L, true, BigInteger.ZERO            , true,     0.0f, true,     0.0, false, null, false, null, false, null, true, "\u0000", false, null, false, null ),
-        new TestData( PlcValueType.WCHAR, Integer.valueOf(      1 ), false, null, true, true , true , (short)     1, true , (short)     1, true,      1, true,      1L, true, BigInteger.ONE             , true,     1.0f, true,     1.0, false, null, false, null, false, null, true, "\u0001", false, null, false, null ),
-        new TestData( PlcValueType.WCHAR, Integer.valueOf(     97 ), false, null, true, true , true , (short)    97, true , (short)    97, true,     97, true,     97L, true, BigInteger.valueOf(97L)    , true,    97.0f, true,    97.0, false, null, false, null, false, null, true,      "a", false, null, false, null ),
-        new TestData( PlcValueType.WCHAR, Integer.valueOf(  32565 ), false, null, true, true , true , (short) 32565, true , (short) 32565, true,  32565, true,  32565L, true, BigInteger.valueOf(32565L) , true, 32565.0f, true, 32565.0, false, null, false, null, false, null, true, "\u7f35", false, null, false, null ),
-        new TestData( PlcValueType.WCHAR, Integer.valueOf( 0xFFFF ), false, null, true, true , false,          null, false,          null, true, 0xFFFF, true, 0xFFFFL, true, BigInteger.valueOf(0xFFFFL), true, 65535.0f, true, 65535.0, false, null, false, null, false, null, true, "\uffff", false, null, false, null ),
+        new TestData( PlcValueType.WCHAR, Integer.valueOf(      0 ), null, false, (byte)  0, (short)     0,      0,      0L, BigInteger.ZERO            ,     0.0f,     0.0, null, null, null, null, "\u0000", null, null ),
+        new TestData( PlcValueType.WCHAR, Integer.valueOf(      1 ), null, true , (byte)  1, (short)     1,      1,      1L, BigInteger.ONE             ,     1.0f,     1.0, null, null, null, null, "\u0001", null, null ),
+        new TestData( PlcValueType.WCHAR, Integer.valueOf(     97 ), null, true , (byte) 97, (short)    97,     97,     97L, BigInteger.valueOf(97L)    ,    97.0f,    97.0, null, null, null, null,      "a", null, null ),
+        new TestData( PlcValueType.WCHAR, Integer.valueOf(  32565 ), null, true ,      null, (short) 32565,  32565,  32565L, BigInteger.valueOf(32565L) , 32565.0f, 32565.0, null, null, null, null, "\u7f35", null, null ),
+        new TestData( PlcValueType.WCHAR, Integer.valueOf( 0xFFFF ), null, true ,      null,          null, 0xFFFF, 0xFFFFL, BigInteger.valueOf(0xFFFFL), 65535.0f, 65535.0, null, null, null, null, "\uffff", null, null ),
         /* WSTRING */                                                                                                                                                                                              
-        new TestData( PlcValueType.WSTRING,           "", false, null, true, false, false,        null, false, (short)    0, false, null, false, null, false,                     null, false, null, false,   null, false, null, false, null, false, null, true,           "", false, null, false, null ),
-        new TestData( PlcValueType.WSTRING,       "true", false, null, true, true , false,        null, false, (short)    1, false, null, false, null, false,                     null, false, null, false,   null, false, null, false, null, false, null, true,       "true", false, null, false, null ),
-        new TestData( PlcValueType.WSTRING,        "123", false, null, true, false, true , (short) 123, true , (short)  123, true ,  123, true , 123L, true , BigInteger.valueOf(123L), true , 123f, true ,  123.0, false, null, false, null, false, null, true,        "123", false, null, false, null ),
-        new TestData( PlcValueType.WSTRING, "Some text.", false, null, true, false, false,        null, false,         null, false, null, false, null, false,                     null, false, null, false,   null, false, null, false, null, false, null, true, "Some text.", false, null, false, null ),
+        new TestData( PlcValueType.WSTRING,           "", null, false,       null,        null, null, null, null                    , null,  null, null, null, null, null,           "", null, null ),
+        new TestData( PlcValueType.WSTRING,       "true", null, true ,       null,        null, null, null, null                    , null,  null, null, null, null, null,       "true", null, null ),
+        new TestData( PlcValueType.WSTRING,        "123", null, false, (byte) 123, (short) 123,  123, 123L, BigInteger.valueOf(123L), 123f, 123.0, null, null, null, null,        "123", null, null ),
+        new TestData( PlcValueType.WSTRING, "Some text.", null, false,       null,        null, null, null, null                    , null,  null, null, null, null, null, "Some text.", null, null ),
         /* List */
         new TestData( PlcValueType.List, new TestData[]{
-            new TestData( PlcValueType.INT, Short.valueOf( (short)       1 ), false, null, true, true , true , (short) 1, true, (short) 1, true, 1, true, 1L, true, BigInteger.ONE, true, 1.0f, true, 1.0, false, null, false, null, false, null, true, "1", false, null, false, null ),
-            new TestData( PlcValueType.INT, Short.valueOf( (short)       2 ), false, null, true, true , true , (short) 1, true, (short) 2, true, 2, true, 2L, true, BigInteger.TWO, true, 2.0f, true, 2.0, false, null, false, null, false, null, true, "2", false, null, false, null ),
-        }, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, true, "[ResponseValue[value=ShortValue[value=1]], ResponseValue[value=ShortValue[value=2]]]", true, 2, false, null ),
+            new TestData( PlcValueType.INT, Short.valueOf( (short)       1 ), null, true , (byte) 1, (short) 1, 1, 1L, BigInteger.ONE, 1.0f, 1.0, null, null, null, null, "1", null, null ),
+            new TestData( PlcValueType.INT, Short.valueOf( (short)       2 ), null, true , (byte) 2, (short) 2, 2, 2L, BigInteger.TWO, 2.0f, 2.0, null, null, null, null, "2", null, null ),
+        }, null, null, null, null, null, null, null, null, null, null, null, null, null, "[ResponseValue[value=ShortValue[value=1]], ResponseValue[value=ShortValue[value=2]]]", 2, null ),
         /* Struct */
         new TestData( PlcValueType.Struct, Map.of(
-            "one",   new TestData( PlcValueType.INT, Short.valueOf( (short)       1 ), false, null, true, true , true , (short) 1, true, (short) 1, true, 1, true, 1L, true, BigInteger.ONE, true, 1.0f, true, 1.0, false, null, false, null, false, null, true, "1", false, null, false, null ),
-            "two",   new TestData( PlcValueType.INT, Short.valueOf( (short)       2 ), false, null, true, true , true , (short) 1, true, (short) 2, true, 2, true, 2L, true, BigInteger.TWO, true, 2.0f, true, 2.0, false, null, false, null, false, null, true, "2", false, null, false, null )
-        ), false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, false, null, true, "{one=ResponseValue[value=ShortValue[value=1]], two=ResponseValue[value=ShortValue[value=2]]}", false, null, true, List.of( "one", "two") ),
+            "one",   new TestData( PlcValueType.INT, Short.valueOf( (short)       1 ), null, true , (byte) 1, (short) 1, 1, 1L, BigInteger.ONE, 1.0f, 1.0, null, null, null, null, "1", null, null ),
+            "two",   new TestData( PlcValueType.INT, Short.valueOf( (short)       2 ), null, true , (byte) 2, (short) 2, 2, 2L, BigInteger.TWO, 2.0f, 2.0, null, null, null, null, "2", null, null )
+        ), null, null, null, null, null, null, null, null, null, null, null, null, null, "{one=ResponseValue[value=ShortValue[value=1]], two=ResponseValue[value=ShortValue[value=2]]}", null, List.of( "one", "two") ),
     };
     // @formatter:on
 
@@ -419,7 +501,7 @@ public class ResponseTest
      * @return The test stream.
      */
     @TestFactory
-    public Stream< DynamicNode > ResponseValueTest()
+    Stream< DynamicNode > ResponseValueTest()
     {
         return Arrays.asList( testData ).stream().map( data -> generateTestNode( data ) );
     }
@@ -446,12 +528,16 @@ public class ResponseTest
                     /* types */
                     binaryResponseTest( input ),
                     booleanResponseTest( input ),
+                    byteResponseTest( input ),
                     shortResponseTest( input ),
                     integerResponseTest( input ),
                     dateResponseTest( input ),
                     dateTimeResponseTest( input ),
+                    timeResponseTest( input ),
+                    durationResponseTest( input ),
                     longResponseTest( input ),
                     bigIntegerResponseTest( input ),
+                    floatResponseTest( input ),
                     doubleResponseTest( input ),
                     stringResponseTest( input ),
                     listResponseTest( input ),
@@ -459,12 +545,16 @@ public class ResponseTest
                     /* plc */
                     binaryResponsePlcTest( input ),
                     booleanResponsePlcTest( input ),
+                    byteResponsePlcTest( input ),
                     shortResponsePlcTest( input ),
                     integerResponsePlcTest( input ),
                     dateResponsePlcTest( input ),
                     dateTimeResponsePlcTest( input ),
+                    timeResponsePlcTest( input ),
+                    durationResponsePlcTest( input ),
                     longResponsePlcTest( input ),
                     bigIntegerResponsePlcTest( input ),
+                    floatResponsePlcTest( input ),
                     doubleResponsePlcTest( input ),
                     stringResponsePlcTest( input ),
                     listResponsePlcTest( input ),
@@ -690,10 +780,10 @@ public class ResponseTest
             Stream
                 .of(
                     /* tests */
-                    dynamicTest( "is", () -> assertEquals( input.testValues.isBoolean, input.value.isBoolean() ) ),
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isBoolean(), input.value.isBoolean() ) ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isBoolean )
+                        if ( input.testValues.isBoolean() )
                         {
                             assertEquals( input.testValues.asBoolean, input.value.getAsBoolean() );
                         }
@@ -720,16 +810,21 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isBoolean != input.plcValue.isBoolean() )
+                        if ( input.testValues.isBoolean() != input.plcValue.isBoolean() )
                         {
                             LOGGER
-                                .warn( "{} is Boolean differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isBoolean, input.plcValue.isBoolean() );
+                                .warn(
+                                    "{} is Boolean differ, expected: {} plc: {}",
+                                    input.plcValue.getClass().getName(),
+                                    input.testValues.isBoolean(),
+                                    input.plcValue.isBoolean()
+                                );
                         }
                     } ),
                     dynamicTest( "as plc", () ->
                     {
                         Boolean plcValue;
-                        if ( input.testValues.isBoolean )
+                        if ( input.testValues.isBoolean() )
                         {
                             try
                             {
@@ -780,11 +875,11 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is", () ->
                     {
-                        assertEquals( input.testValues.isShort, input.value.isShort() );
+                        assertEquals( input.testValues.isShort(), input.value.isShort() );
                     } ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isShort )
+                        if ( input.testValues.isShort() )
                         {
                             assertEquals( input.testValues.asShort, input.value.getAsShort() );
                         }
@@ -811,15 +906,15 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isShort != input.plcValue.isShort() )
+                        if ( input.testValues.isShort() != input.plcValue.isShort() )
                         {
-                            LOGGER.warn( "{} is Short differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isShort, input.plcValue.isShort() );
+                            LOGGER.warn( "{} is Short differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isShort(), input.plcValue.isShort() );
                         }
                     } ),
                     dynamicTest( "as plc", () ->
                     {
                         Short plcValue;
-                        if ( input.testValues.isShort )
+                        if ( input.testValues.isShort() )
                         {
                             try
                             {
@@ -857,6 +952,96 @@ public class ResponseTest
     }
 
     /**
+     * Create the byte response value test. 
+     * @param input The test data to use.
+     * @return The test.
+     */
+    private DynamicContainer byteResponseTest( TestTriple input )
+    {
+        return dynamicContainer(
+            "byte",
+            Stream
+                .of(
+                    /* tests */
+                    dynamicTest( "is", () ->
+                    {
+                        assertEquals( input.testValues.isByte(), input.value.isByte() );
+                    } ),
+                    dynamicTest( "as", () ->
+                    {
+                        if ( input.testValues.isByte() )
+                        {
+                            assertEquals( input.testValues.asByte(), input.value.getAsByte() );
+                        }
+                        else
+                        {
+                            assertThrows( UnsupportedOperationException.class, () -> input.value.getAsByte() );
+                        } ;
+                    } )
+                )
+        );
+    }
+
+    /**
+     * Create the byte plc response value test. 
+     * @param input The test data to use.
+     * @return The test.
+    */
+    private DynamicContainer byteResponsePlcTest( TestTriple input )
+    {
+        return dynamicContainer(
+            "plc byte",
+            Stream
+                .of(
+                    /* tests */
+                    dynamicTest( "is plc ", () ->
+                    {
+                        if ( input.testValues.isByte() != input.plcValue.isByte() )
+                        {
+                            LOGGER.warn( "{} is Byte differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isShort(), input.plcValue.isShort() );
+                        }
+                    } ),
+                    dynamicTest( "as plc", () ->
+                    {
+                        byte plcValue;
+                        if ( input.testValues.isByte() )
+                        {
+                            try
+                            {
+                                plcValue= input.plcValue.getByte();
+                                if ( !Objects.equals( input.testValues.asByte(), plcValue ) )
+                                {
+                                    LOGGER.warn( "{} get Byte value differs, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.asByte(), plcValue );
+                                }
+                            }
+                            catch ( Exception e )
+                            {
+                                LOGGER.warn( "{} get Byte throws unexpected: {}", input.plcValue.getClass().getName(), e.getClass().getName() );
+                            }
+
+                        }
+                        else
+                        {
+                            try
+                            {
+                                plcValue= input.plcValue.getByte();
+                                LOGGER.warn( "{} get Byte value unexpected: {}", input.plcValue.getClass().getName(), plcValue );
+                            }
+                            catch ( Exception e )
+                            {
+                                if ( !( e instanceof PlcIncompatibleDatatypeException ) )
+                                {
+                                    LOGGER.warn( "{} get Byte throws wrong: {}", input.plcValue.getClass().getName(), e.getClass().getName() );
+                                }
+                            }
+
+                        }
+                    } )
+                )
+        );
+    }
+
+    /**
      * Create the binary response value test. 
      * @param input The test data to use.
      * @return The test.
@@ -870,11 +1055,11 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is", () ->
                     {
-                        assertEquals( input.testValues.isBinary, input.value.isBinary() );
+                        assertEquals( input.testValues.isBinary(), input.value.isBinary() );
                     } ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isBinary )
+                        if ( input.testValues.isBinary() )
                         {
                             assertArrayEquals( input.testValues.asBinary, IOUtils.toByteArray( input.value.getAsBinary() ) );
                         }
@@ -901,15 +1086,15 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( ( input.testValues.isBinary == true ) != ( input.plcValue.getPlcValueType() == PlcValueType.RAW_BYTE_ARRAY ) )
+                        if ( ( input.testValues.isBinary() == true ) != ( input.plcValue.getPlcValueType() == PlcValueType.RAW_BYTE_ARRAY ) )
                         {
-                            LOGGER.warn( "{} is Binary differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isShort, input.plcValue.isShort() );
+                            LOGGER.warn( "{} is Binary differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isShort(), input.plcValue.isShort() );
                         }
                     } ),
                     dynamicTest( "as plc", () ->
                     {
                         byte[] plcValue;
-                        if ( input.testValues.isShort )
+                        if ( input.testValues.isBinary() )
                         {
                             try
                             {
@@ -958,10 +1143,10 @@ public class ResponseTest
             Stream
                 .of(
                     /* tests */
-                    dynamicTest( "is", () -> assertEquals( input.testValues.isInteger, input.value.isInteger() ) ),
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isInteger(), input.value.isInteger() ) ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isInteger )
+                        if ( input.testValues.isInteger() )
                         {
                             assertEquals( input.testValues.asInteger, input.value.getAsInteger() );
                         }
@@ -988,16 +1173,21 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isInteger != input.plcValue.isInteger() )
+                        if ( input.testValues.isInteger() != input.plcValue.isInteger() )
                         {
                             LOGGER
-                                .warn( "{} is Integer differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isInteger, input.plcValue.isInteger() );
+                                .warn(
+                                    "{} is Integer differ, expected: {} plc: {}",
+                                    input.plcValue.getClass().getName(),
+                                    input.testValues.isInteger(),
+                                    input.plcValue.isInteger()
+                                );
                         }
                     } ),
                     dynamicTest( "as plc", () ->
                     {
                         Integer plcValue;
-                        if ( input.testValues.isInteger )
+                        if ( input.testValues.isInteger() )
                         {
                             try
                             {
@@ -1046,10 +1236,10 @@ public class ResponseTest
             Stream
                 .of(
                     /* tests */
-                    dynamicTest( "is", () -> assertEquals( input.testValues.isLong, input.value.isLong() ) ),
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isLong(), input.value.isLong() ) ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isLong )
+                        if ( input.testValues.isLong() )
                         {
                             assertEquals( input.testValues.asLong, input.value.getAsLong() );
                         }
@@ -1076,15 +1266,15 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isLong != input.plcValue.isLong() )
+                        if ( input.testValues.isLong() != input.plcValue.isLong() )
                         {
-                            LOGGER.warn( "{} is Long differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isLong, input.plcValue.isLong() );
+                            LOGGER.warn( "{} is Long differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isLong(), input.plcValue.isLong() );
                         }
                     } ),
                     dynamicTest( "as plc", () ->
                     {
                         Long plcValue;
-                        if ( input.testValues.isLong )
+                        if ( input.testValues.isLong() )
                         {
                             try
                             {
@@ -1133,10 +1323,10 @@ public class ResponseTest
             Stream
                 .of(
                     /* tests */
-                    dynamicTest( "is", () -> assertEquals( input.testValues.isBigInteger, input.value.isBigInteger() ) ),
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isBigInteger(), input.value.isBigInteger() ) ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isBigInteger )
+                        if ( input.testValues.isBigInteger() )
                         {
                             assertEquals( input.testValues.asBigInteger, input.value.getAsBigInteger() );
                         }
@@ -1163,13 +1353,13 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isBigInteger != input.plcValue.isBigInteger() )
+                        if ( input.testValues.isBigInteger() != input.plcValue.isBigInteger() )
                         {
                             LOGGER
                                 .warn(
                                     "{} is BigInteger differ, expected: {} plc: {}",
                                     input.plcValue.getClass().getName(),
-                                    input.testValues.isBigInteger,
+                                    input.testValues.isBigInteger(),
                                     input.plcValue.isBigInteger()
                                 );
                         }
@@ -1177,7 +1367,7 @@ public class ResponseTest
                     dynamicTest( "as plc", () ->
                     {
                         BigInteger plcValue;
-                        if ( input.testValues.isBigInteger )
+                        if ( input.testValues.isBigInteger() )
                         {
                             try
                             {
@@ -1221,6 +1411,93 @@ public class ResponseTest
     }
 
     /**
+     * Create the float response value test. 
+     * @param input The test data to use.
+     * @return The test.
+     */
+    private DynamicContainer floatResponseTest( TestTriple input )
+    {
+        return dynamicContainer(
+            "float",
+            Stream
+                .of(
+                    /* tests */
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isFloat(), input.value.isFloat() ) ),
+                    dynamicTest( "as", () ->
+                    {
+                        if ( input.testValues.isFloat() )
+                        {
+                            assertEquals( input.testValues.asFloat, input.value.getAsFloat() );
+                        }
+                        else
+                        {
+                            assertThrows( UnsupportedOperationException.class, () -> input.value.getAsFloat() );
+                        } ;
+                    } )
+                )
+        );
+    }
+
+    /**
+     * Create the float plc response value test. 
+     * @param input The test data to use.
+     * @return The test.
+     */
+    private DynamicContainer floatResponsePlcTest( TestTriple input )
+    {
+        return dynamicContainer(
+            "plc float",
+            Stream
+                .of(
+                    /* tests */
+                    dynamicTest( "is plc ", () ->
+                    {
+                        if ( input.testValues.isFloat() != input.plcValue.isFloat() )
+                        {
+                            LOGGER.warn( "{} is Float differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isFloat(), input.plcValue.isFloat() );
+                        }
+                    } ),
+                    dynamicTest( "as plc", () ->
+                    {
+                        float plcValue;
+                        if ( input.testValues.isFloat() )
+                        {
+                            try
+                            {
+                                plcValue= input.plcValue.getFloat();
+                                if ( !Objects.equals( input.testValues.asFloat, plcValue ) )
+                                {
+                                    LOGGER.warn( "{} get Float value differs, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.asFloat, plcValue );
+                                }
+                            }
+                            catch ( Exception e )
+                            {
+                                LOGGER.warn( "{} get Float throws unexpected: {}", input.plcValue.getClass().getName(), e.getClass().getName() );
+                            }
+
+                        }
+                        else
+                        {
+                            try
+                            {
+                                plcValue= input.plcValue.getFloat();
+                                LOGGER.warn( "{} get Float value unexpected: {}", input.plcValue.getClass().getName(), plcValue );
+                            }
+                            catch ( Exception e )
+                            {
+                                if ( !( e instanceof PlcIncompatibleDatatypeException ) )
+                                {
+                                    LOGGER.warn( "{} get Float throws wrong: {}", input.plcValue.getClass().getName(), e.getClass().getName() );
+                                }
+                            }
+
+                        }
+                    } )
+                )
+        );
+    }
+
+    /**
      * Create the double response value test. 
      * @param input The test data to use.
      * @return The test.
@@ -1232,10 +1509,10 @@ public class ResponseTest
             Stream
                 .of(
                     /* tests */
-                    dynamicTest( "is", () -> assertEquals( input.testValues.isDouble, input.value.isDouble() ) ),
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isDouble(), input.value.isDouble() ) ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isDouble )
+                        if ( input.testValues.isDouble() )
                         {
                             assertEquals( input.testValues.asDouble, input.value.getAsDouble() );
                         }
@@ -1262,15 +1539,15 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isDouble != input.plcValue.isDouble() )
+                        if ( input.testValues.isDouble() != input.plcValue.isDouble() )
                         {
-                            LOGGER.warn( "{} is Double differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isDouble, input.plcValue.isDouble() );
+                            LOGGER.warn( "{} is Double differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isDouble(), input.plcValue.isDouble() );
                         }
                     } ),
                     dynamicTest( "as plc", () ->
                     {
                         Double plcValue;
-                        if ( input.testValues.isDouble )
+                        if ( input.testValues.isDouble() )
                         {
                             try
                             {
@@ -1319,10 +1596,10 @@ public class ResponseTest
             Stream
                 .of(
                     /* tests */
-                    dynamicTest( "is", () -> assertEquals( input.testValues.isDate, input.value.isDate() ) ),
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isDate(), input.value.isDate() ) ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isDate )
+                        if ( input.testValues.isDate() )
                         {
                             assertEquals( input.testValues.asDate, input.value.getAsDate() );
                         }
@@ -1349,15 +1626,15 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isDate != input.plcValue.isDate() )
+                        if ( input.testValues.isDate() != input.plcValue.isDate() )
                         {
-                            LOGGER.warn( "{} is Date differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isDate, input.plcValue.isDate() );
+                            LOGGER.warn( "{} is Date differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isDate(), input.plcValue.isDate() );
                         }
                     } ),
                     dynamicTest( "as plc", () ->
                     {
                         LocalDate plcValue;
-                        if ( input.testValues.isDate )
+                        if ( input.testValues.isDate() )
                         {
                             try
                             {
@@ -1406,10 +1683,10 @@ public class ResponseTest
             Stream
                 .of(
                     /* tests */
-                    dynamicTest( "is", () -> assertEquals( input.testValues.isDateTime, input.value.isDateTime() ) ),
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isDateTime(), input.value.isDateTime() ) ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isDateTime )
+                        if ( input.testValues.isDateTime() )
                         {
                             assertEquals( input.testValues.asDateTime, input.value.getAsDateTime() );
                         }
@@ -1436,13 +1713,13 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isDateTime != input.plcValue.isDateTime() )
+                        if ( input.testValues.isDateTime() != input.plcValue.isDateTime() )
                         {
                             LOGGER
                                 .warn(
                                     "{} is DateTime differ, expected: {} plc: {}",
                                     input.plcValue.getClass().getName(),
-                                    input.testValues.isDateTime,
+                                    input.testValues.isDateTime(),
                                     input.plcValue.isDateTime()
                                 );
                         }
@@ -1450,7 +1727,7 @@ public class ResponseTest
                     dynamicTest( "as plc", () ->
                     {
                         LocalDateTime plcValue;
-                        if ( input.testValues.isDateTime )
+                        if ( input.testValues.isDateTime() )
                         {
                             try
                             {
@@ -1489,6 +1766,187 @@ public class ResponseTest
     }
 
     /**
+     * Create the local time response value test. 
+     * @param input The test data to use.
+     * @return The test.
+     */
+    private DynamicContainer timeResponseTest( TestTriple input )
+    {
+        return dynamicContainer(
+            "localtime",
+            Stream
+                .of(
+                    /* tests */
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isTime(), input.value.isTime() ) ),
+                    dynamicTest( "as", () ->
+                    {
+                        if ( input.testValues.isTime() )
+                        {
+                            assertEquals( input.testValues.asTime, input.value.getAsTime() );
+                        }
+                        else
+                        {
+                            assertThrows( UnsupportedOperationException.class, () -> input.value.getAsTime() );
+                        } ;
+                    } )
+                )
+        );
+    }
+
+    /**
+     * Create the local time plc response value test. 
+     * @param input The test data to use.
+     * @return The test.
+     */
+    private DynamicContainer timeResponsePlcTest( TestTriple input )
+    {
+        return dynamicContainer(
+            "plc localtime",
+            Stream
+                .of(
+                    /* tests */
+                    dynamicTest( "is plc ", () ->
+                    {
+                        if ( input.testValues.isTime() != input.plcValue.isTime() )
+                        {
+                            LOGGER.warn( "{} is Time differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isTime(), input.plcValue.isTime() );
+                        }
+                    } ),
+                    dynamicTest( "as plc", () ->
+                    {
+                        LocalTime plcValue;
+                        if ( input.testValues.isTime() )
+                        {
+                            try
+                            {
+                                plcValue= input.plcValue.getTime();
+                                if ( !Objects.equals( input.testValues.asTime, plcValue ) )
+                                {
+                                    LOGGER.warn( "{} get Time value differs, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.asTime, plcValue );
+                                }
+                            }
+                            catch ( Exception e )
+                            {
+                                LOGGER.warn( "{} get Time throws unexpected: {}", input.plcValue.getClass().getName(), e.getClass().getName() );
+                            }
+
+                        }
+                        else
+                        {
+                            try
+                            {
+                                plcValue= input.plcValue.getTime();
+                                LOGGER.warn( "{} get Time value unexpected: {}", input.plcValue.getClass().getName(), plcValue );
+                            }
+                            catch ( Exception e )
+                            {
+                                if ( !( e instanceof PlcIncompatibleDatatypeException ) )
+                                {
+                                    LOGGER.warn( "{} get Time throws wrong: {}", input.plcValue.getClass().getName(), e.getClass().getName() );
+                                }
+                            }
+
+                        }
+                    } )
+                )
+        );
+    }
+
+    /**
+     * Create the duration response value test. 
+     * @param input The test data to use.
+     * @return The test.
+     */
+    private DynamicContainer durationResponseTest( TestTriple input )
+    {
+        return dynamicContainer(
+            "duration",
+            Stream
+                .of(
+                    /* tests */
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isDuration(), input.value.isDuration() ) ),
+                    dynamicTest( "as", () ->
+                    {
+                        if ( input.testValues.isDuration() )
+                        {
+                            assertEquals( input.testValues.asDuration, input.value.getAsDuration() );
+                        }
+                        else
+                        {
+                            assertThrows( UnsupportedOperationException.class, () -> input.value.getAsDuration() );
+                        } ;
+                    } )
+                )
+        );
+    }
+
+    /**
+     * Create the duration plc response value test. 
+     * @param input The test data to use.
+     * @return The test.
+     */
+    private DynamicContainer durationResponsePlcTest( TestTriple input )
+    {
+        return dynamicContainer(
+            "plc duration",
+            Stream
+                .of(
+                    /* tests */
+                    dynamicTest( "is plc ", () ->
+                    {
+                        if ( input.testValues.isDuration() != input.plcValue.isDuration() )
+                        {
+                            LOGGER
+                                .warn(
+                                    "{} is Duration differ, expected: {} plc: {}",
+                                    input.plcValue.getClass().getName(),
+                                    input.testValues.isDuration(),
+                                    input.plcValue.isDuration()
+                                );
+                        }
+                    } ),
+                    dynamicTest( "as plc", () ->
+                    {
+                        Duration plcValue;
+                        if ( input.testValues.isDuration() )
+                        {
+                            try
+                            {
+                                plcValue= input.plcValue.getDuration();
+                                if ( !Objects.equals( input.testValues.asDuration, plcValue ) )
+                                {
+                                    LOGGER
+                                        .warn( "{} get Duration value differs, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.asDuration, plcValue );
+                                }
+                            }
+                            catch ( Exception e )
+                            {
+                                LOGGER.warn( "{} get Duration throws unexpected: {}", input.plcValue.getClass().getName(), e.getClass().getName() );
+                            }
+
+                        }
+                        else
+                        {
+                            try
+                            {
+                                plcValue= input.plcValue.getDuration();
+                                LOGGER.warn( "{} get Duration value unexpected: {}", input.plcValue.getClass().getName(), plcValue );
+                            }
+                            catch ( Exception e )
+                            {
+                                if ( !( e instanceof PlcIncompatibleDatatypeException ) )
+                                {
+                                    LOGGER.warn( "{} get Duration throws wrong: {}", input.plcValue.getClass().getName(), e.getClass().getName() );
+                                }
+                            }
+
+                        }
+                    } )
+                )
+        );
+    }
+
+    /**
      * Create the string response value test. 
      * @param input The test data to use.
      * @return The test.
@@ -1500,10 +1958,10 @@ public class ResponseTest
             Stream
                 .of(
                     /* tests */
-                    dynamicTest( "is", () -> assertEquals( input.testValues.isString, input.value.isString() ) ),
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isString(), input.value.isString() ) ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isString )
+                        if ( input.testValues.isString() )
                         {
                             assertEquals( input.testValues.asString, input.value.getAsString() );
                         }
@@ -1530,16 +1988,15 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isString != input.plcValue.isString() )
+                        if ( input.testValues.isString() != input.plcValue.isString() )
                         {
-                            LOGGER
-                                .warn( "{} is DateTime differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isDateTime, input.plcValue.isString() );
+                            LOGGER.warn( "{} is String differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isString(), input.plcValue.isString() );
                         }
                     } ),
                     dynamicTest( "as plc", () ->
                     {
                         String plcValue;
-                        if ( input.testValues.isString )
+                        if ( input.testValues.isString() )
                         {
                             try
                             {
@@ -1588,10 +2045,10 @@ public class ResponseTest
             Stream
                 .of(
                     /* tests */
-                    dynamicTest( "is", () -> assertEquals( input.testValues.isList, input.value.isList() ) ),
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isList(), input.value.isList() ) ),
                     dynamicTest( "length", () ->
                     {
-                        if ( input.testValues.isList )
+                        if ( input.testValues.isList() )
                         {
                             assertEquals( input.testValues.getListLength, input.value.getAsList().size() );
                         }
@@ -1602,7 +2059,7 @@ public class ResponseTest
                     } ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isList )
+                        if ( input.testValues.isList() )
                         {
                             assertTrue( input.value.getAsList() instanceof List< ResponseValue > );
                         }
@@ -1629,16 +2086,15 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isList != input.plcValue.isList() )
+                        if ( input.testValues.isList() != input.plcValue.isList() )
                         {
-                            LOGGER
-                                .warn( "{} is DateTime differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isDateTime, input.plcValue.isString() );
+                            LOGGER.warn( "{} is List differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isList(), input.plcValue.isList() );
                         }
                     } ),
                     dynamicTest( "as plc", () ->
                     {
                         int length;
-                        if ( input.testValues.isList )
+                        if ( input.testValues.isList() )
                         {
                             try
                             {
@@ -1674,7 +2130,7 @@ public class ResponseTest
                     dynamicTest( "as plc", () ->
                     {
                         List< ? extends PlcValue > plcValue;
-                        if ( input.testValues.isString )
+                        if ( input.testValues.isList() )
                         {
                             try
                             {
@@ -1739,10 +2195,10 @@ public class ResponseTest
             Stream
                 .of(
                     /* tests */
-                    dynamicTest( "is", () -> assertEquals( input.testValues.isStruct, input.value.isStruct() ) ),
+                    dynamicTest( "is", () -> assertEquals( input.testValues.isStruct(), input.value.isStruct() ) ),
                     dynamicTest( "length", () ->
                     {
-                        if ( input.testValues.isStruct )
+                        if ( input.testValues.isStruct() )
                         {
                             assertEquals( input.testValues.getStructKeys().size(), input.value.getAsStruct().size() );
                         }
@@ -1753,7 +2209,7 @@ public class ResponseTest
                     } ),
                     dynamicTest( "as", () ->
                     {
-                        if ( input.testValues.isStruct )
+                        if ( input.testValues.isStruct() )
                         {
                             assertTrue( input.value.getAsStruct() instanceof Map< String, ResponseValue > );
                         }
@@ -1764,7 +2220,7 @@ public class ResponseTest
                     } ),
                     dynamicTest( "keys", () ->
                     {
-                        if ( input.testValues.isStruct )
+                        if ( input.testValues.isStruct() )
                         {
                             assertIterableEquals( input.value.getAsStruct().keySet(), input.testValues.getStructKeys );
                         }
@@ -1787,16 +2243,15 @@ public class ResponseTest
                     /* tests */
                     dynamicTest( "is plc ", () ->
                     {
-                        if ( input.testValues.isStruct != input.plcValue.isStruct() )
+                        if ( input.testValues.isStruct() != input.plcValue.isStruct() )
                         {
-                            LOGGER
-                                .warn( "{} is DateTime differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isDateTime, input.plcValue.isString() );
+                            LOGGER.warn( "{} is Struct differ, expected: {} plc: {}", input.plcValue.getClass().getName(), input.testValues.isStruct(), input.plcValue.isString() );
                         }
                     } ),
                     dynamicTest( "as plc", () ->
                     {
                         int length;
-                        if ( input.testValues.isStruct )
+                        if ( input.testValues.isStruct() )
                         {
                             try
                             {
@@ -1838,7 +2293,7 @@ public class ResponseTest
                     dynamicTest( "as plc", () ->
                     {
                         Map< String, ? extends PlcValue > plcValue;
-                        if ( input.testValues.isStruct )
+                        if ( input.testValues.isStruct() )
                         {
                             try
                             {
@@ -1874,7 +2329,7 @@ public class ResponseTest
                     } ),
                     dynamicTest( "keys plc", () ->
                     {
-                        if ( input.testValues.isStruct )
+                        if ( input.testValues.isStruct() )
                         {
                             assertIterableEquals( input.plcValue.getKeys(), input.testValues.getStructKeys );
                         }
@@ -1891,7 +2346,7 @@ public class ResponseTest
      */
     private DynamicContainer structContentResponseTest( TestTriple input )
     {
-        if ( input.testValues.isStruct )
+        if ( input.testValues.isStruct() )
         {
             @SuppressWarnings( "unchecked" )
             Map< String, TestData > structData= (Map< String, TestData >) input.testValues().source();

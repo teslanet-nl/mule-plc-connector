@@ -36,8 +36,7 @@ import java.util.Map;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Interface of response value types.
  */
 public sealed interface Valuable extends Serializable
     permits
@@ -56,7 +55,7 @@ public sealed interface Valuable extends Serializable
         LocalDateTimeValue,
         LocalTimeValue,
         DurationValue,
-        NullValue,
+        EmptyValue,
         ListValue,
         StructValue
 {
@@ -65,12 +64,7 @@ public sealed interface Valuable extends Serializable
         return false;
     }
 
-    public default boolean isNullable()
-    {
-        return false;
-    }
-
-    public default boolean isNull()
+    public default boolean isEmpty()
     {
         return false;
     }

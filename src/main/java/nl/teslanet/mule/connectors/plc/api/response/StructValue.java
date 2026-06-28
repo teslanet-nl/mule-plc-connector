@@ -27,8 +27,7 @@ import java.util.Map;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Struct response value.
  */
 public record StructValue( Map< String, ResponseValue > struct ) implements Valuable
 {

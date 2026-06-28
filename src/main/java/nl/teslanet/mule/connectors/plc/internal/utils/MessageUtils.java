@@ -26,11 +26,13 @@ package nl.teslanet.mule.connectors.plc.internal.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
+import org.apache.plc4x.java.api.types.PlcValueType;
 import org.apache.plc4x.java.api.value.PlcValue;
 
 import nl.teslanet.mule.connectors.plc.api.response.BigIntegerValue;
@@ -52,7 +54,7 @@ import nl.teslanet.mule.connectors.plc.api.response.LocalDateTimeValue;
 import nl.teslanet.mule.connectors.plc.api.response.LocalDateValue;
 import nl.teslanet.mule.connectors.plc.api.response.LocalTimeValue;
 import nl.teslanet.mule.connectors.plc.api.response.LongValue;
-import nl.teslanet.mule.connectors.plc.api.response.NullValue;
+import nl.teslanet.mule.connectors.plc.api.response.EmptyValue;
 import nl.teslanet.mule.connectors.plc.api.response.ResponseCode;
 import nl.teslanet.mule.connectors.plc.api.response.ResponseValue;
 
@@ -64,6 +66,14 @@ import nl.teslanet.mule.connectors.plc.api.response.ResponseValue;
 public class MessageUtils
 {
     /**
+     * No instantance.
+     */
+    private MessageUtils()
+    {
+        super();
+    }
+
+    /**
      * Create Field responses list from a PLC read operation. 
      * @param response The PLC response delivering the field data.
      * @return The list of field responses.
@@ -73,10 +83,26 @@ public class MessageUtils
         ArrayList< FieldValueResponse > fieldResponses= new ArrayList<>();
         for ( String name : response.getTagNames() )
         {
-            PlcValue plvValue= response.getPlcValue( name );
-            ResponseValue value= createResponseValue( plvValue );
+            PlcValue plcValue= response.getPlcValue( name );
+            String dataType;
+            if ( plcValue != null )
+            {
+                dataType= plcValue.getPlcValueType().name();
+            }
+            else
+            {
+                dataType= PlcValueType.NULL.name();
+            }
+            ResponseValue value= createResponseValue( plcValue );
             fieldResponses
-                .add( new FieldValueResponse( name, ResponseCode.valueOf( response.getResponseCode( name ).name() ), plvValue.getPlcValueType().name(), value ) );
+                .add(
+                    new FieldValueResponse(
+                        name,
+                        ResponseCode.valueOf( response.getResponseCode( name ).name() ),
+                        dataType,
+                        value
+                    )
+                );
         }
         return Collections.unmodifiableList( fieldResponses );
     }
@@ -118,6 +144,7 @@ public class MessageUtils
      */
     public static ResponseValue createResponseValue( PlcValue plcValue )
     {
+        if ( plcValue == null ) return new ResponseValue( new EmptyValue() );
         ResponseValue value= null;
         switch ( plcValue.getPlcValueType() )
         {
@@ -171,7 +198,7 @@ public class MessageUtils
                 break;
             case List:
                 value= new ResponseValue(
-                    new ListValue( plcValue.getList().stream().map( element -> createResponseValue( element ) ).collect( Collectors.toUnmodifiableList() ) )
+                    new ListValue( plcValue.getList().stream().map( MessageUtils::createResponseValue ).collect( Collectors.toUnmodifiableList() ) )
                 );
                 break;
             case RAW_BYTE_ARRAY:
@@ -189,7 +216,7 @@ public class MessageUtils
             case Struct:
                 value= new ResponseValue(
                     new StructValue(
-                        plcValue.getStruct().entrySet().stream().collect( Collectors.toMap( entry -> entry.getKey(), entry -> createResponseValue( entry.getValue() ) ) )
+                        plcValue.getStruct().entrySet().stream().collect( Collectors.toMap( Entry::getKey, entry -> createResponseValue( entry.getValue() ) ) )
                     )
                 );
                 break;
@@ -222,7 +249,7 @@ public class MessageUtils
                 break;
             default:
             case NULL:
-                value= new ResponseValue( new NullValue() );
+                value= new ResponseValue( new EmptyValue() );
                 break;
         }
         return value;

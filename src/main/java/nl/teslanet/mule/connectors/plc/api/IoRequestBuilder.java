@@ -51,4 +51,12 @@ public abstract class IoRequestBuilder
     {
         return throwExceptionOnIoError;
     }
+
+    /**
+     * @param throwExceptionOnIoError the throwExceptionOnIoError to set
+     */
+    public void setThrowExceptionOnIoError( boolean throwExceptionOnIoError )
+    {
+        this.throwExceptionOnIoError= throwExceptionOnIoError;
+    }
 }

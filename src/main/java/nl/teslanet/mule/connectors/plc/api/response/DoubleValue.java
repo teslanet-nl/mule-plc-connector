@@ -24,8 +24,7 @@ package nl.teslanet.mule.connectors.plc.api.response;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Double response value.
  */
 public record DoubleValue( double value ) implements Valuable
 {
@@ -33,18 +32,6 @@ public record DoubleValue( double value ) implements Valuable
     public boolean isSimple()
     {
         return true;
-    }
-
-    @Override
-    public boolean isFloat()
-    {
-        return false;
-    }
-
-    @Override
-    public float getAsFloat()
-    {
-        throw new UnsupportedOperationException();
     }
 
     @Override

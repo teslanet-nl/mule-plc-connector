@@ -28,8 +28,7 @@ import java.math.BigInteger;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Boolean response value.
  */
 public record BooleanValue( boolean value ) implements Valuable
 {
@@ -38,18 +37,6 @@ public record BooleanValue( boolean value ) implements Valuable
     public boolean isSimple()
     {
         return true;
-    }
-
-    @Override
-    public boolean isNullable()
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isNull()
-    {
-        return false;
     }
 
     @Override
@@ -62,6 +49,18 @@ public record BooleanValue( boolean value ) implements Valuable
     public boolean getAsBoolean()
     {
         return value;
+    }
+
+    @Override
+    public boolean isByte()
+    {
+        return true;
+    }
+
+    @Override
+    public byte getAsByte()
+    {
+        return( value ? (byte) 1 : (byte) 0 );
     }
 
     @Override

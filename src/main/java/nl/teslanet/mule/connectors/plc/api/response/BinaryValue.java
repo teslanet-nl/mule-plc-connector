@@ -30,7 +30,7 @@ import org.apache.commons.codec.binary.Hex;
 
 
 /**
- * Binary value.
+ * Binary response value.
  */
 public record BinaryValue( byte[] value ) implements Valuable
 {

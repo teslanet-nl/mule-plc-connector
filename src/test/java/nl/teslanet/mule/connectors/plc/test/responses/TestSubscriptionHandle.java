@@ -32,7 +32,7 @@ import org.apache.plc4x.java.api.model.PlcConsumerRegistration;
 import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
 
 
-public class TestSubscriptionHandle implements PlcSubscriptionHandle
+class TestSubscriptionHandle implements PlcSubscriptionHandle
 {
     public class TestConsumerRegistration implements PlcConsumerRegistration
     {

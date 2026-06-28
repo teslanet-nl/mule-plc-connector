@@ -28,8 +28,7 @@ import java.math.BigInteger;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Byte response value.
  */
 public record ByteValue( byte value ) implements Valuable
 {

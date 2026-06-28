@@ -25,13 +25,14 @@ package nl.teslanet.mule.connectors.plc.api.response;
 
 import java.math.BigInteger;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * LocalDateTime response value.
  */
 public record LocalDateTimeValue( LocalDateTime value ) implements Valuable
 {
@@ -74,9 +75,33 @@ public record LocalDateTimeValue( LocalDateTime value ) implements Valuable
     }
 
     @Override
+    public boolean isDate()
+    {
+        return true;
+    }
+
+    @Override
+    public LocalDate getAsDate()
+    {
+        return value.toLocalDate();
+    }
+    
+    @Override
     public boolean isDateTime()
     {
         return true;
+    }
+    
+    @Override
+    public boolean isTime()
+    {
+        return true;
+    }
+
+    @Override
+    public LocalTime getAsTime()
+    {
+        return value.toLocalTime();
     }
 
     @Override

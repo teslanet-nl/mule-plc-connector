@@ -49,4 +49,12 @@ public class Subscription extends IoRequestBuilder
     {
         return subscribeFields;
     }
+
+    /**
+     * @param subscribeFields the subscribeFields to set
+     */
+    public void setSubscribeFields( List< SubscribeField > subscribeFields )
+    {
+        this.subscribeFields= subscribeFields;
+    }
 }

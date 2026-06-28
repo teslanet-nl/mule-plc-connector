@@ -28,8 +28,7 @@ import java.math.BigInteger;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * String response value.
  */
 public record StringValue( String value ) implements Valuable
 {

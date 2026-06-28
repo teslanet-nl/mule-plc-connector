@@ -56,4 +56,12 @@ public class WriteRequestBuilder extends IoRequestBuilder
     {
         return writeFields;
     }
+
+    /**
+     * @param writeFields the writeFields to set
+     */
+    public void setWriteFields( List< WriteField > writeFields )
+    {
+        this.writeFields= writeFields;
+    }
 }

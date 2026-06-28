@@ -56,4 +56,12 @@ public class ReadRequestBuilder extends IoRequestBuilder
         return readFields;
     }
 
+    /**
+     * @param readFields the readFields to set
+     */
+    public void setReadFields( List< ReadField > readFields )
+    {
+        this.readFields= readFields;
+    }
+
 }

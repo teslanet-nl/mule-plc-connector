@@ -24,10 +24,9 @@ package nl.teslanet.mule.connectors.plc.api.response;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Empty response value.
  */
-public record NullValue() implements Valuable
+public record EmptyValue() implements Valuable
 {
 
     @Override
@@ -45,6 +44,12 @@ public record NullValue() implements Valuable
     @Override
     public String getAsString()
     {
-        return "null";
+        return "empty";
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return true;
     }
 }

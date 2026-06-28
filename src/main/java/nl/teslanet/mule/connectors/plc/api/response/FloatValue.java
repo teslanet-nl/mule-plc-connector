@@ -24,8 +24,7 @@ package nl.teslanet.mule.connectors.plc.api.response;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Float response value.
  */
 public record FloatValue( float value ) implements Valuable
 {

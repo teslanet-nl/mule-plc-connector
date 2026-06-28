@@ -46,14 +46,9 @@ public record ResponseValue( Valuable value ) implements Serializable
         return value.isSimple();
     }
 
-    public boolean isNullable()
+    public boolean isEmpty()
     {
-        return value.isNullable();
-    }
-
-    public boolean isNull()
-    {
-        return value.isNull();
+        return value.isEmpty();
     }
 
     public boolean isBoolean()

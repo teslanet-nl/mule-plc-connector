@@ -31,8 +31,7 @@ import java.time.ZoneOffset;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * LocalDate response value.
  */
 public record LocalDateValue( LocalDate value ) implements Valuable
 {

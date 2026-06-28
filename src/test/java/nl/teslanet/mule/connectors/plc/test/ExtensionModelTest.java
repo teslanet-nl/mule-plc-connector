@@ -49,7 +49,7 @@ import nl.teslanet.mule.connectors.plc.internal.MulePlcConnector;
 /**
  * Test the Mule extension model.
  */
-public class ExtensionModelTest
+class ExtensionModelTest
 {
 
     private static final Logger logger= LoggerFactory.getLogger( ExtensionModelTest.class.getCanonicalName() );
@@ -69,7 +69,7 @@ public class ExtensionModelTest
     }
 
     @Test
-    public void generate() throws Exception
+    void generate() throws Exception
     {
         GeneratedResource resource= resourceFactory.generateResource( extensionModel ).get();
         assertEquals( modelResourcePath, resource.getPath() );

@@ -139,7 +139,7 @@ public class EventProcessor implements Consumer< PlcSubscriptionEvent >
     }
 
     /**
-     * Accept PLC event, serialize to XML and hand over to the listeners.
+     * Accept PLC event and hand over to the listeners.
      */
     @Override
     public void accept( PlcSubscriptionEvent event )

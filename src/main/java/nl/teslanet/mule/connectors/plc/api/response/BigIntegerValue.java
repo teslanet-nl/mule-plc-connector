@@ -28,8 +28,7 @@ import java.math.BigInteger;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Big integer response value.
  */
 public record BigIntegerValue( BigInteger value ) implements Valuable
 {
@@ -37,18 +36,6 @@ public record BigIntegerValue( BigInteger value ) implements Valuable
     public boolean isSimple()
     {
         return true;
-    }
-
-    @Override
-    public boolean isNullable()
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isNull()
-    {
-        return false;
     }
 
     @Override
@@ -64,9 +51,22 @@ public record BigIntegerValue( BigInteger value ) implements Valuable
     }
 
     @Override
+    public boolean isByte()
+    {
+        return ( value.compareTo( BigInteger.valueOf( Byte.MAX_VALUE ) ) <= 0 ) && ( value.compareTo( BigInteger.valueOf( Byte.MIN_VALUE ) ) >= 0 );
+    }
+
+    @Override
+    public byte getAsByte()
+    {
+        if ( !isByte() ) return Valuable.super.getAsByte();
+        return value.byteValue();
+    }
+
+    @Override
     public boolean isShort()
     {
-        return ( value.compareTo(BigInteger.valueOf(Short.MAX_VALUE)) <= 0) && (value.compareTo(BigInteger.valueOf(Short.MIN_VALUE)) >= 0);
+        return ( value.compareTo( BigInteger.valueOf( Short.MAX_VALUE ) ) <= 0 ) && ( value.compareTo( BigInteger.valueOf( Short.MIN_VALUE ) ) >= 0 );
     }
 
     @Override
@@ -79,7 +79,7 @@ public record BigIntegerValue( BigInteger value ) implements Valuable
     @Override
     public boolean isInteger()
     {
-        return ( value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0) && (value.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) >= 0);
+        return ( value.compareTo( BigInteger.valueOf( Integer.MAX_VALUE ) ) <= 0 ) && ( value.compareTo( BigInteger.valueOf( Integer.MIN_VALUE ) ) >= 0 );
     }
 
     @Override
@@ -92,7 +92,7 @@ public record BigIntegerValue( BigInteger value ) implements Valuable
     @Override
     public boolean isLong()
     {
-        return ( value.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0) && (value.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) >= 0);
+        return ( value.compareTo( BigInteger.valueOf( Long.MAX_VALUE ) ) <= 0 ) && ( value.compareTo( BigInteger.valueOf( Long.MIN_VALUE ) ) >= 0 );
     }
 
     @Override

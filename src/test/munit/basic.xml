@@ -21,19 +21,16 @@
   limitations under the License.
   #L%
 -->
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
-    xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module"
-    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule 
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
     xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
     xmlns:plc="http://www.teslanet.nl/schema/mule/plc"
     xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
         http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
-        http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd
-        http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
-        http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
-        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
+        http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd"
 >
     <munit:config name="plc-basic-testsuite" />
 
@@ -53,21 +50,22 @@
 
     <munit:test name="plc-read">
         <munit:execution>
-            <plc:read config-ref="PLC_Config">
+            <plc:read config-ref="PLC_Config"  throwExceptionOnIoError="false">
                 <reconnect count="5" frequency="500" />
                 <plc:read-fields>
                     <plc:read-field alias="coil1" address="RANDOM/coil1:BOOL[1]" />
                     <plc:read-field alias="reg1" address="RANDOM/register1:INT[1]" />
+                    <plc:read-field alias="reg2" address="STATE/register2:INT[1]" />
                 </plc:read-fields>
             </plc:read>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-equals actual="#[attributes.success]" expected="#[true]"
-                doc:name="success ==  true"
-                message="#['expected success ==  true, but was: ' ++ attributes.success as String]" />
-            <munit-tools:assert-equals actual="#[sizeOf( payload )]" expected="#[2]"
-                message="#['expected payload.size ==  2, but was: ' ++ sizeOf( payload ) as String]"
-                doc:name="payload.size ==  2" />
+            <munit-tools:assert-equals actual="#[attributes.success]" expected="#[false]"
+                doc:name="success == false"
+                message="#['expected success == false but was: ' ++ attributes.success as String]" />
+            <munit-tools:assert-equals actual="#[sizeOf( payload )]" expected="#[3]"
+                message="#['expected payload.size ==  3, but was: ' ++ sizeOf( payload ) as String]"
+                doc:name="payload.size ==  3" />
             <munit-tools:assert-equals doc:name="alias == coil1"
                 doc:id="75d79269-a7f5-447a-8366-87799ed50a9b" actual="#[payload[?( $.alias == 'coil1' )][0].alias]"
                 expected="#['coil1']"
@@ -100,7 +98,23 @@
                 doc:id="003d4326-711f-4ce5-a0b0-7580bb4736ad"
                 actual="#[payload[?( $.alias == 'reg1' )][0].value.integer]" expected="#[true]"
                 message="#['expected reg1.value.integer == true, but was: ' ++ payload[?( $.alias == 'reg1' )][0].value.integer as String]" />
-        </munit:validation>
+            <munit-tools:assert-equals doc:name="alias == reg2"
+                doc:id="371c2815-00f2-44d0-b683-bed85b0655ce" actual="#[payload[?( $.alias == 'reg2' )][0].alias]"
+                expected="#['reg2']"
+                message="#['expected alias == reg2, but was: ' ++ payload[?( $.alias == 'reg2' )][0].alias as String]" />
+            <munit-tools:assert-equals doc:name="reg2.result == NOT_FOUND"
+                doc:id="37dac0be-c5bd-40c9-a2e2-e43991bff75a" actual="#[payload[?( $.alias == 'reg2' )][0].result]"
+                expected="#['NOT_FOUND']"
+                message="#['expected reg2.result == NOT_FOUND, but was: ' ++ payload[?( $.alias == 'reg2' )][0].result as String]" />
+            <munit-tools:assert-equals doc:name="reg1.fieldType == NULL"
+                doc:id="4fa0b962-326d-405c-8985-3cd19a093544" actual="#[payload[?( $.alias == 'reg2' )][0].fieldType]"
+                expected="#['NULL']"
+                message="#['expected reg2.fieldType == NULL but was: ' ++ payload[?( $.alias == 'reg2' )][0].fieldType as String]" />
+            <munit-tools:assert-equals doc:name="reg2.value.empty == true"
+                doc:id="003d4326-711f-4ce5-a0b0-7580bb4736ad"
+                actual="#[payload[?( $.alias == 'reg2' )][0].value.empty]" expected="#[true]"
+                message="#['expected reg1.value.empty == true, but was: ' ++ payload[?( $.alias == 'reg2' )][0].value.empty as String]" />
+       </munit:validation>
     </munit:test>
 
     <munit:test name="plc-write">

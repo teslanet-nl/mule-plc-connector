@@ -28,8 +28,7 @@ import java.math.BigInteger;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * Integer response value.
  */
 public record IntegerValue( int value ) implements Valuable
 {
@@ -37,18 +36,6 @@ public record IntegerValue( int value ) implements Valuable
     public boolean isSimple()
     {
         return true;
-    }
-
-    @Override
-    public boolean isNullable()
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isNull()
-    {
-        return false;
     }
 
     @Override
@@ -66,13 +53,14 @@ public record IntegerValue( int value ) implements Valuable
     @Override
     public boolean isByte()
     {
-        return false;
+        return ( value <= Byte.MAX_VALUE ) && ( value >= Byte.MIN_VALUE );
     }
 
     @Override
     public byte getAsByte()
     {
-        throw new UnsupportedOperationException();
+        if ( !isByte() ) return Valuable.super.getAsByte();
+        return (byte) value;
     }
 
     @Override
@@ -121,19 +109,19 @@ public record IntegerValue( int value ) implements Valuable
     @Override
     public BigInteger getAsBigInteger()
     {
-        return BigInteger.valueOf( (long) value );
+        return BigInteger.valueOf( value );
     }
 
     @Override
     public boolean isFloat()
     {
-        return false;
+        return true;
     }
 
     @Override
     public float getAsFloat()
     {
-        throw new UnsupportedOperationException();
+        return (float) value;
     }
 
     @Override

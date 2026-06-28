@@ -28,8 +28,7 @@ import java.time.LocalTime;
 
 
 /**
- * Canonical response value.
- * In fact an interface but Mule extension API needs concrete classes. 
+ * LocalTime response value.
  */
 public record LocalTimeValue( LocalTime value ) implements Valuable
 {
@@ -67,6 +66,18 @@ public record LocalTimeValue( LocalTime value ) implements Valuable
     public BigInteger getAsBigInteger()
     {
         return BigInteger.valueOf( value.toNanoOfDay() );
+    }
+
+    @Override
+    public boolean isTime()
+    {
+        return true;
+    }
+
+    @Override
+    public LocalTime getAsTime()
+    {
+        return value;
     }
 
     @Override
