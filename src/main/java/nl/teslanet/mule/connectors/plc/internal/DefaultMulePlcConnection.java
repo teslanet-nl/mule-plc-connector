@@ -2,22 +2,22 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  * #L%
  */
 package nl.teslanet.mule.connectors.plc.internal;
@@ -74,11 +74,6 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     private ConcurrentHashMap< String, PlcSubscriptionHandle > handles= new ConcurrentHashMap<>();
 
     /**
-     * The connection string of the plc.
-     */
-    private String connectionString;
-
-    /**
      * The underlying PLC plcConnection.
      */
     protected final PlcConnection plcConnection;
@@ -130,13 +125,13 @@ public class DefaultMulePlcConnection implements MulePlcConnection
 
     /**
      * Constructor.
-     * @param connectionString The connection string of the PLC.
-     * @param plcConnection The PLC Connection. 
-     * @throws ConnectionException When the conncetion failed.
+     * @param plcConnection The PLC Connection.
+     * @param lockFactory The lock-factory.
+     * @param concurrencyParams The concurrency parameters. 
+     * @throws ConnectionException When the connection failed.
      */
-    public DefaultMulePlcConnection( String connectionString, PlcConnection plcConnection, LockFactory lockFactory, ConcurrencyParams concurrencyParams ) throws ConnectionException
+    public DefaultMulePlcConnection( PlcConnection plcConnection, LockFactory lockFactory, ConcurrencyParams concurrencyParams ) throws ConnectionException
     {
-        this.connectionString= connectionString;
         this.plcConnection= plcConnection;
 
         ioLocks= ( concurrencyParams.getConcurrentIo() >= 0 ? new LockPool( lockFactory, this.toString() + "-io-", concurrencyParams.getConcurrentIo() ) : null );
@@ -150,15 +145,6 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         subscribeLocks= ( concurrencyParams.getConcurrentSubscribes() > 0
             ? new LockPool( lockFactory, this.toString() + "-subscribe-", concurrencyParams.getConcurrentSubscribes() ) : null );
         logger.info( "connection created { {} }", this );
-    }
-
-    /**
-     * @return the connection string
-     */
-    @Override
-    public String getConnectionString()
-    {
-        return connectionString;
     }
 
     /**
@@ -297,7 +283,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public boolean canRead()
     {
-        return( readAllowed && plcConnection.getMetadata().canRead() );
+        return( readAllowed && plcConnection.getMetadata().isReadSupported() );
     }
 
     /**
@@ -357,7 +343,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * @throws InterruptedException When the operations is interrupted.
      * @throws TimeoutException When operation duration exceeds timeout period.
      * @throws ExecutionException When execution failed.
-     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws InternalConnectionException When connection to PLC is not established.
      */
     private PlcReadResponse read( List< ReadField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
@@ -368,7 +354,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         PlcReadRequest.Builder builder= plcConnection.readRequestBuilder();
         for ( ReadField field : fields )
         {
-            builder.addItem( field.getAlias(), field.getAddress() );
+            builder.addTagAddress( field.getAlias(), field.getAddress() );
         }
         return builder.build().execute().get( timeout, timeoutUnit );
     }
@@ -379,7 +365,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public boolean canWrite()
     {
-        return( writeAllowed && plcConnection.getMetadata().canWrite() );
+        return( writeAllowed && plcConnection.getMetadata().isWriteSupported() );
     }
 
     /**
@@ -407,7 +393,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     * @throws InterruptedException When the operations is interrupted.
     * @throws TimeoutException When operation duration exceeds timeout period.
     * @throws ExecutionException When execution failed.
-    * @throws InternalConnectionException When connection to PLC is not establishe
+    * @throws InternalConnectionException When connection to PLC is not established.
     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
     * @throws InternalUnsupportedException When the operation is not supported by device.
     */
@@ -438,7 +424,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * @throws InterruptedException When the operations is interrupted.
      * @throws TimeoutException When operation duration exceeds timeout period.
      * @throws ExecutionException When execution failed.
-     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws InternalConnectionException When connection to PLC is not established.
      */
     private PlcWriteResponse write( List< WriteField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
@@ -449,7 +435,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         PlcWriteRequest.Builder builder= plcConnection.writeRequestBuilder();
         for ( WriteField field : fields )
         {
-            builder.addItem( field.getAlias(), field.getAddress(), field.getValues().toArray() );
+            builder.addTagAddress( field.getAlias(), field.getAddress(), field.getValues().toArray() );
         }
         return builder.build().execute().get( timeout, timeoutUnit );
     }
@@ -460,7 +446,7 @@ public class DefaultMulePlcConnection implements MulePlcConnection
     @Override
     public boolean canSubscribe()
     {
-        return( subscribeAllowed && plcConnection.getMetadata().canSubscribe() );
+        return( subscribeAllowed && plcConnection.getMetadata().isSubscribeSupported() );
     }
 
     /**
@@ -486,9 +472,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * @param timeoutUnit Unit of the timeout value.
      * @return The PLC fields subscribed to.
      * @throws InterruptedException When the operations is interrupted.
-     * @throws TimeoutException When operation duration exceeds timeout period.
      * @throws ExecutionException When execution failed.
-     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws InternalConnectionException When connection to PLC is not established.
      * @throws InternalConcurrencyException When the concurrent operation is not allowed.
      * @throws InternalUnsupportedException When the operation is not supported by device.
      */
@@ -517,11 +503,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * @param timeoutUnit Unit of the timeout value.
      * @return The PLC fields subscribed to.
      * @throws InterruptedException When the operations is interrupted.
-     * @throws TimeoutException When operation duration exceeds timeout period.
      * @throws ExecutionException When execution failed.
-     * @throws InternalConnectionException When connection to PLC is not establishe
-     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
-     * @throws InternalUnsupportedException When the operation is not supported by device.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws InternalConnectionException When connection to PLC is not established.
      */
     public PlcSubscriptionResponse subscribe( List< SubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
@@ -535,10 +519,10 @@ public class DefaultMulePlcConnection implements MulePlcConnection
         for ( SubscribeField field : fields )
         {
             //TODO make configurable what type of subscription is wanted
-            builder.addChangeOfStateField( field.getAlias(), field.getAddress() );
+            builder.addChangeOfStateTagAddress( field.getAlias(), field.getAddress() );
         }
         subscribeResponse= builder.build().execute().get( timeout, timeoutUnit );
-        for ( String fieldName : subscribeResponse.getFieldNames() )
+        for ( String fieldName : subscribeResponse.getTagNames() )
         {
             handles.put( fieldName, subscribeResponse.getSubscriptionHandle( fieldName ) );
         }
@@ -547,7 +531,13 @@ public class DefaultMulePlcConnection implements MulePlcConnection
 
     /**
      * Unsubscribe to PLC fields IO locked.
-     * @throws InternalUnsupportedException 
+     * @return The PLC fields unsubscribed to.
+     * @throws InterruptedException When the operations is interrupted.
+     * @throws ExecutionException When execution failed.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws InternalConnectionException When connection to PLC is not established.
+     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
+     * @throws InternalUnsupportedException When the operation is not supported by device.
      */
     @Override
     public PlcUnsubscriptionResponse unSubscribeIoLocked( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
@@ -569,9 +559,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * @param timeoutUnit Unit of the timeout value.
      * @return The PLC fields unsubscribed to.
      * @throws InterruptedException When the operations is interrupted.
-     * @throws TimeoutException When operation duration exceeds timeout period.
      * @throws ExecutionException When execution failed.
-     * @throws InternalConnectionException When connection to PLC is not establishe
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws InternalConnectionException When connection to PLC is not established.
      * @throws InternalConcurrencyException When the concurrent operation is not allowed.
      * @throws InternalUnsupportedException When the operation is not supported by device.
      */
@@ -600,11 +590,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
      * @param timeoutUnit Unit of the timeout value.
      * @return The PLC fields unsubscribed to.
      * @throws InterruptedException When the operations is interrupted.
-     * @throws TimeoutException When operation duration exceeds timeout period.
      * @throws ExecutionException When execution failed.
-     * @throws InternalConnectionException When connection to PLC is not establishe
-     * @throws InternalConcurrencyException When the concurrent operation is not allowed.
-     * @throws InternalUnsupportedException When the operation is not supported by device.
+     * @throws TimeoutException When operation duration exceeds timeout period.
+     * @throws InternalConnectionException When connection to PLC is not established.
      */
     public PlcUnsubscriptionResponse unsubscribe( List< UnsubscribeField > fields, long timeout, TimeUnit timeoutUnit ) throws InterruptedException,
         ExecutionException,
@@ -639,9 +627,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
          * Execute the operation
          * @return The result.
          * @throws InterruptedException When the operations is interrupted.
-         * @throws TimeoutException When operation duration exceeds timeout period.
          * @throws ExecutionException When execution failed.
-         * @throws InternalConnectionException When connection to PLC is not establishe
+         * @throws TimeoutException When operation duration exceeds timeout period.
+         * @throws InternalConnectionException When connection to PLC is not established.
          * @throws InternalConcurrencyException When the concurrent operation is not allowed.
          * @throws InternalUnsupportedException When the operation is not supported by device.
          */
@@ -654,9 +642,9 @@ public class DefaultMulePlcConnection implements MulePlcConnection
          * @param timeoutUnit Unit of the timeout value.
          * @return The result.
          * @throws InterruptedException When the operations is interrupted.
-         * @throws TimeoutException When operation duration exceeds timeout period.
          * @throws ExecutionException When execution failed.
-         * @throws InternalConnectionException When connection to PLC is not establishe
+         * @throws TimeoutException When operation duration exceeds timeout period.
+         * @throws InternalConnectionException When connection to PLC is not established.
          * @throws InternalConcurrencyException When the concurrent operation is not allowed.
          * @throws InternalUnsupportedException When the operation is not supported by device.
          */

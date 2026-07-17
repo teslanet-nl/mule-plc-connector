@@ -2,35 +2,33 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  * #L%
  */
 package nl.teslanet.mule.connectors.plc.internal;
 
 
-import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.Export;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.sdk.api.annotation.Configurations;
+import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.JavaVersionSupport;
-import org.mule.sdk.api.annotation.MinMuleVersion;
+import org.mule.sdk.api.annotation.Sources;
+import org.mule.sdk.api.annotation.dsl.xml.Xml;
+import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.sdk.api.meta.JavaVersion;
 
 import nl.teslanet.mule.connectors.plc.internal.error.Errors;
@@ -44,9 +42,8 @@ import nl.teslanet.mule.connectors.plc.internal.error.Errors;
 @Xml( prefix= "plc", namespace= "http://www.teslanet.nl/schema/mule/plc" )
 @Extension( name= "PLC", vendor= "Teslanet.nl" )
 @JavaVersionSupport(
-    { JavaVersion.JAVA_8, JavaVersion.JAVA_11, JavaVersion.JAVA_17 }
+    { JavaVersion.JAVA_17 }
 )
-@MinMuleVersion( value= "4.1" )
 @Configurations(
     { MulePlcConfig.class }
 )
@@ -54,8 +51,6 @@ import nl.teslanet.mule.connectors.plc.internal.error.Errors;
     { EventListener.class }
 )
 @ErrorTypes( Errors.class )
-@Export( resources=
-{ "nl/teslanet/mule/connectors/plc/v1/plc.rnc", "nl/teslanet/mule/connectors/plc/v1/plc.xsd" } )
 public class MulePlcConnector
 {
     // NOOP

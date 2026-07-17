@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+#%L
+  Mule PLC Connector Test Utilities
+  %%
+  Copyright (C) 2026 (teslanet.nl) Rogier Cobben
+  
+  Contributors:
+      (teslanet.nl) Rogier Cobben - initial creation
+  %%
+  This program and the accompanying materials are made available under the
+  terms of the Eclipse Public License 2.0 which is available at
+  http://www.eclipse.org/legal/epl-2.0.
+  
+  This Source Code may also be made available under the following Secondary
+  Licenses when the conditions for such availability set forth in the Eclipse
+  Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+  with the GNU Classpath Exception which is
+  available at https://www.gnu.org/software/classpath/license.html.
+  
+  SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+  #L%
+-->
+<mule 
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+    xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+    xmlns:plc="http://www.teslanet.nl/schema/mule/plc"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+        http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+        http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd"
+>
+
+    <munit:config name="plc-dynamic-connection-testsuite" />
+
+    <plc:config name="PLC_Config_Dynamic">
+        <plc:connection connectionString="#[vars.connectionString]" />
+    </plc:config>
+
+    <munit:test name="plc-dynamic-ping">
+        <munit:execution>
+            <set-variable variableName="connectionString" value="simulated:plc-dyn1" />
+            <plc:ping config-ref="PLC_Config_Dynamic" />
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[payload]" expected="#[true]"
+                message="#['expected payload == true, but was: ' ++ payload as String]" doc:name="payload == true" />
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="plc-dynamic-read">
+        <munit:execution>
+            <set-variable variableName="connectionString" value="simulated:plc-dyn2" />
+            <plc:read config-ref="PLC_Config_Dynamic">
+                <reconnect count="5" frequency="500" />
+                <plc:read-fields>
+                    <plc:read-field alias="coil1" address="RANDOM/coil1:BOOL[1]" />
+                    <plc:read-field alias="reg1" address="RANDOM/register1:INT[1]" />
+                </plc:read-fields>
+            </plc:read>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[attributes.success]" expected="#[true]"
+                doc:name="success ==  true"
+                message="#['expected success ==  true, but was: ' ++ attributes.success as String]" />
+            <munit-tools:assert-equals actual="#[sizeOf( payload )]" expected="#[2]"
+                message="#['expected payload.size ==  2, but was: ' ++ sizeOf( payload ) as String]"
+                doc:name="payload.size ==  2" />
+            <munit-tools:assert-equals doc:name="alias == coil1"
+                doc:id="75d79269-a7f5-447a-8366-87799ed50a9b" actual="#[payload[?( $.alias == 'coil1' )][0].alias]"
+                expected="#['coil1']"
+                message="#['expected alias == coil1, but was: ' ++ payload[?( $.alias == 'coil1' )][0].alias as String]" />
+            <munit-tools:assert-equals doc:name="coil1.result == OK"
+                doc:id="59ad465b-c272-4367-958d-2af3149c6432" actual="#[payload[?( $.alias == 'coil1' )][0].result]"
+                expected="#['OK']"
+                message="#['expected coil1.result == OK, but was: ' ++ payload[?( $.alias == 'coil1' )][0].result as String]" />
+            <munit-tools:assert-equals doc:name="coil1.fieldType == BOOL"
+                doc:id="40c8e87c-0da4-4146-95ae-e329570f7db3" actual="#[payload[?( $.alias == 'coil1' )][0].fieldType]"
+                expected="#['BOOL']"
+                message="#['expected coil1.fieldType == BOOL, but was: ' ++ payload[?( $.alias == 'coil1' )][0].fieldType as String]" />
+            <munit-tools:assert-equals doc:name="coil1.value.boolean == true"
+                doc:id="f5564870-0b72-42e2-a402-0a04a967ec6c"
+                actual="#[payload[?( $.alias == 'coil1' )][0].value.boolean]" expected="#[true]"
+                message="#['expected coil1.value.boolean == true, but was: ' ++ payload[?( $.alias == 'coil1' )][0].value.boolean as String]" />
+            <munit-tools:assert-equals doc:name="alias == reg1"
+                doc:id="371c2815-00f2-44d0-b683-bed85b0655ce" actual="#[payload[?( $.alias == 'reg1' )][0].alias]"
+                expected="#['reg1']"
+                message="#['expected alias == reg1, but was: ' ++ payload[?( $.alias == 'reg1' )][0].alias as String]" />
+            <munit-tools:assert-equals doc:name="reg1.result == OK"
+                doc:id="37dac0be-c5bd-40c9-a2e2-e43991bff75a" actual="#[payload[?( $.alias == 'reg1' )][0].result]"
+                expected="#['OK']"
+                message="#['expected reg1.result == OK, but was: ' ++ payload[?( $.alias == 'reg1' )][0].result as String]" />
+            <munit-tools:assert-equals doc:name="reg1.fieldType == INT"
+                doc:id="4fa0b962-326d-405c-8985-3cd19a093544" actual="#[payload[?( $.alias == 'reg1' )][0].fieldType]"
+                expected="#['INT']"
+                message="#['expected reg1.fieldType == INT, but was: ' ++ payload[?( $.alias == 'reg1' )][0].fieldType as String]" />
+            <munit-tools:assert-equals doc:name="reg1.value.integer == true"
+                doc:id="003d4326-711f-4ce5-a0b0-7580bb4736ad"
+                actual="#[payload[?( $.alias == 'reg1' )][0].value.integer]" expected="#[true]"
+                message="#['expected reg1.value.integer == true, but was: ' ++ payload[?( $.alias == 'reg1' )][0].value.integer as String]" />
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="plc-dynamic-write">
+        <munit:execution>
+            <set-variable variableName="connectionString" value="simulated:plc-dyn3" />
+            <plc:write doc:name="Write" config-ref="PLC_Config_Dynamic">
+                <reconnect count="5" frequency="500" />
+                <plc:write-fields>
+                    <plc:write-field alias="coil1" address="STATE/coil1:BOOL[2]"
+                        values="#[ [ true, false ] ]" />
+                    <plc:write-field alias="reg1" address="STATE/register1:INT[2]"
+                        values="#[[ '11', '22' ]]" />
+                </plc:write-fields>
+            </plc:write>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[attributes.success]" expected="#[true]"
+                doc:name="success ==  true" message="wrong success value" />
+            <munit-tools:assert-equals actual="#[sizeOf( payload )]" expected="#[2]"
+                message="wrong payload.size" doc:name="payload.size ==  2" />
+            <!-- validate coil1 -->
+            <munit-tools:assert-equals doc:name="alias == coil1"
+                doc:id="a9d7de4c-f192-4ae6-9614-e319289b0f97" actual="#[payload[?( $.alias == 'coil1' )][0].alias]"
+                expected="#['coil1']" message="wrong alias" />
+            <munit-tools:assert-equals doc:name="coil1.result == OK"
+                doc:id="609aa035-f4ca-4b8b-bfb9-9c34aa85a444" actual="#[payload[?( $.alias == 'coil1' )][0].result]"
+                expected="#['OK']" message="wrong coil1.result" />
+            <!-- validate reg1 -->
+            <munit-tools:assert-equals doc:name="alias == reg1"
+                doc:id="7f3d46b8-ca2c-48d7-8585-3028273796a4" actual="#[payload[?( $.alias == 'reg1' )][0].alias]"
+                expected="#['reg1']" message="wrong alias" />
+            <munit-tools:assert-equals doc:name="reg1.result == OK"
+                doc:id="716faadd-2702-49bb-b7fd-08dc8618975f" actual="#[payload[?( $.alias == 'reg1' )][0].result]"
+                expected="#['OK']" message="wrong reg1.result" />
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="plc-dynamic-write-and-read">
+        <munit:execution>
+            <set-variable variableName="connectionString" value="simulated:plc-dyn4" />
+            <plc:write doc:name="Write" config-ref="PLC_Config_Dynamic">
+                <reconnect count="5" frequency="500" />
+                <plc:write-fields>
+                    <plc:write-field alias="coil3" address="STATE/coil3:BOOL[1]" values="#[ [ true ] ]" />
+                    <plc:write-field alias="coil4" address="STATE/coil4:BOOL[1]" values="#[ [ false ] ]" />
+                    <plc:write-field alias="reg3" address="STATE/register3:INT[2]"
+                        values="#[[ '33', '44' ]]" />
+                </plc:write-fields>
+            </plc:write>
+            <set-variable variableName="writeResponse" value="#[payload]" doc:name="writeResponse"
+                doc:id="54f2ba3f-10f1-4070-aa3f-f0a514abc06a" />
+            <set-variable variableName="writeResponseAttr" value="#[attributes]"
+                doc:name="writeResponseAttr" doc:id="919e9646-d823-4694-8489-4371292df10d" />
+            <plc:read doc:name="Read" config-ref="PLC_Config_Dynamic">
+                <plc:read-fields>
+                    <plc:read-field alias="coil3" address="STATE/coil3:BOOL[1]" />
+                    <plc:read-field alias="coil4" address="STATE/coil4:BOOL[1]" />
+                    <plc:read-field alias="reg3" address="STATE/register3:INT[2]" />
+                </plc:read-fields>
+            </plc:read>
+            <set-variable variableName="readResponse" value="#[payload]" doc:name="readResponse"
+                doc:id="34dca19b-8e4d-4d0f-9543-a8e8daa78ae0" />
+            <set-variable variableName="readResponseAttr" value="#[attributes]" doc:name="readResponseAttr"
+                doc:id="c66c9730-971d-49d4-a67d-1ac256e53550" />
+        </munit:execution>
+        <munit:validation>
+            <!-- validate write state -->
+            <munit-tools:assert-equals actual="#[vars.writeResponseAttr.success]"
+                expected="#[true]" message="wrong writeResponseAttr.success" />
+            <munit-tools:assert-equals actual="#[sizeOf( vars.writeResponse )]"
+                expected="#[3]" message="wrong writeResponse.size" />
+            <!-- validate coil3 -->
+            <munit-tools:assert-equals doc:name="alias == coil3"
+                doc:id="e1119ce4-475d-4367-a27b-89450ad44866"
+                actual="#[vars.writeResponse[?( $.alias == 'coil3' )][0].alias]" expected="#['coil3']"
+                message="wrong alias" />
+            <munit-tools:assert-equals doc:name="coil3.result == OK"
+                doc:id="1e582f8c-08c9-4bce-a2c0-eaf0f50c2de9"
+                actual="#[vars.writeResponse[?( $.alias == 'coil3' )][0].result]" expected="#['OK']"
+                message="wrong coil3.result" />
+            <!-- validate coil4 -->
+            <munit-tools:assert-equals doc:name="alias == coil4"
+                doc:id="96f223f2-0154-4b25-9c54-72f2b9258a9b"
+                actual="#[vars.writeResponse[?( $.alias == 'coil4' )][0].alias]" expected="#['coil4']"
+                message="wrong alias" />
+            <munit-tools:assert-equals doc:name="coil4.result == OK"
+                doc:id="b19dd374-9dcc-4970-b0fa-afb5a5defda7"
+                actual="#[vars.writeResponse[?( $.alias == 'coil4' )][0].result]" expected="#['OK']"
+                message="wrong coil4.result" />
+            <!-- validate reg3 -->
+            <munit-tools:assert-equals doc:name="alias == reg3"
+                doc:id="71700d59-715c-43b8-b68c-18cb75f97a6d"
+                actual="#[vars.writeResponse[?( $.alias == 'reg3' )][0].alias]" expected="#['reg3']"
+                message="wrong alias" />
+            <munit-tools:assert-equals doc:name="reg3.result == OK"
+                doc:id="f71de883-e207-4494-98fa-972ae9361464"
+                actual="#[vars.writeResponse[?( $.alias == 'reg3' )][0].result]" expected="#['OK']"
+                message="wrong reg3.result" />
+            <!-- validate read state -->
+            <munit-tools:assert-equals actual="#[vars.readResponseAttr.success]"
+                expected="#[true]" message="wrong writeResponseAttr.success" />
+            <munit-tools:assert-equals actual="#[sizeOf( vars.readResponse )]" expected="#[3]"
+                message="wrong writeResponse.size" />
+            <!-- validate coil3 -->
+            <munit-tools:assert-equals doc:name="alias == coil3"
+                doc:id="983db886-4400-4457-a964-02c136442271"
+                actual="#[vars.readResponse[?( $.alias == 'coil3' )][0].alias]" expected="#['coil3']"
+                message="wrong alias" />
+            <munit-tools:assert-equals doc:name="coil3.result == OK"
+                doc:id="384f150b-96b2-4709-b233-9400dfd57749"
+                actual="#[vars.readResponse[?( $.alias == 'coil3' )][0].result]" expected="#['OK']"
+                message="wrong coil3.result" />
+            <munit-tools:assert-equals doc:name="coil3.fieldType == BOOL"
+                doc:id="5ff26fb3-a69a-4fdc-a4a1-2834cf337ce7"
+                actual="#[vars.readResponse[?( $.alias == 'coil3' )][0].fieldType]" expected="#['BOOL']"
+                message="wrong coil3.fieldType" />
+            <munit-tools:assert-equals doc:name="coil3.value.boolean == true"
+                doc:id="93b3427f-52dc-4ec5-acd9-42cedbd922d8"
+                actual="#[vars.readResponse[?( $.alias == 'coil3' )][0].value.boolean]" expected="#[true]"
+                message="wrong coil3.value.boolean" />
+            <munit-tools:assert-equals doc:name="coil3.value.asBoolean == true"
+                doc:id="c14edf00-7c61-425a-8db0-f9929c8ef7aa"
+                actual="#[vars.readResponse[?( $.alias == 'coil3' )][0].value.asBoolean]" expected="#[true]"
+                message="wrong coil3.value.asBoolean" />
+            <!-- validate coil4 -->
+            <munit-tools:assert-equals doc:name="alias == coil4"
+                doc:id="1e407908-de2a-48f8-8c7b-7a11ee3fb6bf"
+                actual="#[vars.readResponse[?( $.alias == 'coil4' )][0].alias]" expected="#['coil4']"
+                message="wrong alias" />
+            <munit-tools:assert-equals doc:name="coil4.result == OK"
+                doc:id="4d669b5b-8081-4b9a-8034-09be1ea5c74c"
+                actual="#[vars.readResponse[?( $.alias == 'coil4' )][0].result]" expected="#['OK']"
+                message="wrong coil4.result" />
+            <munit-tools:assert-equals doc:name="coil4.fieldType == BOOL"
+                doc:id="3182c2e7-ff09-483d-a480-a7897ffdb388"
+                actual="#[vars.readResponse[?( $.alias == 'coil4' )][0].fieldType]" expected="#['BOOL']"
+                message="wrong coil4.fieldType" />
+            <munit-tools:assert-equals doc:name="coil4.value.boolean == true"
+                doc:id="a710c7f1-d056-4fdd-8b0c-e85e47b65ac7"
+                actual="#[vars.readResponse[?( $.alias == 'coil4' )][0].value.boolean]" expected="#[true]"
+                message="wrong coil4.value.boolean" />
+            <munit-tools:assert-equals doc:name="coil4.value.asBoolean == false"
+                doc:id="d4c0fbf7-c0c8-4442-bf91-46d2709c58d5"
+                actual="#[vars.readResponse[?( $.alias == 'coil4' )][0].value.asBoolean]" expected="#[false]"
+                message="wrong coil4.value.asBoolean" />
+            <!-- validate reg3 -->
+            <munit-tools:assert-equals doc:name="alias == reg3"
+                doc:id="3bb125f7-e23e-41e4-b1f7-3b52ba56894a"
+                actual="#[vars.readResponse[?( $.alias == 'reg3' )][0].alias]" expected="#['reg3']"
+                message="wrong alias" />
+            <munit-tools:assert-equals doc:name="reg3.result == OK"
+                doc:id="53558d18-93a8-4c65-87af-e146e1d4df84"
+                actual="#[vars.readResponse[?( $.alias == 'reg3' )][0].result]" expected="#['OK']"
+                message="wrong reg3.result" />
+            <munit-tools:assert-equals doc:name="reg3.fieldType == List"
+                doc:id="cf90ce27-10b2-49fe-9f25-6a0b6405c968"
+                actual="#[vars.readResponse[?( $.alias == 'reg3' )][0].fieldType]" expected="#['List']"
+                message="wrong reg3.fieldType" />
+            <munit-tools:assert-equals doc:name="reg3.value.list == true"
+                doc:id="07d2e20f-f2b6-45c2-8742-a079e7fda714"
+                actual="#[vars.readResponse[?( $.alias == 'reg3' )][0].value.list]" expected="#[true]"
+                message="wrong reg3.value.list" />
+            <munit-tools:assert-equals doc:name="size of reg3.value.length == 2"
+                doc:id="489ad488-f6c7-4e4c-8f4a-320d61054867"
+                actual="#[sizeOf( vars.readResponse[?( $.alias == 'reg3' )][0].value.asList )]" expected="#[2]"
+                message="wrong reg3.value.length" />
+            <munit-tools:assert-equals doc:name="reg3.value.integer == false"
+                doc:id="715a1716-f7a1-48cb-8ce3-f65ec412b3c2"
+                actual="#[vars.readResponse[?( $.alias == 'reg3' )][0].value.integer]" expected="#[false]"
+                message="wrong reg3.value.integer" />
+            <!-- validate reg3[0] -->
+            <munit-tools:assert-equals doc:name="reg3.value.asList[0].integer] == true"
+                doc:id="2b1cf5c8-20ff-471e-bb26-1819e374f252"
+                actual="#[vars.readResponse[?( $.alias == 'reg3' )][0].value.asList[0].integer]" expected="#[true]"
+                message="wrong coil1.value.asList[0].integer" />
+            <munit-tools:assert-equals doc:name="reg3.value.asList[0].asInteger] == 33"
+                doc:id="00642f54-782a-4fa9-ac43-fd1f6ec8bca7"
+                actual="#[vars.readResponse[?( $.alias == 'reg3' )][0].value.asList[0].asInteger]" expected="#[33]"
+                message="wrong coil1.value.asList[0].asInteger" />
+            <!-- validate reg3[1] -->
+            <munit-tools:assert-equals doc:name="reg3.value.asList[1].integer] == true"
+                doc:id="9f80f4d2-bb24-4d63-b534-25bade95a5c1"
+                actual="#[vars.readResponse[?( $.alias == 'reg3' )][0].value.asList[1].integer]" expected="#[true]"
+                message="wrong coil1.value.asList[1].integer" />
+            <munit-tools:assert-equals doc:name="reg3.value.asList[1].asInteger] == 44"
+                doc:id="f857a45b-26d9-4161-b0d8-6dd2055f7b0f"
+                actual="#[vars.readResponse[?( $.alias == 'reg3' )][0].value.asList[1].asInteger]" expected="#[44]"
+                message="wrong coil1.value.asList[1].asInteger" />
+        </munit:validation>
+    </munit:test>
+
+</mule>

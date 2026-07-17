@@ -2,24 +2,24 @@
 <!-- 
 #%L
   Mule PLC Connector Test Utilities
-%%
-  Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+  %%
+  Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
   
   Contributors:
       (teslanet.nl) Rogier Cobben - initial creation
-%%
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+  %%
+  This program and the accompanying materials are made available under the
+  terms of the Eclipse Public License 2.0 which is available at
+  http://www.eclipse.org/legal/epl-2.0.
   
-       http://www.apache.org/licenses/LICENSE-2.0
+  This Source Code may also be made available under the following Secondary
+  Licenses when the conditions for such availability set forth in the Eclipse
+  Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+  with the GNU Classpath Exception which is
+  available at https://www.gnu.org/software/classpath/license.html.
   
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-#L%
+  SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+  #L%
 -->
 <extension-documentation>
     <configs>
@@ -32,6 +32,9 @@
                 <parameter name="timeoutUnits">
                     <description><![CDATA[The timeout units user for plc communcation.]]></description>
                 </parameter>
+                <parameter name="name">
+                    <description><![CDATA[The identifier of this element used to reference it in other components]]></description>
+                </parameter>
                 <parameter name="expirationPolicy">
                     <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
                 </parameter>
@@ -40,25 +43,25 @@
     </configs>
     <connections>
         <connection name="connection">
-            <description><![CDATA[This class (as it's name implies) provides connection instances and the functionality to disconnect and validate those connections. <p> All connection related parameters (values required in order to create a connection) are declared in the connection providers. <p> It implements CachedConnectionProvider which lazily creates and caches connections .]]></description>
+            <description/>
             <parameters>
                 <parameter name="connectionString">
-                    <description><![CDATA[The connection string of the plc.]]></description>
+                    <description/>
                 </parameter>
                 <parameter name="concurrentIo">
-                    <description><![CDATA[The number of concurrent IO per connection. The total number of concurrent ping, read, write and (un)subscribe operations is limited to this number. Default is 1, resulting in serialization of all operations on a connection. When negative the number is unlimited.]]></description>
+                    <description/>
                 </parameter>
                 <parameter name="concurrentPings">
-                    <description><![CDATA[Number of concurrent ping operations per connection. When negative the number is unlimited.]]></description>
+                    <description/>
                 </parameter>
                 <parameter name="concurrentReads">
-                    <description><![CDATA[Number of concurrent reads per connection. When negative the number is unlimited.]]></description>
+                    <description/>
                 </parameter>
                 <parameter name="concurrentWrites">
-                    <description><![CDATA[Number of concurrent writes per connection. When negative the number is unlimited.]]></description>
+                    <description/>
                 </parameter>
                 <parameter name="concurrentSubscribes">
-                    <description><![CDATA[Number of concurrent subscribe and unsubscribe operations per connection. When negative the number is unlimited.]]></description>
+                    <description/>
                 </parameter>
                 <parameter name="reconnection">
                     <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
@@ -74,11 +77,17 @@
         <operation name="ping">
             <description><![CDATA[Ping the PLC.]]></description>
             <parameters>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
                 <parameter name="target">
                     <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
                 </parameter>
                 <parameter name="targetValue">
                     <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
@@ -88,8 +97,8 @@
         <operation name="read">
             <description><![CDATA[Read PLC flields.]]></description>
             <parameters>
-                <parameter name="streamingStrategy">
-                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
                 </parameter>
                 <parameter name="throwExceptionOnIoError">
                     <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
@@ -103,6 +112,9 @@
                 <parameter name="targetValue">
                     <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
                 </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
                 </parameter>
@@ -111,8 +123,8 @@
         <operation name="subscribe">
             <description><![CDATA[Subscribe PLC fields.]]></description>
             <parameters>
-                <parameter name="streamingStrategy">
-                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
                 </parameter>
                 <parameter name="eventHandler">
                     <description><![CDATA[The event handler that will collect the PLC events produced by the subscription.]]></description>
@@ -129,6 +141,9 @@
                 <parameter name="targetValue">
                     <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
                 </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
                 </parameter>
@@ -137,8 +152,8 @@
         <operation name="unsubscribe">
             <description><![CDATA[Unsubscribe PLC fields.]]></description>
             <parameters>
-                <parameter name="streamingStrategy">
-                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
                 </parameter>
                 <parameter name="throwExceptionOnIoError">
                     <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
@@ -146,11 +161,8 @@
                 <parameter name="unsubscribeFields">
                     <description><![CDATA[The PLC fields to unsubscribe to.]]></description>
                 </parameter>
-                <parameter name="target">
-                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
-                </parameter>
-                <parameter name="targetValue">
-                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
@@ -160,8 +172,8 @@
         <operation name="write">
             <description><![CDATA[Write PLC fields.]]></description>
             <parameters>
-                <parameter name="streamingStrategy">
-                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
                 </parameter>
                 <parameter name="throwExceptionOnIoError">
                     <description><![CDATA[When true an exception is thrown on field io errrors.]]></description>
@@ -174,6 +186,9 @@
                 </parameter>
                 <parameter name="targetValue">
                     <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
                 </parameter>
                 <parameter name="reconnectionStrategy">
                     <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
@@ -191,9 +206,6 @@
                 <parameter name="primaryNodeOnly">
                     <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
                 </parameter>
-                <parameter name="streamingStrategy">
-                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
-                </parameter>
                 <parameter name="redeliveryPolicy">
                     <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
                 </parameter>
@@ -202,102 +214,90 @@
     </sources>
     <types>
         <type name="nl.teslanet.mule.connectors.plc.api.EventHandler">
-            <description><![CDATA[]]></description>
+            <description/>
             <parameters>
                 <parameter name="description">
-                    <description><![CDATA[]]></description>
+                    <description/>
                 </parameter>
             </parameters>
         </type>
         <type name="nl.teslanet.mule.connectors.plc.api.ReadField">
-            <description><![CDATA[]]></description>
+            <description/>
             <parameters>
                 <parameter name="address">
-                    <description><![CDATA[]]></description>
+                    <description/>
                 </parameter>
                 <parameter name="alias">
-                    <description><![CDATA[]]></description>
+                    <description/>
                 </parameter>
             </parameters>
         </type>
         <type name="nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes">
-            <description><![CDATA[]]></description>
+            <description/>
             <parameters>
                 <parameter name="success">
-                    <description><![CDATA[]]></description>
+                    <description/>
                 </parameter>
             </parameters>
         </type>
         <type name="nl.teslanet.mule.connectors.plc.api.SubscribeField">
-            <description><![CDATA[]]></description>
+            <description/>
             <parameters>
                 <parameter name="address">
-                    <description><![CDATA[]]></description>
+                    <description/>
                 </parameter>
                 <parameter name="alias">
-                    <description><![CDATA[]]></description>
+                    <description/>
                 </parameter>
             </parameters>
         </type>
         <type name="nl.teslanet.mule.connectors.plc.api.UnsubscribeField">
-            <description><![CDATA[]]></description>
+            <description/>
             <parameters>
                 <parameter name="alias">
-                    <description><![CDATA[]]></description>
+                    <description/>
                 </parameter>
             </parameters>
         </type>
         <type name="nl.teslanet.mule.connectors.plc.api.WriteField">
-            <description><![CDATA[]]></description>
+            <description/>
             <parameters>
                 <parameter name="values">
-                    <description><![CDATA[]]></description>
+                    <description/>
                 </parameter>
                 <parameter name="address">
-                    <description><![CDATA[]]></description>
+                    <description/>
                 </parameter>
                 <parameter name="alias">
-                    <description><![CDATA[]]></description>
+                    <description/>
                 </parameter>
             </parameters>
         </type>
-        <type name="plcEvent">
-            <description><![CDATA[]]></description>
+        <type name="nl.teslanet.mule.connectors.plc.api.response.FieldResponse">
+            <description/>
             <parameters>
-                <parameter name="plcEvent">
-                    <description><![CDATA[]]></description>
+                <parameter name="alias">
+                    <description/>
+                </parameter>
+                <parameter name="result">
+                    <description/>
                 </parameter>
             </parameters>
         </type>
-        <type name="plcReadResponse">
-            <description><![CDATA[]]></description>
+        <type name="nl.teslanet.mule.connectors.plc.api.response.FieldValueResponse">
+            <description/>
             <parameters>
-                <parameter name="plcReadResponse">
-                    <description><![CDATA[]]></description>
+                <parameter name="alias">
+                    <description/>
                 </parameter>
-            </parameters>
-        </type>
-        <type name="plcSubscribeResponse">
-            <description><![CDATA[]]></description>
-            <parameters>
-                <parameter name="plcSubscribeResponse">
-                    <description><![CDATA[]]></description>
+                <parameter name="fieldType">
+                    <description/>
                 </parameter>
-            </parameters>
-        </type>
-        <type name="plcUnsubscribeResponse">
-            <description><![CDATA[]]></description>
-            <parameters>
-                <parameter name="plcUnsubscribeResponse">
-                    <description><![CDATA[]]></description>
+                <parameter name="result">
+                    <description/>
                 </parameter>
-            </parameters>
-        </type>
-        <type name="plcWriteResponse">
-            <description><![CDATA[]]></description>
-            <parameters>
-                <parameter name="plcWriteResponse">
-                    <description><![CDATA[]]></description>
+                <parameter name="value">
+                    <description/>
                 </parameter>
             </parameters>
         </type>

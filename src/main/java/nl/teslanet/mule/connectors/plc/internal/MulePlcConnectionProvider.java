@@ -2,22 +2,22 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  * #L%
  */
 package nl.teslanet.mule.connectors.plc.internal;
@@ -25,17 +25,19 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 import javax.inject.Inject;
 
-import org.apache.plc4x.java.PlcDriverManager;
+import org.apache.plc4x.java.DefaultPlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
+import org.apache.plc4x.java.api.PlcDriver;
+import org.apache.plc4x.java.api.PlcDriverManager;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
-import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.sdk.api.annotation.Alias;
+import org.mule.sdk.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.param.ParameterGroup;
+import org.mule.sdk.api.annotation.param.display.Summary;
+import org.mule.sdk.api.connectivity.CachedConnectionProvider;
+import org.mule.sdk.api.connectivity.ConnectionValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,15 +83,7 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
     /**
      * The PLC driver manager.
      */
-    private static final PlcDriverManager driverManager= new PlcDriverManager();
-
-    /**
-     * @return the drivermanager
-     */
-    public static PlcDriverManager getDrivermanager()
-    {
-        return driverManager;
-    }
+    private static final PlcDriverManager driverManager= new DefaultPlcDriverManager();
 
     /**
      * Connect to PLC using the connection string.
@@ -101,8 +95,9 @@ public class MulePlcConnectionProvider implements CachedConnectionProvider< Mule
         MulePlcConnection connection= null;
         try
         {
-            PlcConnection plcConnnection= driverManager.getConnection( connectionString );
-            connection= new DefaultMulePlcConnection( connectionString, plcConnnection, lockFactory, concurrencyParams );
+            PlcDriver driver= driverManager.getDriverForUrl( connectionString );
+            PlcConnection plcConnnection= driver.getConnection( connectionString );
+            connection= new DefaultMulePlcConnection( plcConnnection, lockFactory, concurrencyParams );
             connection.connect();
         }
         catch ( InternalConnectionException | PlcConnectionException e )

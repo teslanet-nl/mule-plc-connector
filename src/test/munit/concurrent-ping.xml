@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+#%L
+  Mule PLC Connector Test Utilities
+  %%
+  Copyright (C) 2026 (teslanet.nl) Rogier Cobben
+  
+  Contributors:
+      (teslanet.nl) Rogier Cobben - initial creation
+  %%
+  This program and the accompanying materials are made available under the
+  terms of the Eclipse Public License 2.0 which is available at
+  http://www.eclipse.org/legal/epl-2.0.
+  
+  This Source Code may also be made available under the following Secondary
+  Licenses when the conditions for such availability set forth in the Eclipse
+  Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+  with the GNU Classpath Exception which is
+  available at https://www.gnu.org/software/classpath/license.html.
+  
+  SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+  #L%
+-->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+    xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+    xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+    xmlns:plc="http://www.teslanet.nl/schema/mule/plc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
+    http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+    http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd 
+    http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd"
+>
+
+    <munit:config name="concurrent-ping-test">
+        <munit:parameterizations>
+            <munit:parameterization name="simulated">
+                <munit:parameters>
+                    <munit:parameter propertyName="connectorConfig"
+                        value="PLC_Config_Concurrent-ping-sim" />
+                </munit:parameters>
+            </munit:parameterization>
+            <munit:parameterization name="simulated-io">
+                <munit:parameters>
+                    <munit:parameter propertyName="connectorConfig"
+                        value="PLC_Config_Concurrent-ping-sim-io" />
+                </munit:parameters>
+            </munit:parameterization>
+        </munit:parameterizations>
+    </munit:config>
+
+    <plc:config name="PLC_Config_Concurrent-ping-sim" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="simulated:test-plc" concurrentIo="-1" concurrentPings="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-ping-sim-io" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="simulated:test-plc" concurrentIo="1" concurrentPings="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-ping-mock" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="mock:test-plc" concurrentIo="-1" concurrentPings="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-ping-mock-io" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="mock:test-plc" concurrentIo="1" concurrentPings="1" />
+    </plc:config>
+
+    <munit:test name="concurrent-ping-testsuite">
+        <munit:execution>
+            <munit-tools:clear-stored-data doc:name="Clear stored data" />
+            <foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
+                <async doc:name="Async">
+                    <plc:ping doc:name="Ping" config-ref="${connectorConfig}">
+                        <reconnect count="5" frequency="500" />
+                    </plc:ping>
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="STORE ping" />
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="#[payload]" />
+                    <munit-tools:queue doc:name="concurrent-ping-q" queueName="concurrent-ping-q" />
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="STORED ping" />
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="#[payload]" />
+                </async>
+            </foreach>
+        </munit:execution>
+        <munit:validation>
+            <foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
+                <munit-tools:dequeue doc:name="concurrent-ping-q" queueName="concurrent-ping-q"
+                    timeout="#[100]" />
+                <logger level="INFO" doc:name="Logger" doc:id="3248c90f-6bd8-4e3a-b055-c52b356df30d"
+                    message="#[payload]" />
+                <munit-tools:assert-equals doc:name="payload == one"
+                    doc:id="fd9916da-985b-4755-bf73-fea2b3c00922" actual="#[payload]" expected="#[true]"
+                    message="wrong payload" />
+            </foreach>
+        </munit:validation>
+    </munit:test>
+
+</mule>

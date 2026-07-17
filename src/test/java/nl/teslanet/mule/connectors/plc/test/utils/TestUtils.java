@@ -2,28 +2,28 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  * #L%
  */
 package nl.teslanet.mule.connectors.plc.test.utils;
 
 
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -36,11 +36,12 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.io.IOUtils;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.message.OutputHandler;
-import org.mule.runtime.core.api.util.IOUtils;
+//import org.mule.runtime.core.api.message.OutputHandler;
 import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 
 /**
@@ -95,7 +96,7 @@ public class TestUtils
      */
     public static String readResourceAsString( String resourcePath ) throws IOException
     {
-        return IOUtils.getResourceAsString( resourcePath, TestUtils.class );
+        return IOUtils.resourceToString( resourcePath, StandardCharsets.UTF_8, TestUtils.class.getClassLoader() );
     }
 
     /**
@@ -107,7 +108,7 @@ public class TestUtils
      */
     public static InputStream readResourceAsInputStream( String resourcePath ) throws IOException
     {
-        return IOUtils.getResourceAsStream( resourcePath, TestUtils.class );
+        return new ByteArrayInputStream(IOUtils.resourceToByteArray( resourcePath, TestUtils.class.getClassLoader() ));
     }
 
     /**
@@ -138,10 +139,6 @@ public class TestUtils
         {
             return (String) object;
         }
-        if ( object instanceof CursorStreamProvider )
-        {
-            return IOUtils.toString( (CursorStreamProvider) object );
-        }
         else if ( object instanceof InputStream )
         {
             return IOUtils.toString( (InputStream) object, StandardCharsets.UTF_8 );
@@ -150,15 +147,21 @@ public class TestUtils
         {
             return new String( (byte[]) object, StandardCharsets.UTF_8 );
         }
-        else if ( object instanceof OutputHandler )
-        {
-            ByteArrayOutputStream output= new ByteArrayOutputStream();
-            ( (OutputHandler) object ).write( null, output );
-            return output.toString();
-        }
         else
         {
             return object.toString();
         }
     }
+
+    /**
+     * Determine the differnce between two xml strings.
+     * @param xml1 The first xml string.
+     * @param xml2 The second xml string.
+     * @return The Difference.
+     */
+    public static Diff difference( String xml1, String xml2 )
+    {
+        return DiffBuilder.compare( xml1 ).withTest( xml2 ).ignoreComments().ignoreWhitespace().build();
+    }
+
 }

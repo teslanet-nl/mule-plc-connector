@@ -2,22 +2,22 @@
  * #%L
  * Mule PLC Connector
  * %%
- * Copyright (C) 2021 - 2022 (teslanet.nl) Rogier Cobben
+ * Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
  * 
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  * #L%
  */
 package nl.teslanet.mule.connectors.plc.internal;
@@ -28,17 +28,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.plc4x.java.api.messages.PlcSubscriptionEvent;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionResponse;
 import org.apache.plc4x.java.api.model.PlcSubscriptionHandle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.plc4x.java.api.types.PlcResponseCode;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.sdk.api.runtime.operation.Result;
 
+import nl.teslanet.mule.connectors.plc.api.ReceivedResponseAttributes;
+import nl.teslanet.mule.connectors.plc.api.response.FieldValueResponse;
 import nl.teslanet.mule.connectors.plc.internal.exception.InternalInvalidHandlerNameException;
-import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer;
-import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSerializerResult;
+import nl.teslanet.mule.connectors.plc.internal.utils.MessageUtils;
 
 
 /**
@@ -46,11 +46,6 @@ import nl.teslanet.mule.connectors.plc.internal.serialize.XmlSerializer.XmlSeria
  */
 public class EventProcessor implements Consumer< PlcSubscriptionEvent >
 {
-    /**
-     * The logger of this class.
-     */
-    private static final Logger logger= LoggerFactory.getLogger( EventProcessor.class );
-
     /**
      * The registry of response processors
      */
@@ -144,22 +139,26 @@ public class EventProcessor implements Consumer< PlcSubscriptionEvent >
     }
 
     /**
-     * Accept PLC event, serialize to XML and hand over to the listeners.
+     * Accept PLC event and hand over to the listeners.
      */
     @Override
     public void accept( PlcSubscriptionEvent event )
     {
-        XmlSerializerResult serializedContent;
-        try
+        boolean success= true;
+        for ( String tagName : event.getTagNames() )
         {
-            serializedContent= XmlSerializer.xmlSerialize( event );
+            if ( event.getResponseCode( tagName ) != PlcResponseCode.OK )
+            {
+                success= false;
+            }
         }
-        catch ( ParserConfigurationException e )
-        {
-            logger.error( "EventHandler {} cannot process event.", handlerName, e );
-            return;
-        }
+        Result< List< FieldValueResponse >, ReceivedResponseAttributes > result= Result
+            .< List< FieldValueResponse >, ReceivedResponseAttributes > builder()
+            .output( MessageUtils.createFieldResponses( event ) )
+            .attributes( new ReceivedResponseAttributes( success ) )
+            .mediaType( MediaType.APPLICATION_JAVA )
+            .build();
         //hand over to listeners
-        listeners.stream().forEach( listener -> listener.accept( serializedContent ) );
+        listeners.stream().forEach( listener -> listener.accept( result ) );
     }
 }

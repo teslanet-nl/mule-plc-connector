@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+#%L
+  Mule PLC Connector Test Utilities
+  %%
+  Copyright (C) 2026 (teslanet.nl) Rogier Cobben
+  
+  Contributors:
+      (teslanet.nl) Rogier Cobben - initial creation
+  %%
+  This program and the accompanying materials are made available under the
+  terms of the Eclipse Public License 2.0 which is available at
+  http://www.eclipse.org/legal/epl-2.0.
+  
+  This Source Code may also be made available under the following Secondary
+  Licenses when the conditions for such availability set forth in the Eclipse
+  Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+  with the GNU Classpath Exception which is
+  available at https://www.gnu.org/software/classpath/license.html.
+  
+  SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+  #L%
+-->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+    xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+    xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+    xmlns:plc="http://www.teslanet.nl/schema/mule/plc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
+    http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+    http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd 
+    http://www.teslanet.nl/schema/mule/plc http://www.teslanet.nl/schema/mule/plc/current/mule-plc.xsd"
+>
+
+    <munit:config name="concurrent-write-testsuite">
+        <munit:parameterizations>
+            <munit:parameterization name="simulated">
+                <munit:parameters>
+                    <munit:parameter propertyName="connectorConfig"
+                        value="PLC_Config_Concurrent-write-sim" />
+                </munit:parameters>
+            </munit:parameterization>
+            <munit:parameterization name="simulated-io">
+                <munit:parameters>
+                    <munit:parameter propertyName="connectorConfig"
+                        value="PLC_Config_Concurrent-write-sim-io" />
+                </munit:parameters>
+            </munit:parameterization>
+        </munit:parameterizations>
+    </munit:config>
+
+    <plc:config name="PLC_Config_Concurrent-write-sim" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="simulated:test-plc" concurrentIo="-1" concurrentWrites="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-write-sim-io" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="simulated:test-plc" concurrentIo="1" concurrentWrites="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-write-mock" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="mock:test-plc" concurrentIo="-1" concurrentWrites="1" />
+    </plc:config>
+    <plc:config name="PLC_Config_Concurrent-write-mock-io" timeout="20" timeoutUnits="SECONDS">
+        <plc:connection connectionString="mock:test-plc" concurrentIo="1" concurrentWrites="1" />
+    </plc:config>
+
+    <munit:test name="concurrent-write-test">
+        <munit:execution>
+            <munit-tools:clear-stored-data doc:name="Clear stored data" />
+            <foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
+                <async doc:name="Async">
+                    <plc:write doc:name="Write" config-ref="${connectorConfig}"
+                        throwExceptionOnIoError="false"
+                    >
+                        <reconnect count="5" frequency="500" />
+                        <plc:write-fields>
+                            <plc:write-field alias="one" address="STATE/address_one:BOOL"
+                                values="#[[ true ]]" />
+                            <plc:write-field alias="two" address="STATE/address_two:BOOL"
+                                values="#[[ false ]]" />
+                        </plc:write-fields>
+                    </plc:write>
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="STORE write" />
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="#[payload]" />
+                    <munit-tools:queue doc:name="concurrent-write-q" queueName="concurrent-write-q" />
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="STORED write" />
+                    <logger category="nl.teslanet.mule.connectors.plc.test" doc:name="Logger" level="INFO"
+                        message="#[payload]" />
+                </async>
+            </foreach>
+        </munit:execution>
+        <munit:validation>
+            <foreach collection="#[[ 1, 2, 3, 4 ]]" doc:name="Four times">
+                <munit-tools:dequeue doc:name="concurrent-write-q" queueName="concurrent-write-q"
+                    timeout="#[100]" />
+                <logger level="INFO" doc:name="Logger" doc:id="9c8b68e1-7434-407b-9319-000c8ac0bbb3"
+                    message="#[payload]" />
+                <munit-tools:assert-equals doc:name="alias == one"
+                    doc:id="f54b5889-98fb-433c-a96a-358072a1c5ea" actual="#[payload[0].alias]" expected="one"
+                    message="wrong alias" />
+                <munit-tools:assert-equals doc:name="result == ok"
+                    doc:id="601e0013-8574-41a4-a1ef-5aed9ddfd5c8" actual="#[payload[0].result]" expected="OK"
+                    message="wrong result" />
+                <munit-tools:assert-equals doc:name="alias == two"
+                    doc:id="403d009b-d8d9-491b-8ec6-a2602ad41162" actual="#[payload[1].alias]" expected="two"
+                    message="wrong alias" />
+                <munit-tools:assert-equals doc:name="result == ok"
+                    doc:id="431442eb-8b10-49cd-873b-ff172251343b" actual="#[payload[1].result]" expected="OK"
+                    message="wrong result" />
+            </foreach>
+        </munit:validation>
+    </munit:test>
+
+</mule>

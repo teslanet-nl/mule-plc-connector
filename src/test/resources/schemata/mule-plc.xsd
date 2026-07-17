@@ -2,29 +2,27 @@
 <!-- 
 #%L
   Mule PLC Connector Test Utilities
-%%
-  Copyright (C) 2021 - 2025 (teslanet.nl) Rogier Cobben
+  %%
+  Copyright (C) 2021 - 2026 (teslanet.nl) Rogier Cobben
   
   Contributors:
       (teslanet.nl) Rogier Cobben - initial creation
-%%
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+  %%
+  This program and the accompanying materials are made available under the
+  terms of the Eclipse Public License 2.0 which is available at
+  http://www.eclipse.org/legal/epl-2.0.
   
-       http://www.apache.org/licenses/LICENSE-2.0
+  This Source Code may also be made available under the following Secondary
+  Licenses when the conditions for such availability set forth in the Eclipse
+  Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+  with the GNU Classpath Exception which is
+  available at https://www.gnu.org/software/classpath/license.html.
   
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-#L%
+  SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+  #L%
 -->
-
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.teslanet.nl/schema/mule/plc" attributeFormDefault="unqualified" elementFormDefault="qualified">
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
-  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
   <xs:complexType name="nl.teslanet.mule.connectors.plc.api.EventHandler">
     <xs:complexContent>
@@ -56,7 +54,6 @@
             <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
           </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
           <xs:attribute type="mule:expressionLong" use="optional" default="1000" name="timeout">
             <xs:annotation>
               <xs:documentation>The timeout units used for plc communcation.</xs:documentation>
@@ -65,6 +62,11 @@
           <xs:attribute xmlns="http://www.teslanet.nl/schema/mule/plc" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="MILLISECONDS" name="timeoutUnits">
             <xs:annotation>
               <xs:documentation>The timeout units user for plc communcation.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
             </xs:annotation>
           </xs:attribute>
         </xs:extension>
@@ -78,36 +80,12 @@
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
           </xs:sequence>
-          <xs:attribute type="mule:expressionString" use="required" name="connectionString">
-            <xs:annotation>
-              <xs:documentation>The connection string of the plc.</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" default="1" name="concurrentIo">
-            <xs:annotation>
-              <xs:documentation>The number of concurrent IO per connection. The total number of concurrent ping, read, write and (un)subscribe operations is limited to this number. Default is 1, resulting in serialization of all operations on a connection. When negative the number is unlimited.</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentPings">
-            <xs:annotation>
-              <xs:documentation>Number of concurrent ping operations per connection. When negative the number is unlimited.</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentReads">
-            <xs:annotation>
-              <xs:documentation>Number of concurrent reads per connection. When negative the number is unlimited.</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentWrites">
-            <xs:annotation>
-              <xs:documentation>Number of concurrent writes per connection. When negative the number is unlimited.</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentSubscribes">
-            <xs:annotation>
-              <xs:documentation>Number of concurrent subscribe and unsubscribe operations per connection. When negative the number is unlimited.</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="connectionString"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="1" name="concurrentIo"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentPings"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentReads"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentWrites"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="-1" name="concurrentSubscribes"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -123,9 +101,9 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+        <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
@@ -150,7 +128,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="read-fields">
             <xs:annotation>
@@ -163,9 +140,9 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+        <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnIoError">
@@ -216,7 +193,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="subscribe-fields">
             <xs:annotation>
@@ -229,9 +205,9 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+        <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="required" name="eventHandler">
@@ -287,7 +263,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="unsubscribe-fields">
             <xs:annotation>
@@ -300,9 +275,9 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+        <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnIoError">
@@ -313,16 +288,6 @@
         <xs:attribute type="mule:expressionList" use="optional" name="unsubscribeFields">
           <xs:annotation>
             <xs:documentation>The PLC fields to unsubscribe to.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -352,7 +317,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="write-fields">
             <xs:annotation>
@@ -365,9 +329,9 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+        <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="throwExceptionOnIoError">
@@ -420,7 +384,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="required" name="eventHandler">
           <xs:annotation>
@@ -454,3 +417,4 @@
     </xs:union>
   </xs:simpleType>
 </xs:schema>
+

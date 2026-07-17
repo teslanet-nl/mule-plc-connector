@@ -7,7 +7,9 @@ pipeline
     }
     environment
     {
-        MVN_SETTINGS = credentials( 'secret-teslanet-maven-settings.xml' )
+        MVN_SETTINGS = credentials( 'secret-teslanet-maven-settings-2.xml' )
+        MAVEN_GPG_KEY= credentials( 'secret-teslanet-gpg-key' )
+        MAVEN_GPG_PASSPHRASE= credentials( 'secret-teslanet-gpg-passphrase' )
         GNUPGHOME = '/var/lib/jenkins_keys/.gnupg'
     }
     agent
