@@ -7,17 +7,17 @@
  * Contributors:
  *     (teslanet.nl) Rogier Cobben - initial creation
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  * #L%
  */
 package nl.teslanet.mule.connectors.plc.internal;
@@ -25,6 +25,7 @@ package nl.teslanet.mule.connectors.plc.internal;
 
 import org.mule.sdk.api.annotation.param.Optional;
 import org.mule.sdk.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.param.display.Summary;
 
 
 /**
@@ -34,45 +35,54 @@ import org.mule.sdk.api.annotation.param.Parameter;
 public class ConcurrencyParams
 {
     /**
-     * The number of concurrent IO per connection.
+     * The maximum number of concurrent IO per connection.
      * The total number of concurrent ping, read, write and (un)subscribe operations is limited to this number.
      * Default is 1, resulting in serialization of all operations on a connection.
      * When negative the number is unlimited.
      */
     @Parameter
     @Optional( defaultValue= "1" )
+    @Summary(
+                    value= "The maximum number of concurrent IO per connection."
+                        + "\nThe total number of concurrent ping, read, write and (un)subscribe operations is limited to this number."
+                        + "\nDefault is 1, resulting in serialization of all operations on a connection." + "\nWhen negative the number is unlimited."
+    )
     private int concurrentIo;
 
     /**
-     * Number of concurrent ping operations per connection.
+     * The maximum number of concurrent ping operations per connection.
      * When negative the number is unlimited.
      */
     @Parameter
     @Optional( defaultValue= "-1" )
+    @Summary( value= "The maximum number of concurrent ping operations per connection." + "\nWhen negative the number is unlimited." )
     private int concurrentPings;
 
     /**
-     * Number of concurrent reads per connection.
+     * The maximum number of concurrent reads per connection.
      * When negative the number is unlimited.
      */
     @Parameter
     @Optional( defaultValue= "-1" )
+    @Summary( value= "The maximum number of concurrent ping operations per connection." + "\nWhen negative the number is unlimited." )
     private int concurrentReads;
 
     /**
-     * Number of concurrent writes per connection.
+     * The maximum number of concurrent writes per connection.
      * When negative the number is unlimited.
      */
     @Parameter
     @Optional( defaultValue= "-1" )
+    @Summary( value= "The maximum number of concurrent writes per connection." + "\nWhen negative the number is unlimited." )
     private int concurrentWrites;
 
     /**
-     * Number of concurrent subscribe and unsubscribe operations per connection.
+     * The maximum number of concurrent subscribe and unsubscribe operations per connection.
      * When negative the number is unlimited.
      */
     @Parameter
     @Optional( defaultValue= "-1" )
+    @Summary( value= "The maximum number of concurrent subscribe and unsubscribe operations per connection." + "\nWhen negative the number is unlimited." )
     private int concurrentSubscribes;
 
     /**

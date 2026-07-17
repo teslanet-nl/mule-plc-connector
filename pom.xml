@@ -30,12 +30,12 @@ L%
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-java-extension-parent</artifactId>
-        <version>1.12.0</version>
+        <version>1.12.1</version>
     </parent>
     
     <groupId>nl.teslanet.mule.connectors</groupId>
     <artifactId>mule-plc-connector</artifactId>
-    <version>2.0.0-M3-SNAPSHOT</version>
+    <version>2.0.0-RC1-SNAPSHOT</version>
     <packaging>mule-extension</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Mule extension that enables Mule-applications to communicate with PLC systems.</description>
@@ -67,7 +67,7 @@ L%
         <plc4j.version>0.13.1</plc4j.version>
         <slf4jVersion>2.0.18</slf4jVersion>
         <xmlunit.version>2.12.0</xmlunit.version>
-        <junit.version>6.1.0</junit.version>
+        <junit.version>6.1.1</junit.version>
         <min.mule.version>4.9.0</min.mule.version>
         <gpg.keyname>${env.MAVEN_GPG_KEY}</gpg.keyname>
     </properties>
@@ -87,7 +87,7 @@ L%
                 <version>2.7.1</version>
                 <configuration>
                     <projectName>Mule PLC Connector</projectName>
-                    <licenseName>apache_v2</licenseName>
+                    <licenseName>epl_v2</licenseName>
                     <inceptionYear>2021</inceptionYear>
                     <copyrightOwners><![CDATA[(teslanet.nl) Rogier Cobben
 
@@ -103,6 +103,22 @@ Contributors:
                 </configuration>
                 <executions>
                     <execution>
+                        <id>update headers</id>
+                        <phase>none</phase>
+                        <configuration>
+                            <failOnMissingHeader>true</failOnMissingHeader>
+                            <failOnNotUptodateHeader>true</failOnNotUptodateHeader>
+                            <excludes>
+                                <exclude>**/auto-generated-mule-artifact.json</exclude>
+                                <exclude>**/generated/*.java</exclude>
+                                <exclude>**/*.json</exclude>
+                            </excludes>
+                        </configuration>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                    </execution>
+                     <execution>
                         <id>verify headers</id>
                         <phase>compile</phase>
                         <configuration>
@@ -118,7 +134,7 @@ Contributors:
                             <goal>check-file-header</goal>
                         </goals>
                     </execution>
-                </executions>
+               </executions>
                 <dependencies>
                     <dependency>
                         <groupId>org.freemarker</groupId>
@@ -162,26 +178,6 @@ Contributors:
             <plugin>
                 <groupId>com.mulesoft.munit</groupId>
                 <artifactId>munit-extensions-maven-plugin</artifactId>
-                <configuration>
-                    <sharedLibraries>
-                        <sharedLibrary>
-                            <groupId>org.apache.plc4x</groupId>
-                            <artifactId>plc4j-api</artifactId>
-                        </sharedLibrary>
-                        <sharedLibrary>
-                            <groupId>org.apache.plc4x</groupId>
-                            <artifactId>plc4j-spi</artifactId>
-                        </sharedLibrary>
-                        <sharedLibrary>
-                            <groupId>org.apache.plc4x</groupId>
-                            <artifactId>plc4j-driver-simulated</artifactId>
-                        </sharedLibrary>
-                        <sharedLibrary>
-                            <groupId>org.apache.plc4x</groupId>
-                            <artifactId>plc4j-driver-mock</artifactId>
-                        </sharedLibrary>
-                    </sharedLibraries>
-                </configuration>
                 <executions>
                     <execution>
                         <id>default-test</id>
@@ -269,6 +265,12 @@ Contributors:
             <version>${plc4j.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.plc4x</groupId>
+            <artifactId>plc4j-driver-simulated</artifactId>
+            <version>${plc4j.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.20.0</version>
@@ -290,7 +292,7 @@ Contributors:
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j2-impl</artifactId>
-            <version>2.26.0</version>
+            <version>2.26.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -331,44 +333,6 @@ Contributors:
                 <exclusion>
                     <groupId>org.hamcrest</groupId>
                     <artifactId>hamcrest-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>4.3.0</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hamcrest</groupId>
-                    <artifactId>hamcrest</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.plc4x</groupId>
-            <artifactId>plc4j-driver-simulated</artifactId>
-            <version>${plc4j.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.plc4x</groupId>
-            <artifactId>plc4j-driver-mock</artifactId>
-            <version>${plc4j.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hamcrest</groupId>
-                    <artifactId>hamcrest</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hamcrest</groupId>
-                    <artifactId>hamcrest-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hamcrest</groupId>
-                    <artifactId>hamcrest-library</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

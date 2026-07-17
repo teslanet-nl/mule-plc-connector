@@ -1,14 +1,13 @@
 # Mule PLC Connector Release Notes
 ![Mule-PLC logo](icon/icon.svg)
 
-## Release 2.0.0-M1
+## Release 2.0.0
 
-Milestone release.
-
-* Revised response format.
 * Update to PLC4X 0.13.1 .
-* Discontinued support for pre Mule 4.9 versions.
-* Discontinued support for pre Java 17 versions.
+* Revised connector API.
+* Use of Eclipse License
+* Support for Mule 4.9+ versions.
+* Removed support for Java 8 and 11.
 
 ## Release 1.1.2
 
