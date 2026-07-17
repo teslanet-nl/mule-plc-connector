@@ -53,14 +53,9 @@ The connector is installed by adding its Maven dependency to your Mule 4 applica
 When the dependency is added to your application in [AnypointStudio 7](https://en.wikipedia.org/wiki/MuleSoft), the connector will be installed from [Maven Central](). After that the Mule Palette in AnypointStudio will show the connectors operations, ready for use. 
 
 For every PLC protocol needed in your application, the corresponding PLC4X Driver has to be added as dependency.
-For example, to use Modbus and Simulated protocol add the dependencies to the pom:
+For example, to use Modbus add the dependencies to the pom:
  
 ```
-		<dependency>
-			<groupId>org.apache.plc4x</groupId>
-			<artifactId>plc4j-driver-simulated</artifactId>
-			<version>0.13.1</version>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.plc4x</groupId>
 			<artifactId>plc4j-driver-modbus</artifactId>
@@ -75,7 +70,7 @@ See [PLC4X site](https://plc4x.apache.org/users/protocols/) for the the availabl
 Needed PLC4X Drivers have to be added as shared library to the configuration of the Mule Maven Plugin. This way the drivers become 
 available on the classpath of the Mule PLC Connector. 
 
-For example, to use Modbus and Simulated protocol, add the shared library configuration to the pom:
+For example, to use Modbus protocol, add the shared library configuration to the pom:
 
 ```
 	<plugin>
@@ -85,10 +80,6 @@ For example, to use Modbus and Simulated protocol, add the shared library config
 		<extensions>true</extensions>
 		<configuration>
 			<sharedLibraries>
-				<sharedLibrary>
-					<groupId>org.apache.plc4x</groupId>
-					<artifactId>plc4j-driver-simulated</artifactId>
-				</sharedLibrary>
 				<sharedLibrary>
 					<groupId>org.apache.plc4x</groupId>
 					<artifactId>plc4j-driver-modbus</artifactId>
@@ -142,7 +133,9 @@ Ping example:
 Xml configuration:
 
 ```
+
     <plc:ping doc:name="Ping" config-ref="PLC_Config_Simulated" />
+    
 ```
 
 ### Read operation
@@ -165,7 +158,8 @@ Xml configuration:
     </plc:read>
 ```
 
-The result of the read operation is a **FieldValueResponse** list describing the fields and the values read. It contains an entry for every field. Each entry gives the alias, result and the values of the field.
+The result of the read operation is a list of objects describing the fields and the values read.
+Each entry gives the alias, result and the values of the read field.
 Your application can use this response, for example using Dataweave:
 
 ```
